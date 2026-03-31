@@ -1,0 +1,892 @@
+<!DOCTYPE html>
+<html lang="he" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>BrandSync â × ××ª×× ×××ª× â ××¨××£ ×××¡××§××</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Heebo:wght@300;400;500;600;700;800;900&display=swap');
+
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  :root {
+    --bg: #0a0a0f;
+    --surface: #12121a;
+    --surface2: #1a1a2e;
+    --border: #2a2a3e;
+    --accent: #7c3aed;
+    --accent2: #a855f7;
+    --accent-glow: rgba(124, 58, 237, 0.3);
+    --text: #e8e8f0;
+    --text2: #9898b0;
+    --success: #10b981;
+    --warn: #f59e0b;
+  }
+
+  body {
+    font-family: 'Heebo', sans-serif;
+    background: var(--bg);
+    color: var(--text);
+    min-height: 100vh;
+    overflow-x: hidden;
+  }
+
+  /* Animated background */
+  body::before {
+    content: '';
+    position: fixed;
+    top: -50%;
+    left: -50%;
+    width: 200%;
+    height: 200%;
+    background: radial-gradient(circle at 30% 40%, rgba(124, 58, 237, 0.05) 0%, transparent 50%),
+                radial-gradient(circle at 70% 60%, rgba(168, 85, 247, 0.04) 0%, transparent 50%);
+    animation: bgShift 20s ease-in-out infinite alternate;
+    z-index: 0;
+  }
+
+  @keyframes bgShift {
+    0% { transform: translate(0, 0); }
+    100% { transform: translate(5%, -5%); }
+  }
+
+  .container {
+    position: relative;
+    z-index: 1;
+    max-width: 900px;
+    margin: 0 auto;
+    padding: 40px 24px;
+  }
+
+  /* Header */
+  .header {
+    text-align: center;
+    margin-bottom: 48px;
+  }
+
+  .logo {
+    font-size: 14px;
+    font-weight: 600;
+    letter-spacing: 4px;
+    text-transform: uppercase;
+    color: var(--accent2);
+    margin-bottom: 16px;
+  }
+
+  .header h1 {
+    font-size: 42px;
+    font-weight: 900;
+    background: linear-gradient(135deg, #fff, var(--accent2));
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+    margin-bottom: 12px;
+  }
+
+  .header p {
+    color: var(--text2);
+    font-size: 17px;
+    font-weight: 300;
+  }
+
+  /* Input Section */
+  .input-section {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 20px;
+    padding: 36px;
+    margin-bottom: 32px;
+    position: relative;
+    overflow: hidden;
+  }
+
+  .input-section::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 2px;
+    background: linear-gradient(90deg, transparent, var(--accent), transparent);
+  }
+
+  .input-group {
+    margin-bottom: 20px;
+  }
+
+  .input-group label {
+    display: block;
+    font-size: 13px;
+    font-weight: 600;
+    color: var(--text2);
+    margin-bottom: 8px;
+    letter-spacing: 1px;
+    text-transform: uppercase;
+  }
+
+  .input-row {
+    display: flex;
+    gap: 12px;
+    align-items: stretch;
+  }
+
+  .brand-input {
+    flex: 1;
+    background: var(--surface2);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    padding: 16px 20px;
+    font-size: 18px;
+    font-family: 'Heebo', sans-serif;
+    color: var(--text);
+    outline: none;
+    transition: all 0.3s;
+  }
+
+  .brand-input:focus {
+    border-color: var(--accent);
+    box-shadow: 0 0 20px var(--accent-glow);
+  }
+
+  .brand-input::placeholder {
+    color: #555;
+  }
+
+  .api-input {
+    flex: 1;
+    background: var(--surface2);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    padding: 12px 16px;
+    font-size: 14px;
+    font-family: 'Heebo', monospace;
+    color: var(--text);
+    outline: none;
+    transition: all 0.3s;
+    direction: ltr;
+    text-align: left;
+  }
+
+  .api-input:focus {
+    border-color: var(--accent);
+    box-shadow: 0 0 20px var(--accent-glow);
+  }
+
+  .analyze-btn {
+    background: linear-gradient(135deg, var(--accent), var(--accent2));
+    border: none;
+    border-radius: 12px;
+    padding: 16px 36px;
+    font-size: 16px;
+    font-weight: 700;
+    font-family: 'Heebo', sans-serif;
+    color: white;
+    cursor: pointer;
+    transition: all 0.3s;
+    white-space: nowrap;
+  }
+
+  .analyze-btn:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 8px 30px var(--accent-glow);
+  }
+
+  .analyze-btn:active {
+    transform: translateY(0);
+  }
+
+  .analyze-btn:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+    transform: none;
+  }
+
+  .quick-brands {
+    display: flex;
+    gap: 8px;
+    flex-wrap: wrap;
+    margin-top: 16px;
+  }
+
+  .quick-brand {
+    background: var(--surface2);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    padding: 6px 14px;
+    font-size: 13px;
+    font-family: 'Heebo', sans-serif;
+    color: var(--text2);
+    cursor: pointer;
+    transition: all 0.2s;
+  }
+
+  .quick-brand:hover {
+    border-color: var(--accent);
+    color: var(--text);
+    background: rgba(124, 58, 237, 0.1);
+  }
+
+  /* Loading */
+  .loading {
+    text-align: center;
+    padding: 60px 20px;
+    display: none;
+  }
+
+  .loading.active { display: block; }
+
+  .loading-spinner {
+    width: 48px;
+    height: 48px;
+    border: 3px solid var(--border);
+    border-top-color: var(--accent);
+    border-radius: 50%;
+    animation: spin 0.8s linear infinite;
+    margin: 0 auto 20px;
+  }
+
+  @keyframes spin { to { transform: rotate(360deg); } }
+
+  .loading-text {
+    color: var(--text2);
+    font-size: 16px;
+  }
+
+  .loading-steps {
+    margin-top: 20px;
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    align-items: center;
+  }
+
+  .loading-step {
+    font-size: 13px;
+    color: var(--text2);
+    opacity: 0.4;
+    transition: all 0.5s;
+  }
+
+  .loading-step.active {
+    opacity: 1;
+    color: var(--accent2);
+  }
+
+  .loading-step.done {
+    opacity: 0.7;
+    color: var(--success);
+  }
+
+  /* Results */
+  .results {
+    display: none;
+  }
+
+  .results.active { display: block; }
+
+  .result-card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 16px;
+    padding: 28px;
+    margin-bottom: 20px;
+    position: relative;
+    overflow: hidden;
+    animation: fadeUp 0.5s ease-out both;
+  }
+
+  .result-card:nth-child(1) { animation-delay: 0.1s; }
+  .result-card:nth-child(2) { animation-delay: 0.2s; }
+  .result-card:nth-child(3) { animation-delay: 0.3s; }
+  .result-card:nth-child(4) { animation-delay: 0.4s; }
+
+  @keyframes fadeUp {
+    from { opacity: 0; transform: translateY(20px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+
+  .card-header {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    margin-bottom: 20px;
+  }
+
+  .card-icon {
+    width: 40px;
+    height: 40px;
+    border-radius: 10px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 20px;
+  }
+
+  .card-icon.purple { background: rgba(124, 58, 237, 0.15); }
+  .card-icon.blue { background: rgba(59, 130, 246, 0.15); }
+  .card-icon.green { background: rgba(16, 185, 129, 0.15); }
+  .card-icon.orange { background: rgba(245, 158, 11, 0.15); }
+
+  .card-title {
+    font-size: 20px;
+    font-weight: 700;
+  }
+
+  .card-content {
+    color: var(--text2);
+    font-size: 15px;
+    line-height: 1.8;
+  }
+
+  .card-content strong {
+    color: var(--text);
+    font-weight: 600;
+  }
+
+  /* Tags */
+  .tags {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+    margin-top: 12px;
+  }
+
+  .tag {
+    background: var(--surface2);
+    border: 1px solid var(--border);
+    border-radius: 20px;
+    padding: 4px 14px;
+    font-size: 13px;
+    color: var(--accent2);
+  }
+
+  /* Music Brief Special */
+  .music-brief {
+    border-color: var(--accent);
+  }
+
+  .music-brief::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 3px;
+    background: linear-gradient(90deg, var(--accent), var(--accent2), #ec4899);
+  }
+
+  /* Meter bars */
+  .meter {
+    margin: 12px 0;
+  }
+
+  .meter-label {
+    display: flex;
+    justify-content: space-between;
+    font-size: 13px;
+    margin-bottom: 4px;
+  }
+
+  .meter-bar {
+    height: 6px;
+    background: var(--surface2);
+    border-radius: 3px;
+    overflow: hidden;
+  }
+
+  .meter-fill {
+    height: 100%;
+    border-radius: 3px;
+    background: linear-gradient(90deg, var(--accent), var(--accent2));
+    transition: width 1s ease-out;
+  }
+
+  /* Section divider */
+  .section-block {
+    margin-bottom: 16px;
+    padding-bottom: 16px;
+    border-bottom: 1px solid var(--border);
+  }
+
+  .section-block:last-child {
+    border-bottom: none;
+    margin-bottom: 0;
+    padding-bottom: 0;
+  }
+
+  .section-label {
+    font-size: 12px;
+    font-weight: 700;
+    color: var(--accent2);
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    margin-bottom: 6px;
+  }
+
+  /* Export button */
+  .export-bar {
+    display: flex;
+    gap: 12px;
+    margin-top: 24px;
+    justify-content: center;
+  }
+
+  .export-btn {
+    background: var(--surface2);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    padding: 10px 24px;
+    font-size: 14px;
+    font-family: 'Heebo', sans-serif;
+    color: var(--text);
+    cursor: pointer;
+    transition: all 0.2s;
+  }
+
+  .export-btn:hover {
+    border-color: var(--accent);
+    background: rgba(124, 58, 237, 0.1);
+  }
+
+  .new-search-btn {
+    background: linear-gradient(135deg, var(--accent), var(--accent2));
+    border: none;
+    border-radius: 10px;
+    padding: 10px 24px;
+    font-size: 14px;
+    font-weight: 600;
+    font-family: 'Heebo', sans-serif;
+    color: white;
+    cursor: pointer;
+    transition: all 0.2s;
+  }
+
+  .new-search-btn:hover {
+    transform: translateY(-1px);
+    box-shadow: 0 4px 20px var(--accent-glow);
+  }
+
+  /* Error */
+  .error-msg {
+    background: rgba(239, 68, 68, 0.1);
+    border: 1px solid rgba(239, 68, 68, 0.3);
+    border-radius: 12px;
+    padding: 16px 20px;
+    color: #f87171;
+    font-size: 14px;
+    display: none;
+    margin-top: 16px;
+  }
+
+  .error-msg.active { display: block; }
+
+  /* Responsive */
+  @media (max-width: 640px) {
+    .header h1 { font-size: 28px; }
+    .input-row { flex-direction: column; }
+    .container { padding: 24px 16px; }
+    .result-card { padding: 20px; }
+  }
+
+  /* Brand name highlight */
+  .brand-highlight {
+    display: inline-block;
+    background: linear-gradient(135deg, var(--accent), var(--accent2));
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+    font-weight: 800;
+    font-size: 28px;
+    margin-bottom: 8px;
+  }
+</style>
+</head>
+<body>
+
+<div class="container">
+  <!-- Header -->
+  <div class="header">
+    <div class="logo">BrandSync AI</div>
+    <h1>×××ª× â ××¨××£ ×××¡××§××</h1>
+    <p>××× ×©× ×Õ×ª× â ×-AI ×× ×ª× ××ª ××§×× ×××ª××× ×¡×× ×× ×××¡××§×× ×××××§</p>
+  </div>
+
+  <!-- Input -->
+  <div class="input-section">
+    <div class="input-group">
+      <label>OpenAI API Key</label>
+      <input type="password" class="api-input" id="apiKey" placeholder="sk-..." />
+    </div>
+    <div class="input-group">
+      <label>×©× ××Õ×ª×</label>
+      <div class="input-row">
+        <input type="text" class="brand-input" id="brandInput" placeholder="××§×× ×©× ×××ª×..." />
+        <button class="analyze-btn" id="analyzeBtn" onclick="analyze()">× ×ª× ×××ª× â</button>
+      </div>
+    </div>
+    <div class="quick-brands">
+      <button class="quick-brand" onclick="quickFill('×©××¤×¨×¡×')">×©××¤×¨×¡×</button>
+      <button class="quick-brand" onclick="quickFill('×¡××§××')">×¡××§××</button>
+      <button class="quick-brand" onclick="quickFill('Nike')">Nike</button>
+      <button class="quick-brand" onclick="quickFill('Apple')">Apple</button>
+      <button class="quick-brand" onclick="quickFill('Red Bull')">Red Bull</button>
+      <button class="quick-brand" onclick="quickFill('IKEA')">IKEA</button>
+      <button class="quick-brand" onclick="quickFill('×¤×××¤××')">×¤×××¤××</button>
+      <button class="quick-brand" onclick="quickFill('×§×¡××¨×')">×§×¡××¨×</button>
+      <button class="quick-brand" onclick="quickFill('×××××')">×××××</button>
+    </div>
+    <div class="error-msg" id="errorMsg"></div>
+  </div>
+
+  <!-- Loading -->
+  <div class="loading" id="loading">
+    <div class="loading-spinner"></div>
+    <div class="loading-text">×× ×ª× ××ª ××××ª×...</div>
+    <div class="loading-steps">
+      <div class="loading-step" id="step1">ð ×××¡××£ ××××¢ ×¢× ××Õ×ª×</div>
+      <div class="loading-step" id="step2">ð¥ ×××¤×× ×§×× ××¢×</div>
+      <div class="loading-step" id="step3">ð × ××ª×× ×××××¨×¤× ××¤×¡×××××¨×¤×</div>
+      <div class="loading-step" id="step4">ðµ ×× ×××ª ××¨××£ ×××¡××§××</div>
+    </div>
+  </div>
+
+  <!-- Results -->
+  <div class="results" id="results"></div>
+</div>
+
+<script>
+function quickFill(brand) {
+  document.getElementById('brandInput').value = brand;
+  document.getElementById('brandInput').focus();
+}
+
+function showError(msg) {
+  const el = document.getElementById('errorMsg');
+  el.textContent = msg;
+  el.classList.add('active');
+  setTimeout(() => el.classList.remove('active'), 5000);
+}
+
+async function animateSteps() {
+  const steps = ['step1', 'step2', 'step3', 'step4'];
+  for (let i = 0; i < steps.length; i++) {
+    await new Promise(r => setTimeout(r, 1500));
+    if (i > 0) document.getElementById(steps[i - 1]).classList.replace('active', 'done');
+    document.getElementById(steps[i]).classList.add('active');
+  }
+}
+
+async function analyze() {
+  const brand = document.getElementById('brandInput').value.trim();
+  const apiKey = document.getElementById('apiKey').value.trim();
+
+  if (!brand) { showError('××× ×©× ×××ª×'); return; }
+  if (!apiKey) { showError('××× OpenAI API Key'); return; }
+
+  const btn = document.getElementById('analyzeBtn');
+  const loading = document.getElementById('loading');
+  const results = document.getElementById('results');
+
+  btn.disabled = true;
+  results.classList.remove('active');
+  results.innerHTML = '';
+  loading.classList.add('active');
+
+  // Reset steps
+  ['step1','step2','step3','step4'].forEach(s => {
+    document.getElementById(s).classList.remove('active','done');
+  });
+  animateSteps();
+
+  const prompt = `××ª× ××××× ×× ××ª×× ×××ª×××, ×©××××§, ×××××¨×¤×× ××××¡××§×. × ×ª× ××ª ××Õ×ª× "${brand}" ×××××¨ ×ª×©××× ××¤××¨×× JSON ×××× (××× ××§×¡× × ××¡×£, ×¨×§ JSON ×ª×§××).
+
+×××× × ×× ××¨×©:
+{
+  "brandName": "${brand}",
+  "brandSummary": "×ª××××¨ ×§×¦×¨ ×©× ××××ª× ×-2-3 ××©×¤×××",
+  "audience": {
+    "primaryAge": "×××× ×××××× ×¢××§×¨× (×××©×: 25-45)",
+    "secondaryAge": "×××× ×××××× ××©× ×",
+    "gender": "××××§× ××××¨××ª ×××××××",
+    "socioeconomic": "××¢×× ×¡××¦××××§×× ××× (× ×××/××× ×× ×-× ×××/××× ×× ×/××× ×× ×-××××/××××)",
+    "education": "×¨××ª ××©××× ×××¤××¡××ª",
+    "lifestyle": "×ª××××¨ ×××¨× ×××× ×-2-3 ××©×¤×××",
+    "values": ["×¢×¨×1", "×¢×¨×2", "×¢×¨×3", "×¢×¨×4", "×¢×¨×5"],
+    "interests": ["×ª××× ×¢× ××× 1", "×ª××× ×¢× ××× 2", "×ª××× ×¢× ××× 3", "×ª××× ×¢× ××× 4"],
+    "painPoints": ["××× 1", "××× 2", "××× 3"],
+    "mediaConsumption": "×××¤× ××§×× ×¦××¨× ×ª××× (×¨×©×ª××ª ×××¨×ª×××ª, ××××××× ××××³)"
+  },
+  "psychographics": {
+    "personality": "×ª××××¨ ××××©×××ª ××××¤××¡××ª ×©× ××§××",
+    "emotionalDrivers": "×× ×× ××¢ ×××ª× ×¨××©××ª",
+    "brandRelationship": "×× ××§×©×¨ ××¨××©× ×©××× ××Õ×ª×"
+  },
+  "musicBrief": {
+    "primaryGenre": "××³×× ×¨ ×××¡××§×× ×¢××§×¨×",
+    "subGenres": ["×ª×ª-××³×× ×¨ 1", "×ª×ª-××³×× ×¨ 2"],
+    "bpm": "×××× BPM ×××××¥",
+    "mood": "××¦× ×¨×× ×××¡××§××",
+    "energy": 75,
+    "instruments": ["××× × ××× × 1", "××× × ××× × 2", "××× × ××× × 3"],
+    "vocalStyle": "×¡×× ×× ×©××¨× ×××××¥",
+    "productionStyle": "×¡×× ×× ××¤×§× ×××¡××§×××ª",
+    "referenceArtists": ["××× 1", "××× 2", "××× 3"],
+    "referenceTracks": ["×©××¨ 1 - ×××", "×©××¨ 2 - ×××"],
+    "lyricalThemes": ["× ××©× 1", "× ××©× 2", "× ××©× 3"],
+    "avoidElements": ["×× ××××× ×¢ ××× × 1", "×× ××××× ×¢ ××× × 2"],
+    "briefSummary": "×¤×¡×§× ×©× 3-4 ××©×¤××× ×©××¡×××ª ××ª ×××¨××£ ××××¡××§×× ×××× â ×× ××¡××× ×, ××× ××× ××ª×××, ××× ××× ××××¨ ×××¨×× ××§×× ×××¨×××©"
+  }
+}
+
+××©××: ××××¨ JSON ××××. ××× markdown, ××× backticks, ××× ××¡××¨××. ×¨×§ ××××××§× JSON ×ª×§××.`;
+
+  try {
+    const response = await fetch('https://api.openai.com/v1/chat/completions', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': `Bearer ${apiKey}`
+      },
+      body: JSON.stringify({
+        model: 'gpt-4o',
+        max_tokens: 4000,
+        response_format: { type: 'json_object' },
+        messages: [
+          { role: 'system', content: '××ª× ××××× ×× ××ª×× ×××ª×××, ×©××××§, ×××××¨×¤×× ××××¡××§×. ×ª××× ×××××¨ JSON ×ª×§×× ××××.' },
+          { role: 'user', content: prompt }
+        ]
+      })
+    });
+
+    if (!response.ok) {
+      const err = await response.json();
+      throw new Error(err.error?.message || 'API Error');
+    }
+
+    const data = await response.json();
+    const text = data.choices[0].message.content;
+
+    // Parse JSON - handle potential markdown wrapping
+    let json;
+    try {
+      json = JSON.parse(text);
+    } catch {
+      const match = text.match(/\{[\s\S]*\}/);
+      if (match) json = JSON.parse(match[0]);
+      else throw new Error('×ª×©××× ×× ×ª×§×× × ××-AI');
+    }
+
+    loading.classList.remove('active');
+    renderResults(json);
+
+  } catch (err) {
+    loading.classList.remove('active');
+    showError('×©××××: ' + err.message);
+  }
+
+  btn.disabled = false;
+}
+
+function renderResults(d) {
+  const results = document.getElementById('results');
+  const a = d.audience;
+  const p = d.psychographics;
+  const m = d.musicBrief;
+
+  results.innerHTML = `
+    <!-- Brand Overview -->
+    <div class="result-card">
+      <div class="brand-highlight">${d.brandName}</div>
+      <div class="card-content">${d.brandSummary}</div>
+    </div>
+
+    <!-- Audience Profile -->
+    <div class="result-card">
+      <div class="card-header">
+        <div class="card-icon purple">ð¥</div>
+        <div class="card-title">×¤×¨××¤×× ×§×× ××¢×</div>
+      </div>
+      <div class="card-content">
+        <div class="section-block">
+          <div class="section-label">×××××¨×¤××</div>
+          <strong>××× ×¢××§×¨×:</strong> ${a.primaryAge} &nbsp;|&nbsp; <strong>××× ××©× ×:</strong> ${a.secondaryAge}<br>
+          <strong>××××¨:</strong> ${a.gender}<br>
+          <strong>××¢×× ×¡××¦××××§×× ×××:</strong> ${a.socioeconomic}<br>
+          <strong>××©×××:</strong> ${a.education}
+        </div>
+        <div class="section-block">
+          <div class="section-label">×××¨× ××××</div>
+          ${a.lifestyle}
+        </div>
+        <div class="section-block">
+          <div class="section-label">×¦×¨×××ª ××××</div>
+          ${a.mediaConsumption}
+        </div>
+        <div class="section-block">
+          <div class="section-label">×¢×¨×××</div>
+          <div class="tags">${a.values.map(v => `<span class="tag">${v}</span>`).join('')}</div>
+        </div>
+        <div class="section-block">
+          <div class="section-label">×ª×××× ×¢× ×××</div>
+          <div class="tags">${a.interests.map(v => `<span class="tag">${v}</span>`).join('')}</div>
+        </div>
+        <div class="section-block">
+          <div class="section-label">× ×§××××ª ×××</div>
+          <div class="tags">${a.painPoints.map(v => `<span class="tag">${v}</span>`).join('')}</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Psychographics -->
+    <div class="result-card">
+      <div class="card-header">
+        <div class="card-icon blue">ð§ </div>
+        <div class="card-title">×¤×¨××¤×× ×¤×¡×××××¨×¤×</div>
+      </div>
+      <div class="card-content">
+        <div class="section-block">
+          <div class="section-label">×××©×××ª</div>
+          ${p.personality}
+        </div>
+        <div class="section-block">
+          <div class="section-label">×× ××¢×× ×¨××©×××</div>
+          ${p.emotionalDrivers}
+        </div>
+        <div class="section-block">
+          <div class="section-label">×§×©×¨ ×¨××©× ××××ª×</div>
+          ${p.brandRelationship}
+        </div>
+      </div>
+    </div>
+
+    <!-- Music Brief -->
+    <div class="result-card music-brief">
+      <div class="card-header">
+        <div class="card-icon orange">ðµ</div>
+        <div class="card-title">××¨××£ ×××¡××§××</div>
+      </div>
+      <div class="card-content">
+        <div class="section-block">
+          <div class="section-label">××³×× ×¨ ×××¦× ×¨××</div>
+          <strong>××³×× ×¨ ×¢××§×¨×:</strong> ${m.primaryGenre}<br>
+          <strong>×ª×ª-××³×× ×¨××:</strong> ${m.subGenres.join(', ')}<br>
+          <strong>××¦× ×¨××:</strong> ${m.mood}<br>
+          <strong>BPM:</strong> ${m.bpm}
+        </div>
+
+        <div class="section-block">
+          <div class="section-label">×× ×¨×××</div>
+          <div class="meter">
+            <div class="meter-label">
+              <span>× ××××</span>
+              <span>${m.energy}%</span>
+              <span>×××××</span>
+            </div>
+            <div class="meter-bar">
+              <div class="meter-fill" style="width: ${m.energy}%"></div>
+            </div>
+          </div>
+        </div>
+
+        <div class="section-block">
+          <div class="section-label">×¡×× ×× ××¤×§× ××©××¨×</div>
+          <strong>×¡×× ×× ××¤×§×:</strong> ${m.productionStyle}<br>
+          <strong>×¡×× ×× ×©××¨×:</strong> ${m.vocalStyle}
+        </div>
+
+        <div class="section-block">
+          <div class="section-label">××× × ××× ×</div>
+          <div class="tags">${m.instruments.map(v => `<span class="tag">${v}</span>`).join('')}</div>
+        </div>
+
+        <div class="section-block">
+          <div class="section-label">××× ×× ××©××¨×× ××¨×¤×¨× ×¡</div>
+          <strong>××× ××:</strong> ${m.referenceArtists.join(' Â· ')}<br>
+          <strong>×©××¨××:</strong> ${m.referenceTracks.join(' Â· ')}
+        </div>
+
+        <div class="section-block">
+          <div class="section-label">× ××©××× ×××§×¡×××</div>
+          <div class="tags">${m.lyricalThemes.map(v => `<span class="tag">${v}</span>`).join('')}</div>
+        </div>
+
+        <div class="section-block">
+          <div class="section-label">×× ××××× ×¢ ××× ×</div>
+          <div class="tags">${m.avoidElements.map(v => `<span class="tag" style="border-color: rgba(239,68,68,0.3); color: #f87171;">${v}</span>`).join('')}</div>
+        </div>
+
+        <div class="section-block">
+          <div class="section-label">×¡×××× ×××¨××£</div>
+          <div style="background: var(--surface2); border-radius: 10px; padding: 16px; margin-top: 8px; font-size: 15px; line-height: 1.9;">
+            ${m.briefSummary}
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Actions -->
+    <div class="export-bar">
+      <button class="export-btn" onclick="exportJSON()">×××¦×× JSON</button>
+      <button class="export-btn" onclick="copyBrief()">××¢×ª×§ ××¨××£</button>
+      <button class="new-search-btn" onclick="newSearch()">× ××ª×× ×××ª× ×××© â</button>
+    </div>
+  `;
+
+  results.classList.add('active');
+
+  // Store for export
+  window._lastResult = d;
+}
+
+function exportJSON() {
+  if (!window._lastResult) return;
+  const blob = new Blob([JSON.stringify(window._lastResult, null, 2)], { type: 'application/json' });
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  a.href = url;
+  a.download = `brand-analysis-${window._lastResult.brandName}.json`;
+  a.click();
+  URL.revokeObjectURL(url);
+}
+
+function copyBrief() {
+  if (!window._lastResult) return;
+  const m = window._lastResult.musicBrief;
+  const text = `ðµ ××¨××£ ×××¡××§×× â ${window._lastResult.brandName}
+
+××³×× ×¨: ${m.primaryGenre} (${m.subGenres.join(', ')})
+BPM: ${m.bpm}
+××¦× ×¨××: ${m.mood}
+×× ×¨×××: ${m.energy}%
+×¡×× ×× ××¤×§×: ${m.productionStyle}
+×¡×× ×× ×©××¨×: ${m.vocalStyle}
+××× × ××× ×: ${m.instruments.join(', ')}
+××× ×× ××¨×¤×¨× ×¡: ${m.referenceArtists.join(', ')}
+×©××¨×× ××¨×¤×¨× ×¡: ${m.referenceTracks.join(', ')}
+× ××©××× ×××§×¡×××: ${m.lyricalThemes.join(', ')}
+×× ××××× ×¢ ××× ×: ${m.avoidElements.join(', ')}
+
+${m.briefSummary}`;
+
+  navigator.clipboard.writeText(text).then(() => {
+    const btns = document.querySelectorAll('.export-btn');
+    btns[1].textContent = 'â ×××¢×ª×§!';
+    setTimeout(() => btns[1].textContent = '××¢×ª×§ ××¨××£', 2000);
+  });
+}
+
+function newSearch() {
+  document.getElementById('results').classList.remove('active');
+  document.getElementById('results').innerHTML = '';
+  document.getElementById('brandInput').value = '';
+  document.getElementById('brandInput').focus();
+}
+
+// Enter key
+document.getElementById('brandInput').addEventListener('keydown', e => {
+  if (e.key === 'Enter') analyze();
+});
+</script>
+
+</body>
+</html>
