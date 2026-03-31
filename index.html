@@ -959,37 +959,10 @@ Required JSON structure:
     "lyricalThemes": ["נושא1", "נושא2", "נושא3"],
     "avoidElements": ["להימנע1", "להימנע2"],
     "briefSummary": "סיכום בריף מוסיקלי ב-3-4 משפטים"
-  },
-  "soundGeneration": {
-    "mainTrack": {
-      "prompt": "A precise, copy-paste-ready prompt for Suno/MusicAI. Include: genre, BPM, key, instruments, mood, structure (intro/verse/chorus/drop/outro), production style, vocal direction, and reference artists/styles. Write it like a real producer brief. Must be 4-8 lines, highly specific, no vague language.",
-      "why": "הסבר בעברית למה הסאונד הזה מתאים למותג — 2-3 משפטים"
-    },
-    "socialLoop": {
-      "prompt": "A prompt for a 5-10 second social media loop (TikTok/Reels). Must be: highly addictive, instant hook within first second, catchy rhythm, designed to make people stop scrolling. Include specific BPM, genre elements, and sonic texture. Write like a producer giving instructions.",
-      "why": "הסבר בעברית למה הלופ הזה יעבוד ברשתות — 2-3 משפטים"
-    },
-    "jingle": {
-      "prompt": "A prompt for a brand jingle. Must be: catchy, memorable, hummable after one listen, repeatable. Include melodic direction, tempo, key, instrumentation, and suggested vocal hook syllables or melody description. Think Intel, McDonald's, Netflix level.",
-      "why": "הסבר בעברית למה הג׳ינגל הזה יהיה בלתי נשכח — 2-3 משפטים"
-    },
-    "voice": {
-      "prompt": "A prompt for ElevenLabs/Voice AI to generate the brand narrator voice. Include: tone (warm/authoritative/playful etc), delivery style (conversational/cinematic/energetic), emotion, pacing (slow/medium/fast), pitch range, accent preference, breathing style. End with an example sentence the voice should read.",
-      "why": "הסבר בעברית למה הקול הזה מייצג את המותג — 2-3 משפטים"
-    },
-    "audioLogo": {
-      "prompt": "A prompt for a 1-2 second audio logo / signature sound. Must be: instantly recognizable, distinct, works on any platform (TV/app/podcast). Describe the exact sonic elements — what happens in each fraction of a second. Think Netflix 'ta-dum', Intel chime, HBO static.",
-      "why": "הסבר בעברית למה הסאונד לוגו הזה ייחרט בזיכרון — 2-3 משפטים"
-    }
   }
 }
 
-CRITICAL RULES:
-- All "prompt" fields must be in ENGLISH, ready to copy-paste into Suno/ElevenLabs/AI tools
-- All "why" fields must be in HEBREW
-- Prompts must sound like a professional producer wrote them — specific, technical, no filler words
-- Each prompt must be ACTIONABLE (usable as-is, no editing needed)
-- Return valid JSON only. No markdown, no backticks, no explanations outside the JSON.`;
+CRITICAL: Return valid JSON only. No markdown, no backticks, no explanations outside the JSON. All text in Hebrew.`;
 
   try {
     const response = await fetch('https://api.openai.com/v1/chat/completions', {
@@ -1000,7 +973,7 @@ CRITICAL RULES:
       },
       body: JSON.stringify({
         model: 'gpt-4o',
-        max_tokens: 7000,
+        max_tokens: 4000,
         response_format: { type: 'json_object' },
         messages: [
           { role: 'system', content: 'You are a world-class brand strategist, music producer, and sound designer. You analyze brands and create actionable audio identities. Always return valid JSON only. Write prompts in English, descriptions in Hebrew.' },
@@ -1043,7 +1016,6 @@ function renderResults(d) {
   const a = d.audience;
   const p = d.psychographics;
   const m = d.musicBrief;
-  const sg = d.soundGeneration || {};
 
   results.innerHTML = `
     <!-- Brand Overview -->
@@ -1176,48 +1148,10 @@ function renderResults(d) {
       </div>
     </div>
 
-    <!-- Sound Generation -->
-    ${d.soundGeneration ? `
-    <div class="result-card sound-gen-card">
-      <div class="card-header">
-        <div class="card-icon" style="background: rgba(16,185,129,0.15);">🔊</div>
-        <div class="card-title">Sound Generation — פרומפטים מוכנים לשימוש</div>
-      </div>
-      <div class="card-content">
-        <div class="section-block">
-          <div class="section-label">🎵 Main Brand Track (Suno / Music AI)</div>
-          <div class="prompt-box"><button class="copy-prompt" onclick="copyText(this)">העתק</button>${sg.mainTrack.prompt}</div>
-          <div class="prompt-why"><strong>למה זה עובד:</strong> ${sg.mainTrack.why}</div>
-        </div>
-        <div class="section-block">
-          <div class="section-label">📱 Short Social Loop (TikTok / Reels)</div>
-          <div class="prompt-box"><button class="copy-prompt" onclick="copyText(this)">העתק</button>${sg.socialLoop.prompt}</div>
-          <div class="prompt-why"><strong>למה זה עובד:</strong> ${sg.socialLoop.why}</div>
-        </div>
-        <div class="section-block">
-          <div class="section-label">🔔 Brand Jingle</div>
-          <div class="prompt-box"><button class="copy-prompt" onclick="copyText(this)">העתק</button>${sg.jingle.prompt}</div>
-          <div class="prompt-why"><strong>למה זה עובד:</strong> ${sg.jingle.why}</div>
-        </div>
-        <div class="section-block">
-          <div class="section-label">🎙️ Brand Voice (ElevenLabs / Voice AI)</div>
-          <div class="prompt-box"><button class="copy-prompt" onclick="copyText(this)">העתק</button>${sg.voice.prompt}</div>
-          <div class="prompt-why"><strong>למה זה עובד:</strong> ${sg.voice.why}</div>
-        </div>
-        <div class="section-block">
-          <div class="section-label">⚡ Audio Logo / Signature Sound</div>
-          <div class="prompt-box"><button class="copy-prompt" onclick="copyText(this)">העתק</button>${sg.audioLogo.prompt}</div>
-          <div class="prompt-why"><strong>למה זה עובד:</strong> ${sg.audioLogo.why}</div>
-        </div>
-      </div>
-    </div>
-    ` : ''}
-
     <!-- Actions -->
     <div class="export-bar">
       <button class="export-btn" onclick="exportJSON()">ייצוא JSON</button>
       <button class="export-btn" onclick="copyBrief()">העתק בריף</button>
-      <button class="export-btn" onclick="copyAllPrompts()">העתק כל הפרומפטים</button>
       <button class="new-search-btn" onclick="newSearch()">ניתוח מותג חדש →</button>
     </div>
   `;
@@ -1262,42 +1196,6 @@ ${m.briefSummary}`;
     const btns = document.querySelectorAll('.export-btn');
     btns[1].textContent = '✓ הועתק!';
     setTimeout(() => btns[1].textContent = 'העתק בריף', 2000);
-  });
-}
-
-function copyText(btn) {
-  const box = btn.parentElement;
-  const text = box.textContent.replace('העתק', '').trim();
-  navigator.clipboard.writeText(text).then(() => {
-    btn.textContent = '✓';
-    setTimeout(() => btn.textContent = 'העתק', 1500);
-  });
-}
-
-function copyAllPrompts() {
-  if (!window._lastResult || !window._lastResult.soundGeneration) return;
-  const sg = window._lastResult.soundGeneration;
-  const brand = window._lastResult.brandName;
-  const text = `=== SOUND GENERATION PROMPTS — ${brand} ===
-
-🎵 MAIN BRAND TRACK (Suno):
-${sg.mainTrack.prompt}
-
-📱 SHORT SOCIAL LOOP (TikTok/Reels):
-${sg.socialLoop.prompt}
-
-🔔 BRAND JINGLE:
-${sg.jingle.prompt}
-
-🎙️ BRAND VOICE (ElevenLabs):
-${sg.voice.prompt}
-
-⚡ AUDIO LOGO:
-${sg.audioLogo.prompt}`;
-  navigator.clipboard.writeText(text).then(() => {
-    const btns = document.querySelectorAll('.export-btn');
-    btns[2].textContent = '✓ הועתק!';
-    setTimeout(() => btns[2].textContent = 'העתק כל הפרומפטים', 2000);
   });
 }
 
