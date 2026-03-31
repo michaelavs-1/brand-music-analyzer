@@ -712,9 +712,117 @@
     background: linear-gradient(90deg, #10b981, var(--accent), var(--accent2), #e8d5a0);
   }
 
-  .result-card:nth-child(5) { animation-delay: 0.5s; }
-  .result-card:nth-child(6) { animation-delay: 0.6s; }
+  /* Tabs navigation */
+  .tabs-nav {
+    display: flex;
+    gap: 6px;
+    margin-bottom: 24px;
+    flex-wrap: wrap;
+  }
+
+  .tab-btn {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    padding: 8px 16px;
+    font-size: 13px;
+    font-family: 'Heebo', sans-serif;
+    font-weight: 600;
+    color: var(--text2);
+    cursor: pointer;
+    transition: all 0.2s;
+    white-space: nowrap;
+  }
+
+  .tab-btn:hover { border-color: var(--accent); color: var(--text); }
+
+  .tab-btn.active {
+    background: var(--accent);
+    border-color: var(--accent);
+    color: #000;
+  }
+
+  .tab-panel { display: none; }
+  .tab-panel.active { display: block; }
+
+  /* Accordion */
+  .accordion {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 14px;
+    margin-bottom: 12px;
+    overflow: hidden;
+  }
+
+  .accordion-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 18px 22px;
+    cursor: pointer;
+    user-select: none;
+    transition: background 0.2s;
+  }
+
+  .accordion-header:hover { background: var(--surface2); }
+
+  .accordion-title {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    font-size: 16px;
+    font-weight: 700;
+  }
+
+  .accordion-arrow {
+    font-size: 12px;
+    color: var(--text2);
+    transition: transform 0.3s;
+  }
+
+  .accordion.open .accordion-arrow { transform: rotate(180deg); }
+
+  .accordion-body {
+    display: none;
+    padding: 0 22px 22px;
+    border-top: 1px solid var(--border);
+  }
+
+  .accordion.open .accordion-body { display: block; }
+
+  /* Reasoning block */
+  .prompt-why {
+    background: rgba(200,164,78,0.07);
+    border-right: 3px solid var(--accent);
+    border-radius: 0 8px 8px 0;
+    padding: 10px 14px;
+    margin-top: 8px;
+    margin-bottom: 4px;
+    font-size: 13.5px;
+    line-height: 1.8;
+    color: var(--text2);
+  }
+
+  .prompt-why strong { color: var(--accent2); }
+
+  /* Export PDF btn */
+  .export-pdf-btn {
+    background: linear-gradient(135deg, var(--accent), var(--accent2));
+    border: none;
+    border-radius: 10px;
+    padding: 10px 24px;
+    font-size: 14px;
+    font-weight: 700;
+    font-family: 'Heebo', sans-serif;
+    color: #000;
+    cursor: pointer;
+    transition: all 0.2s;
+  }
+
+  .export-pdf-btn:hover { transform: translateY(-1px); box-shadow: 0 4px 20px var(--accent-glow); }
+
 </style>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
 </head>
 <body>
 
@@ -757,17 +865,6 @@
         <input type="text" class="brand-input" id="brandInput" placeholder="הקלד שם מותג..." />
         <button class="analyze-btn" id="analyzeBtn" onclick="analyze()">נתח מותג ←</button>
       </div>
-    </div>
-    <div class="quick-brands">
-      <button class="quick-brand" onclick="quickFill('שופרסל')">שופרסל</button>
-      <button class="quick-brand" onclick="quickFill('סלקום')">סלקום</button>
-      <button class="quick-brand" onclick="quickFill('Nike')">Nike</button>
-      <button class="quick-brand" onclick="quickFill('Apple')">Apple</button>
-      <button class="quick-brand" onclick="quickFill('Red Bull')">Red Bull</button>
-      <button class="quick-brand" onclick="quickFill('IKEA')">IKEA</button>
-      <button class="quick-brand" onclick="quickFill('פלאפון')">פלאפון</button>
-      <button class="quick-brand" onclick="quickFill('קסטרו')">קסטרו</button>
-      <button class="quick-brand" onclick="quickFill('אלביט')">אלביט</button>
     </div>
     <div class="error-msg" id="errorMsg"></div>
   </div>
@@ -920,92 +1017,162 @@ async function analyze() {
   });
   animateSteps();
 
-  const prompt = `You are a world-class brand strategist, music producer, and sound designer. Analyze the brand "${brand}".
+  const prompt = `אתה אסטרטג מותגים, מפיק מוסיקלי ומעצב סאונד ברמה עולמית. עליך לנתח את המותג "${brand}" לעומק.
 
-CRITICAL RULE — REASONING IS MANDATORY:
-Every single conclusion you make MUST be accompanied by a "reasoning" field that explains the FULL thought process that led to that conclusion. Not just the answer — the WHY behind it. What data, logic, cultural context, or market insight led you there. This is the most important part of the entire output.
+חשוב בשלבים לפני כל מסקנה:
+1. מה אתה יודע על המותג — קטגוריה, היסטוריה, מיצוב, קהל, מתחרים
+2. מה זה אומר על הקהל — מי הם, מה מניע אותם, מה הם מחפשים
+3. מה זה אומר על הסאונד — איזה מוסיקה מדברת לקהל הזה ומייצגת את המותג הזה
+4. רק אז — הסק מסקנות
 
-All text must be in Hebrew.
+כלל ברזל: כל שדה מסקנה מלווה בנימוק מפורט. לא רק מה — אלא כל תהליך החשיבה שהוביל לשם.
 
-Required JSON structure:
+החזר JSON בלבד, הכל בעברית:
 {
   "brandName": "${brand}",
+  "brandArchetype": {
+    "primary": "ארכיטיפ ראשי (Hero / Rebel / Caregiver / Sage / Creator / Ruler / Innocent / Explorer / Jester / Lover / Everyman / Magician)",
+    "secondary": "ארכיטיפ משני",
+    "archetypeReasoning": "למה הארכיטיפ הזה? מה בערכי המותג, בשפה שלו, במסרים, ובהתנהגות בשוק מצביע על הזהות הזו? איך הארכיטיפ הזה מתבטא ספציפית ב-${brand}?",
+    "sonicImplication": "מה הארכיטיפ הזה אומר על הסאונד — איזה מוסיקה מתאימה ל-Hero לעומת Rebel לעומת Caregiver?"
+  },
   "brandSummary": "תיאור המותג ב-2-3 משפטים",
-  "brandSummaryReasoning": "הסבר מלא: מה הבסיס לתיאור הזה? אילו מאפיינים של המותג הובילו לסיכום הזה? מה הDNA של המותג?",
+  "brandSummaryReasoning": "מה הבסיס לתיאור הזה? אילו מאפיינים מרכזיים של המותג הובילו לסיכום הזה?",
   "audience": {
-    "primaryAge": "טווח גילאים עיקרי (למשל: 25-45)",
-    "primaryAgeReasoning": "למה דווקא הטווח הזה? מה במוצר/שירות/מיצוב של המותג מושך את הגיל הזה? אילו נתוני שוק או התנהגות צרכנית תומכים בזה?",
+    "primaryAge": "טווח גילאים עיקרי",
+    "primaryAgeReasoning": "למה הטווח הזה? מה במוצר, במיצוב ובמסרים מושך את הגיל הזה?",
     "secondaryAge": "טווח גילאים משני",
-    "secondaryAgeReasoning": "למה יש קהל משני בגילאים האלה? מה מושך אותם למותג למרות שהם לא הליבה?",
+    "secondaryAgeReasoning": "מה מושך את הקהל הזה למרות שאינו הליבה?",
     "gender": "חלוקה מגדרית באחוזים",
-    "genderReasoning": "למה החלוקה הזו? מה בקטגוריה, במסרים, או באסטרטגיית המותג יוצר את ההטיה הזו?",
+    "genderReasoning": "מה בקטגוריה, במסרים ובאסטרטגיה יוצר את ההטיה הזו?",
     "socioeconomic": "מעמד סוציואקונומי",
-    "socioeconomicReasoning": "מה בתמחור, במיצוב, בערוצי ההפצה או בשפה של המותג מגדיר את המעמד הזה?",
+    "socioeconomicReasoning": "מה בתמחור, במיצוב ובשפה של המותג מגדיר את המעמד הזה?",
     "education": "רמת השכלה טיפוסית",
     "lifestyle": "תיאור אורח חיים ב-2-3 משפטים",
-    "lifestyleReasoning": "איך הגעת למסקנה הזו? מה בערכי המותג, בפרסום שלו, או בקהל שלו מצביע על אורח החיים הזה?",
+    "lifestyleReasoning": "מה בערכי המותג ובפרסום שלו מצביע על אורח החיים הזה?",
     "values": ["ערך1", "ערך2", "ערך3", "ערך4", "ערך5"],
-    "valuesReasoning": "למה דווקא הערכים האלה? איך הם משתקפים במסרים, בפעילות, או בזהות של המותג?",
+    "valuesReasoning": "למה הערכים האלה? איך הם משתקפים בזהות המותג?",
     "interests": ["תחום1", "תחום2", "תחום3", "תחום4"],
-    "interestsReasoning": "מה הקשר בין תחומי העניין האלה למותג? איך הם נגזרים מהפרופיל שבנית?",
+    "interestsReasoning": "מה הקשר בין תחומי העניין האלה לפרופיל שבנית?",
     "painPoints": ["כאב1", "כאב2", "כאב3"],
-    "painPointsReasoning": "למה אלה הכאבים המרכזיים? איך המותג פותר או מתייחס אליהם?",
+    "painPointsReasoning": "למה אלה הכאבים? איך המותג פותר אותם?",
     "mediaConsumption": "צריכת מדיה",
-    "mediaConsumptionReasoning": "למה דווקא הערוצים האלה? מה בגיל, באורח החיים, ובהרגלים של הקהל מוביל לצריכת המדיה הזו?"
+    "mediaConsumptionReasoning": "מה בגיל ובאורח החיים מוביל לצריכת המדיה הזו?"
   },
   "psychographics": {
-    "personality": "תיאור האישיות הטיפוסית של הקהל",
-    "personalityReasoning": "איך הגעת לפרופיל האישיות הזה? מה במותג מושך אנשים עם התכונות האלה?",
+    "personality": "תיאור האישיות הטיפוסית",
+    "personalityReasoning": "מה במותג מושך אנשים עם האישיות הזו?",
     "emotionalDrivers": "מה מניע אותם רגשית",
-    "emotionalDriversReasoning": "למה דווקא המניעים האלה? מה בקשר שלהם למותג חושף את הצרכים הרגשיים האלה?",
+    "emotionalDriversReasoning": "מה בקשר למותג חושף את הצרכים הרגשיים האלה?",
     "brandRelationship": "מה הקשר הרגשי שלהם למותג",
-    "brandRelationshipReasoning": "מה יוצר את הקשר הרגשי הזה? אילו חוויות, זיכרונות, או אסוציאציות בונים אותו?"
+    "brandRelationshipReasoning": "מה יוצר את הקשר הזה? אילו חוויות ואסוציאציות בונים אותו?"
   },
+  "sonicCompetitiveMap": {
+    "mainCompetitors": ["מתחרה1", "מתחרה2", "מתחרה3"],
+    "competitorsSonicDescription": "איך המתחרים נשמעים היום — מה הסאונד הרווח בקטגוריה?",
+    "whiteSpace": "מה החלל הפנוי — איזה סאונד לא תפוס בקטגוריה שבו ${brand} יכול להיות ייחודי?",
+    "whiteSpaceReasoning": "למה החלל הזה פנוי? מה יאפשר ל-${brand} לתפוס אותו? מה הסיכון ומה ההזדמנות?",
+    "differentiationStrategy": "כיצד הסאונד של ${brand} צריך להיות שונה ממתחריו — מה יזכיר אותו מיד?"
+  },
+  "emotionalJourney": [
+    {
+      "stage": "Awareness — חשיפה ראשונה",
+      "emotionGoal": "איזו תחושה צריך הצרכן להרגיש בפגישה הראשונה עם המותג?",
+      "musicDirection": "איזו מוסיקה תייצר את התחושה הזו?",
+      "reasoning": "למה המוסיקה הזו מתאימה לשלב הזה ספציפית?"
+    },
+    {
+      "stage": "Consideration — שלב השקילה",
+      "emotionGoal": "מה צריך המוסיקה לגרום לו להרגיש כדי שיבחר ב-${brand}?",
+      "musicDirection": "סגנון מוסיקלי לשלב הזה",
+      "reasoning": "למה?"
+    },
+    {
+      "stage": "Purchase — רגע הרכישה",
+      "emotionGoal": "איזו תחושה תאמת שהוא קיבל את ההחלטה הנכונה?",
+      "musicDirection": "סגנון מוסיקלי לרגע הזה",
+      "reasoning": "למה?"
+    },
+    {
+      "stage": "Loyalty — לקוח קבוע",
+      "emotionGoal": "מה שומר אותו קשור למותג לאורך זמן?",
+      "musicDirection": "סגנון מוסיקלי לשימור",
+      "reasoning": "למה?"
+    }
+  ],
+  "touchpointMap": [
+    {
+      "touchpoint": "פרסומת טלוויזיה / וידאו",
+      "musicStyle": "סגנון מוסיקלי מומלץ",
+      "reasoning": "למה הסגנון הזה מתאים לפרסומת? מה הוא צריך לעשות בתוך 30 שניות?"
+    },
+    {
+      "touchpoint": "רשתות חברתיות / TikTok / Reels",
+      "musicStyle": "סגנון מוסיקלי מומלץ",
+      "reasoning": "מה ההבדל מפרסומת? למה הסאונד הזה מנצח בפיד?"
+    },
+    {
+      "touchpoint": "חנות / נקודת מכירה",
+      "musicStyle": "סגנון מוסיקלי מומלץ",
+      "reasoning": "מה הסאונד אמור לעשות בחנות? איך הוא משפיע על זמן שהייה ורכישה?"
+    },
+    {
+      "touchpoint": "אפליקציה / דיגיטל",
+      "musicStyle": "סגנון מוסיקלי מומלץ",
+      "reasoning": "מה ההתנהגות הדיגיטלית של הקהל? איזה סאונד מתאים לחוויית UI?"
+    },
+    {
+      "touchpoint": "אירועים / פופ-אפ",
+      "musicStyle": "סגנון מוסיקלי מומלץ",
+      "reasoning": "מה הסאונד צריך לייצר בחוויה לייב?"
+    }
+  ],
   "musicBrief": {
     "primaryGenre": "ז׳אנר מוסיקלי עיקרי",
-    "primaryGenreReasoning": "למה דווקא הז׳אנר הזה? איך הוא מתחבר לאישיות המותג, לקהל היעד, ולמצב הרוח שהמותג רוצה ליצור?",
+    "primaryGenreReasoning": "למה הז׳אנר הזה? איך הוא נגזר מהארכיטיפ, מהקהל, ומהמיצוב התחרותי?",
     "subGenres": ["תת-ז׳אנר1", "תת-ז׳אנר2"],
     "bpm": "טווח BPM מומלץ",
-    "bpmReasoning": "למה הטמפו הזה? מה באנרגיה של המותג, בהקשר השימוש, ובציפיות הקהל מצדיק את ה-BPM הזה?",
+    "bpmReasoning": "למה הטמפו הזה? מה באנרגיה של המותג ובציפיות הקהל מצדיק אותו?",
     "mood": "מצב רוח מוסיקלי",
     "moodReasoning": "למה מצב הרוח הזה? איך הוא משקף את החוויה שהמותג רוצה ליצור?",
     "energy": 75,
-    "energyReasoning": "למה רמת האנרגיה הזו? מה במותג, בקהל, ובהקשר השימוש קובע את העוצמה?",
+    "energyReasoning": "למה רמת האנרגיה הזו? מה בקהל ובהקשר השימוש קובע את העוצמה?",
     "instruments": ["כלי1", "כלי2", "כלי3"],
-    "instrumentsReasoning": "למה הכלים האלה? מה בצליל שלהם מתחבר לאופי המותג?",
+    "instrumentsReasoning": "למה הכלים האלה? מה בצליל שלהם מתחבר לאופי המותג ולארכיטיפ שלו?",
     "vocalStyle": "סגנון שירה מומלץ",
-    "vocalStyleReasoning": "למה סגנון השירה הזה? איך הקול הזה מדבר לקהל היעד?",
+    "vocalStyleReasoning": "למה הקול הזה? איך הוא מדבר לקהל ומייצג את הארכיטיפ?",
     "productionStyle": "סגנון הפקה מוסיקלית",
     "productionStyleReasoning": "למה סגנון ההפקה הזה? מה בעולם המותג מחייב את הגישה הזו?",
     "referenceArtists": ["אמן1", "אמן2", "אמן3"],
-    "referenceArtistsReasoning": "למה האמנים האלה? מה באסתטיקה המוסיקלית שלהם תואם את המותג?",
+    "referenceArtistsReasoning": "למה האמנים האלה? מה באסתטיקה שלהם תואם את המותג?",
     "referenceTracks": ["שיר1 - אמן", "שיר2 - אמן"],
-    "referenceTracksReasoning": "למה השירים האלה? מה בספציפית בכל שיר מייצג את הסאונד שהמותג צריך?",
+    "referenceTracksReasoning": "מה ספציפית בכל שיר מייצג את הסאונד שהמותג צריך?",
     "lyricalThemes": ["נושא1", "נושא2", "נושא3"],
-    "lyricalThemesReasoning": "למה הנושאים האלה? איך הם מתחברים לערכי המותג ולעולם הרגשי של הקהל?",
+    "lyricalThemesReasoning": "איך הנושאים האלה מתחברים לערכי המותג ולמסע הרגשי של הקהל?",
     "avoidElements": ["להימנע1", "להימנע2"],
-    "avoidElementsReasoning": "למה להימנע מהאלמנטים האלה? מה הסיכון שלהם למותג?",
+    "avoidElementsReasoning": "מה הסיכון בכל אלמנט? איך הוא עלול לפגוע במותג?",
     "briefSummary": "סיכום בריף מוסיקלי ב-3-4 משפטים — מה הסאונד, למה הוא מתאים, ומה הוא אמור לגרום לקהל להרגיש"
   },
   "audienceExpansion": [
     {
-      "segmentName": "שם הקהל החדש (למשל: דור Z, הורים צעירים, קהל פריפריה וכו׳)",
-      "description": "תיאור הקהל הזה — מי הם, מה מאפיין אותם, למה הם פוטנציאליים למותג",
-      "expansionReasoning": "למה דווקא הקהל הזה? מה במותג יכול למשוך אותם? מה חסר היום כדי להגיע אליהם? מה ההזדמנות העסקית?",
-      "musicStyle": "איזה סגנון מוסיקלי ידבר לקהל הזה",
-      "musicReasoning": "למה המוסיקה הזו תעבוד עבורם? מה בהרגלי ההאזנה, בתרבות, ובעולם הרגשי שלהם מחייב את הסגנון הזה?",
+      "segmentName": "שם הקהל החדש",
+      "description": "מי הם ולמה הם פוטנציאליים למותג",
+      "expansionReasoning": "למה הקהל הזה? מה ההזדמנות העסקית? מה חסר כדי להגיע אליהם?",
+      "musicStyle": "סגנון מוסיקלי שידבר לקהל הזה",
+      "musicReasoning": "למה המוסיקה הזו תעבוד עבורם?",
       "referenceArtists": ["אמן1", "אמן2"],
-      "keyDifference": "מה השוני העיקרי בגישה המוסיקלית לעומת הקהל הנוכחי"
+      "keyDifference": "מה השוני בגישה המוסיקלית לעומת הקהל הנוכחי"
     }
   ]
 }
 
-CRITICAL RULES:
-- Return valid JSON only. No markdown, no backticks.
-- All text in Hebrew.
-- EVERY reasoning field must be detailed — minimum 2 sentences per reasoning. This is non-negotiable.
-- audienceExpansion must contain exactly 3 different potential audience segments the brand can expand into.
-- Each expansion segment must have a completely different music style than the others.`;
+כללים:
+- JSON בלבד, ללא markdown
+- הכל בעברית
+- כל reasoning — מינימום 2-3 משפטים מפורטים
+- audienceExpansion: בדיוק 3 קהלים עם סגנונות מוסיקה שונים לחלוטין
+- touchpointMap: 5 נקודות מגע
+- emotionalJourney: 4 שלבים`;
 
   try {
     const response = await fetch('https://api.openai.com/v1/chat/completions', {
@@ -1016,7 +1183,7 @@ CRITICAL RULES:
       },
       body: JSON.stringify({
         model: 'gpt-4o',
-        max_tokens: 8000,
+        max_tokens: 12000,
         response_format: { type: 'json_object' },
         messages: [
           { role: 'system', content: 'אתה אסטרטג מותגים, מפיק מוסיקלי ומעצב סאונד ברמה עולמית. הכלל החשוב ביותר: כל מסקנה חייבת להיות מלווה בנימוק מפורט שמסביר את כל תהליך החשיבה שהוביל אליה. לא רק מה — אלא למה. תמיד מחזיר JSON תקין בלבד, הכל בעברית.' },
@@ -1059,210 +1226,416 @@ function R(text) {
   return '<div class="prompt-why"><strong>הנימוק:</strong> ' + text + '</div>';
 }
 
+function acc(id, icon, title, contentHtml, open) {
+  return `
+  <div class="accordion${open ? ' open' : ''}" id="acc-${id}">
+    <div class="accordion-header" onclick="toggleAccordion('acc-${id}')">
+      <div class="accordion-title"><span>${icon}</span><span>${title}</span></div>
+      <span class="accordion-arrow">▼</span>
+    </div>
+    <div class="accordion-body">${contentHtml}</div>
+  </div>`;
+}
+
 function renderResults(d) {
   const results = document.getElementById('results');
   const a = d.audience || {};
   const p = d.psychographics || {};
   const m = d.musicBrief || {};
   const ex = d.audienceExpansion || [];
+  const arc = d.brandArchetype || {};
+  const scm = d.sonicCompetitiveMap || {};
+  const ej = d.emotionalJourney || [];
+  const tp = d.touchpointMap || [];
 
-  results.innerHTML = `
-    <!-- Brand Overview -->
-    <div class="result-card">
-      <div class="brand-highlight">${d.brandName}</div>
-      <div class="card-content">${d.brandSummary}</div>
-      ${R(d.brandSummaryReasoning)}
+  // ── TAB 1: מותג ──────────────────────────────────────────────
+  const tab1 = `
+    <div style="margin-bottom:12px;">
+      <div class="brand-highlight" style="font-size:32px;">${d.brandName}</div>
     </div>
-
-    <!-- Audience Profile -->
-    <div class="result-card">
-      <div class="card-header">
-        <div class="card-icon purple">👥</div>
-        <div class="card-title">פרופיל קהל יעד</div>
+    ${acc('brand-summary','📋','תקציר המותג',`
+      <div class="card-content" style="padding-top:12px;">${d.brandSummary || ''}${R(d.brandSummaryReasoning)}</div>
+    `, true)}
+    ${acc('brand-archetype','🎭','ארכיטיפ המותג',`
+      <div class="card-content" style="padding-top:12px;">
+        <div class="section-block">
+          <div class="section-label">ארכיטיפ ראשי</div>
+          <strong style="font-size:18px;color:var(--accent2);">${arc.primary || ''}</strong>
+          ${R(arc.archetypeReasoning)}
+        </div>
+        <div class="section-block">
+          <div class="section-label">ארכיטיפ משני</div>
+          <strong>${arc.secondary || ''}</strong>
+        </div>
+        <div class="section-block">
+          <div class="section-label">השלכות סאונד מהארכיטיפ</div>
+          ${arc.sonicImplication || ''}
+        </div>
       </div>
-      <div class="card-content">
-        <div class="section-block">
-          <div class="section-label">דמוגרפיה</div>
-          <strong>גיל עיקרי:</strong> ${a.primaryAge}
-          ${R(a.primaryAgeReasoning)}
-          <strong>גיל משני:</strong> ${a.secondaryAge}
-          ${R(a.secondaryAgeReasoning)}
-          <strong>מגדר:</strong> ${a.gender}
-          ${R(a.genderReasoning)}
-          <strong>מעמד סוציואקונומי:</strong> ${a.socioeconomic}
-          ${R(a.socioeconomicReasoning)}
-          <strong>השכלה:</strong> ${a.education}
-        </div>
-        <div class="section-block">
-          <div class="section-label">אורח חיים</div>
-          ${a.lifestyle}
-          ${R(a.lifestyleReasoning)}
-        </div>
-        <div class="section-block">
-          <div class="section-label">צריכת מדיה</div>
-          ${a.mediaConsumption}
-          ${R(a.mediaConsumptionReasoning)}
-        </div>
+    `, true)}
+  `;
+
+  // ── TAB 2: קהל יעד ───────────────────────────────────────────
+  const tab2 = `
+    ${acc('aud-demo','👥','דמוגרפיה',`
+      <div class="card-content" style="padding-top:12px;">
+        <div class="section-block"><div class="section-label">גיל עיקרי</div><strong>${a.primaryAge||''}</strong>${R(a.primaryAgeReasoning)}</div>
+        <div class="section-block"><div class="section-label">גיל משני</div><strong>${a.secondaryAge||''}</strong>${R(a.secondaryAgeReasoning)}</div>
+        <div class="section-block"><div class="section-label">מגדר</div><strong>${a.gender||''}</strong>${R(a.genderReasoning)}</div>
+        <div class="section-block"><div class="section-label">מעמד סוציואקונומי</div><strong>${a.socioeconomic||''}</strong>${R(a.socioeconomicReasoning)}</div>
+        <div class="section-block"><div class="section-label">השכלה</div>${a.education||''}</div>
+      </div>
+    `, true)}
+    ${acc('aud-life','🌍','אורח חיים וצריכת מדיה',`
+      <div class="card-content" style="padding-top:12px;">
+        <div class="section-block"><div class="section-label">אורח חיים</div>${a.lifestyle||''}${R(a.lifestyleReasoning)}</div>
+        <div class="section-block"><div class="section-label">צריכת מדיה</div>${a.mediaConsumption||''}${R(a.mediaConsumptionReasoning)}</div>
+      </div>
+    `, false)}
+    ${acc('aud-vals','💡','ערכים, תחומי עניין, כאבים',`
+      <div class="card-content" style="padding-top:12px;">
         <div class="section-block">
           <div class="section-label">ערכים</div>
-          <div class="tags">${(a.values||[]).map(v => '<span class="tag">'+v+'</span>').join('')}</div>
+          <div class="tags">${(a.values||[]).map(v=>'<span class="tag">'+v+'</span>').join('')}</div>
           ${R(a.valuesReasoning)}
         </div>
         <div class="section-block">
           <div class="section-label">תחומי עניין</div>
-          <div class="tags">${(a.interests||[]).map(v => '<span class="tag">'+v+'</span>').join('')}</div>
+          <div class="tags">${(a.interests||[]).map(v=>'<span class="tag">'+v+'</span>').join('')}</div>
           ${R(a.interestsReasoning)}
         </div>
         <div class="section-block">
           <div class="section-label">נקודות כאב</div>
-          <div class="tags">${(a.painPoints||[]).map(v => '<span class="tag">'+v+'</span>').join('')}</div>
+          <div class="tags">${(a.painPoints||[]).map(v=>'<span class="tag" style="border-color:rgba(239,68,68,.3);color:#f87171">'+v+'</span>').join('')}</div>
           ${R(a.painPointsReasoning)}
         </div>
       </div>
-    </div>
-
-    <!-- Psychographics -->
-    <div class="result-card">
-      <div class="card-header">
-        <div class="card-icon blue">🧠</div>
-        <div class="card-title">פרופיל פסיכוגרפי</div>
+    `, false)}
+    ${acc('aud-psych','🧠','פסיכוגרפיה',`
+      <div class="card-content" style="padding-top:12px;">
+        <div class="section-block"><div class="section-label">אישיות</div>${p.personality||''}${R(p.personalityReasoning)}</div>
+        <div class="section-block"><div class="section-label">מניעים רגשיים</div>${p.emotionalDrivers||''}${R(p.emotionalDriversReasoning)}</div>
+        <div class="section-block"><div class="section-label">קשר רגשי למותג</div>${p.brandRelationship||''}${R(p.brandRelationshipReasoning)}</div>
       </div>
-      <div class="card-content">
+    `, false)}
+  `;
+
+  // ── TAB 3: מפת סאונד ─────────────────────────────────────────
+  const tab3 = `
+    ${acc('sonic-comp','⚔️','מיצוב תחרותי',`
+      <div class="card-content" style="padding-top:12px;">
         <div class="section-block">
-          <div class="section-label">אישיות</div>
-          ${p.personality}
-          ${R(p.personalityReasoning)}
+          <div class="section-label">מתחרים עיקריים</div>
+          <div class="tags">${(scm.mainCompetitors||[]).map(v=>'<span class="tag">'+v+'</span>').join('')}</div>
         </div>
-        <div class="section-block">
-          <div class="section-label">מניעים רגשיים</div>
-          ${p.emotionalDrivers}
-          ${R(p.emotionalDriversReasoning)}
-        </div>
-        <div class="section-block">
-          <div class="section-label">קשר רגשי למותג</div>
-          ${p.brandRelationship}
-          ${R(p.brandRelationshipReasoning)}
-        </div>
+        <div class="section-block"><div class="section-label">הסאונד הרווח בקטגוריה</div>${scm.competitorsSonicDescription||''}</div>
+        <div class="section-block"><div class="section-label">חלל פנוי — White Space</div><strong>${scm.whiteSpace||''}</strong>${R(scm.whiteSpaceReasoning)}</div>
+        <div class="section-block"><div class="section-label">אסטרטגיית בידול</div>${scm.differentiationStrategy||''}</div>
       </div>
-    </div>
-
-    <!-- Music Brief -->
-    <div class="result-card music-brief">
-      <div class="card-header">
-        <div class="card-icon orange">🎵</div>
-        <div class="card-title">בריף מוסיקלי</div>
+    `, true)}
+    ${acc('sonic-touch','📍','מפת נקודות מגע',`
+      <div class="card-content" style="padding-top:12px;">
+        ${tp.map(t => `
+          <div class="section-block">
+            <div class="section-label">${t.touchpoint||''}</div>
+            <strong>${t.musicStyle||''}</strong>
+            ${R(t.reasoning)}
+          </div>
+        `).join('')}
       </div>
-      <div class="card-content">
-        <div class="section-block">
-          <div class="section-label">ז׳אנר</div>
-          <strong>ז׳אנר עיקרי:</strong> ${m.primaryGenre}
-          ${R(m.primaryGenreReasoning)}
-          <strong>תת-ז׳אנרים:</strong> ${(m.subGenres||[]).join(', ')}
-        </div>
+    `, false)}
+  `;
 
-        <div class="section-block">
-          <div class="section-label">טמפו ומצב רוח</div>
-          <strong>BPM:</strong> ${m.bpm}
-          ${R(m.bpmReasoning)}
-          <strong>מצב רוח:</strong> ${m.mood}
-          ${R(m.moodReasoning)}
-        </div>
+  // ── TAB 4: מסע רגשי ──────────────────────────────────────────
+  const stageIcons = ['👁','🤔','💳','❤️'];
+  const tab4 = ej.map((stage, i) => acc(
+    `ej-${i}`,
+    stageIcons[i] || '🎯',
+    stage.stage || `שלב ${i+1}`,
+    `<div class="card-content" style="padding-top:12px;">
+      <div class="section-block"><div class="section-label">מטרה רגשית</div>${stage.emotionGoal||''}</div>
+      <div class="section-block"><div class="section-label">כיוון מוסיקלי</div><strong>${stage.musicDirection||''}</strong></div>
+      ${R(stage.reasoning)}
+    </div>`,
+    i === 0
+  )).join('');
 
+  // ── TAB 5: בריף מוסיקלי ──────────────────────────────────────
+  const tab5 = `
+    ${acc('mb-genre','🎼','ז׳אנר, טמפו, מצב רוח',`
+      <div class="card-content" style="padding-top:12px;">
+        <div class="section-block"><div class="section-label">ז׳אנר עיקרי</div><strong style="font-size:17px;color:var(--accent2);">${m.primaryGenre||''}</strong>${R(m.primaryGenreReasoning)}</div>
+        <div class="section-block"><div class="section-label">תת-ז׳אנרים</div><div class="tags">${(m.subGenres||[]).map(v=>'<span class="tag">'+v+'</span>').join('')}</div></div>
+        <div class="section-block"><div class="section-label">BPM</div><strong>${m.bpm||''}</strong>${R(m.bpmReasoning)}</div>
+        <div class="section-block"><div class="section-label">מצב רוח</div><strong>${m.mood||''}</strong>${R(m.moodReasoning)}</div>
         <div class="section-block">
           <div class="section-label">אנרגיה</div>
           <div class="meter">
-            <div class="meter-label">
-              <span>נמוכה</span>
-              <span>${m.energy}%</span>
-              <span>גבוהה</span>
-            </div>
-            <div class="meter-bar">
-              <div class="meter-fill" style="width: ${m.energy}%"></div>
-            </div>
+            <div class="meter-label"><span>נמוכה</span><span>${m.energy||0}%</span><span>גבוהה</span></div>
+            <div class="meter-bar"><div class="meter-fill" style="width:${m.energy||0}%"></div></div>
           </div>
           ${R(m.energyReasoning)}
         </div>
+      </div>
+    `, true)}
+    ${acc('mb-prod','🎚️','הפקה, שירה, כלי נגינה',`
+      <div class="card-content" style="padding-top:12px;">
+        <div class="section-block"><div class="section-label">סגנון הפקה</div><strong>${m.productionStyle||''}</strong>${R(m.productionStyleReasoning)}</div>
+        <div class="section-block"><div class="section-label">סגנון שירה</div><strong>${m.vocalStyle||''}</strong>${R(m.vocalStyleReasoning)}</div>
+        <div class="section-block"><div class="section-label">כלי נגינה</div><div class="tags">${(m.instruments||[]).map(v=>'<span class="tag">'+v+'</span>').join('')}</div>${R(m.instrumentsReasoning)}</div>
+      </div>
+    `, false)}
+    ${acc('mb-ref','🎧','רפרנסים מוסיקליים',`
+      <div class="card-content" style="padding-top:12px;">
+        <div class="section-block"><div class="section-label">אמנים לרפרנס</div><div class="tags">${(m.referenceArtists||[]).map(v=>'<span class="tag">'+v+'</span>').join('')}</div>${R(m.referenceArtistsReasoning)}</div>
+        <div class="section-block"><div class="section-label">שירים לרפרנס</div>${(m.referenceTracks||[]).map(v=>'<div style="padding:4px 0;color:var(--text2)">▶ '+v+'</div>').join('')}${R(m.referenceTracksReasoning)}</div>
+      </div>
+    `, false)}
+    ${acc('mb-lyrics','✍️','טקסטים ומה להימנע',`
+      <div class="card-content" style="padding-top:12px;">
+        <div class="section-block"><div class="section-label">נושאים לטקסטים</div><div class="tags">${(m.lyricalThemes||[]).map(v=>'<span class="tag">'+v+'</span>').join('')}</div>${R(m.lyricalThemesReasoning)}</div>
+        <div class="section-block"><div class="section-label">מה להימנע ממנו</div><div class="tags">${(m.avoidElements||[]).map(v=>'<span class="tag" style="border-color:rgba(239,68,68,.3);color:#f87171">'+v+'</span>').join('')}</div>${R(m.avoidElementsReasoning)}</div>
+      </div>
+    `, false)}
+    ${acc('mb-summary','📄','סיכום הבריף',`
+      <div style="background:var(--surface2);border-radius:10px;padding:16px;margin-top:12px;font-size:15px;line-height:1.9;color:var(--text);">${m.briefSummary||''}</div>
+    `, false)}
+  `;
 
-        <div class="section-block">
-          <div class="section-label">סגנון הפקה ושירה</div>
-          <strong>סגנון הפקה:</strong> ${m.productionStyle}
-          ${R(m.productionStyleReasoning)}
-          <strong>סגנון שירה:</strong> ${m.vocalStyle}
-          ${R(m.vocalStyleReasoning)}
-        </div>
+  // ── TAB 6: צמיחה ────────────────────────────────────────────
+  const tab6 = ex.length > 0 ? ex.map((seg, i) => acc(
+    `exp-${i}`,
+    '🚀',
+    `קהל ${i+1}: ${seg.segmentName||''}`,
+    `<div class="card-content" style="padding-top:12px;">
+      <div class="section-block"><div class="section-label">מי הם?</div>${seg.description||''}${R(seg.expansionReasoning)}</div>
+      <div class="section-block"><div class="section-label">סגנון מוסיקלי מומלץ</div><strong>${seg.musicStyle||''}</strong>${R(seg.musicReasoning)}</div>
+      <div class="section-block"><div class="section-label">אמנים לרפרנס</div><div class="tags">${(seg.referenceArtists||[]).map(v=>'<span class="tag">'+v+'</span>').join('')}</div></div>
+      <div class="section-block"><div class="section-label">מה השוני מהקהל הנוכחי</div>${seg.keyDifference||''}</div>
+    </div>`,
+    i === 0
+  )).join('') : '<p style="color:var(--text2);padding:20px 0;">אין נתוני הרחבת קהלים</p>';
 
-        <div class="section-block">
-          <div class="section-label">כלי נגינה</div>
-          <div class="tags">${(m.instruments||[]).map(v => '<span class="tag">'+v+'</span>').join('')}</div>
-          ${R(m.instrumentsReasoning)}
-        </div>
+  const tabs = [
+    { id:'tab-brand',   label:'🎭 מותג',          content: tab1 },
+    { id:'tab-aud',     label:'👥 קהל יעד',        content: tab2 },
+    { id:'tab-sonic',   label:'🗺️ מפת סאונד',     content: tab3 },
+    { id:'tab-journey', label:'🎯 מסע רגשי',       content: tab4 },
+    { id:'tab-brief',   label:'🎵 בריף מוסיקלי',  content: tab5 },
+    { id:'tab-growth',  label:'🚀 צמיחה',          content: tab6 },
+  ];
 
-        <div class="section-block">
-          <div class="section-label">אמנים לרפרנס</div>
-          <strong>אמנים:</strong> ${(m.referenceArtists||[]).join(' · ')}
-          ${R(m.referenceArtistsReasoning)}
-          <strong>שירים:</strong> ${(m.referenceTracks||[]).join(' · ')}
-          ${R(m.referenceTracksReasoning)}
-        </div>
+  results.innerHTML = `
+    <div class="tabs-nav" id="tabsNav">
+      ${tabs.map((t,i) => `<button class="tab-btn${i===0?' active':''}" onclick="showTab('${t.id}', this)">${t.label}</button>`).join('')}
+    </div>
+    <div id="tabsBody">
+      ${tabs.map((t,i) => `<div class="tab-panel${i===0?' active':''}" id="${t.id}">${t.content}</div>`).join('')}
+    </div>
+    <div class="export-bar">
+      <button class="export-btn" onclick="exportJSON()">⬇ JSON</button>
+      <button class="export-btn" onclick="copyBrief()">📋 העתק בריף</button>
+      <button class="export-pdf-btn" onclick="exportPDF()">📄 ייצוא PDF</button>
+      <button class="new-search-btn" onclick="newSearch()">ניתוח חדש →</button>
+    </div>
+  `;
 
-        <div class="section-block">
-          <div class="section-label">נושאים לטקסטים</div>
-          <div class="tags">${(m.lyricalThemes||[]).map(v => '<span class="tag">'+v+'</span>').join('')}</div>
-          ${R(m.lyricalThemesReasoning)}
-        </div>
+  results.classList.add('active');
+  window._lastResult = d;
+}
 
-        <div class="section-block">
-          <div class="section-label">מה להימנע ממנו</div>
-          <div class="tags">${(m.avoidElements||[]).map(v => '<span class="tag" style="border-color: rgba(239,68,68,0.3); color: #f87171;">'+v+'</span>').join('')}</div>
-          ${R(m.avoidElementsReasoning)}
-        </div>
+function showTab(id, btn) {
+  document.querySelectorAll('.tab-panel').forEach(p => p.classList.remove('active'));
+  document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+  document.getElementById(id).classList.add('active');
+  btn.classList.add('active');
+}
 
-        <div class="section-block">
-          <div class="section-label">סיכום הבריף</div>
-          <div style="background: var(--surface2); border-radius: 10px; padding: 16px; margin-top: 8px; font-size: 15px; line-height: 1.9;">
-            ${m.briefSummary}
+function toggleAccordion(id) {
+  const el = document.getElementById(id);
+  if (el) el.classList.toggle('open');
+}
+
+function exportPDF() {
+  if (!window._lastResult) return;
+  const d = window._lastResult;
+  const m = d.musicBrief || {};
+  const a = d.audience || {};
+  const arc = d.brandArchetype || {};
+  const scm = d.sonicCompetitiveMap || {};
+  const ej = d.emotionalJourney || [];
+  const tp = d.touchpointMap || [];
+  const ex = d.audienceExpansion || [];
+  const p = d.psychographics || {};
+
+  const stageIcons = ['👁','🤔','💳','❤️'];
+
+  const pdfHtml = `
+  <div style="font-family:'Helvetica Neue',Arial,sans-serif;color:#111;direction:rtl;text-align:right;max-width:780px;margin:0 auto;padding:0 20px;">
+
+    <!-- Cover -->
+    <div style="background:linear-gradient(135deg,#09090b,#1a1a1f);color:#fff;padding:60px 40px;border-radius:16px;margin-bottom:32px;text-align:center;">
+      <div style="font-size:11px;letter-spacing:4px;color:#c8a44e;text-transform:uppercase;margin-bottom:12px;">BrandSync AI</div>
+      <div style="font-size:42px;font-weight:900;background:linear-gradient(135deg,#fff,#e2c06e);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;margin-bottom:8px;">${d.brandName}</div>
+      <div style="font-size:16px;color:#9898a0;margin-bottom:24px;">ניתוח מותג ← בריף מוסיקלי מלא</div>
+      <div style="font-size:13px;color:#666;">נוצר על ידי BrandSync AI · ${new Date().toLocaleDateString('he-IL')}</div>
+    </div>
+
+    <!-- Brand Summary -->
+    <div style="background:#f8f8f9;border-radius:12px;padding:28px;margin-bottom:20px;border-right:4px solid #c8a44e;">
+      <div style="font-size:11px;font-weight:700;color:#c8a44e;letter-spacing:2px;text-transform:uppercase;margin-bottom:8px;">תקציר המותג</div>
+      <div style="font-size:16px;line-height:1.9;color:#222;">${d.brandSummary||''}</div>
+      ${d.brandSummaryReasoning ? `<div style="font-size:13px;color:#666;margin-top:10px;padding:10px;background:#fff;border-radius:8px;border-right:2px solid #c8a44e;"><strong style="color:#c8a44e;">הנימוק:</strong> ${d.brandSummaryReasoning}</div>` : ''}
+    </div>
+
+    <!-- Archetype -->
+    <div style="background:#f8f8f9;border-radius:12px;padding:28px;margin-bottom:20px;">
+      <div style="font-size:11px;font-weight:700;color:#c8a44e;letter-spacing:2px;text-transform:uppercase;margin-bottom:12px;">ארכיטיפ המותג</div>
+      <div style="font-size:26px;font-weight:800;color:#111;margin-bottom:4px;">${arc.primary||''} <span style="font-size:16px;color:#888;font-weight:400;">+ ${arc.secondary||''}</span></div>
+      ${arc.archetypeReasoning ? `<div style="font-size:13px;color:#555;margin-top:10px;padding:10px;background:#fff;border-radius:8px;border-right:2px solid #c8a44e;"><strong style="color:#c8a44e;">הנימוק:</strong> ${arc.archetypeReasoning}</div>` : ''}
+      ${arc.sonicImplication ? `<div style="font-size:13px;color:#555;margin-top:8px;"><strong>השלכות סאונד:</strong> ${arc.sonicImplication}</div>` : ''}
+    </div>
+
+    <!-- Audience -->
+    <div style="background:#f8f8f9;border-radius:12px;padding:28px;margin-bottom:20px;">
+      <div style="font-size:11px;font-weight:700;color:#c8a44e;letter-spacing:2px;text-transform:uppercase;margin-bottom:16px;">פרופיל קהל יעד</div>
+      <table style="width:100%;border-collapse:collapse;font-size:14px;">
+        ${[['גיל עיקרי', a.primaryAge],['גיל משני',a.secondaryAge],['מגדר',a.gender],['מעמד סוציואקונומי',a.socioeconomic],['השכלה',a.education]].map(r=>`
+        <tr style="border-bottom:1px solid #e5e5e5;">
+          <td style="padding:8px 0;font-weight:600;color:#333;width:35%;">${r[0]}</td>
+          <td style="padding:8px 0;color:#555;">${r[1]||''}</td>
+        </tr>`).join('')}
+      </table>
+      ${a.lifestyle ? `<div style="margin-top:12px;font-size:14px;color:#444;"><strong>אורח חיים:</strong> ${a.lifestyle}</div>` : ''}
+      ${a.values && a.values.length ? `<div style="margin-top:10px;"><strong style="font-size:13px;color:#333;">ערכים:</strong> <span style="color:#666;font-size:13px;">${a.values.join(' · ')}</span></div>` : ''}
+      ${a.interests && a.interests.length ? `<div style="margin-top:6px;"><strong style="font-size:13px;color:#333;">תחומי עניין:</strong> <span style="color:#666;font-size:13px;">${a.interests.join(' · ')}</span></div>` : ''}
+      ${a.painPoints && a.painPoints.length ? `<div style="margin-top:6px;"><strong style="font-size:13px;color:#333;">נקודות כאב:</strong> <span style="color:#c0392b;font-size:13px;">${a.painPoints.join(' · ')}</span></div>` : ''}
+    </div>
+
+    <!-- Psychographics -->
+    <div style="background:#f8f8f9;border-radius:12px;padding:28px;margin-bottom:20px;">
+      <div style="font-size:11px;font-weight:700;color:#c8a44e;letter-spacing:2px;text-transform:uppercase;margin-bottom:16px;">פסיכוגרפיה</div>
+      ${[['אישיות',p.personality,p.personalityReasoning],['מניעים רגשיים',p.emotionalDrivers,p.emotionalDriversReasoning],['קשר רגשי למותג',p.brandRelationship,p.brandRelationshipReasoning]].map(r=>`
+      <div style="margin-bottom:14px;">
+        <div style="font-size:12px;font-weight:700;color:#c8a44e;letter-spacing:1px;text-transform:uppercase;margin-bottom:4px;">${r[0]}</div>
+        <div style="font-size:14px;color:#333;">${r[1]||''}</div>
+        ${r[2] ? `<div style="font-size:12px;color:#666;margin-top:6px;padding:8px;background:#fff;border-radius:6px;border-right:2px solid #c8a44e;"><strong style="color:#c8a44e;">הנימוק:</strong> ${r[2]}</div>` : ''}
+      </div>`).join('')}
+    </div>
+
+    <!-- Sonic Competitive Map -->
+    <div style="background:#f8f8f9;border-radius:12px;padding:28px;margin-bottom:20px;">
+      <div style="font-size:11px;font-weight:700;color:#c8a44e;letter-spacing:2px;text-transform:uppercase;margin-bottom:16px;">מיצוב תחרותי</div>
+      ${scm.mainCompetitors && scm.mainCompetitors.length ? `<div style="margin-bottom:12px;"><strong style="font-size:13px;">מתחרים:</strong> <span style="color:#555;font-size:13px;">${scm.mainCompetitors.join(' · ')}</span></div>` : ''}
+      ${scm.competitorsSonicDescription ? `<div style="font-size:14px;color:#444;margin-bottom:10px;"><strong>סאונד קיים בקטגוריה:</strong> ${scm.competitorsSonicDescription}</div>` : ''}
+      ${scm.whiteSpace ? `<div style="font-size:14px;color:#444;margin-bottom:6px;"><strong>חלל פנוי:</strong> ${scm.whiteSpace}</div>` : ''}
+      ${scm.whiteSpaceReasoning ? `<div style="font-size:12px;color:#666;padding:8px;background:#fff;border-radius:6px;border-right:2px solid #c8a44e;margin-bottom:10px;"><strong style="color:#c8a44e;">הנימוק:</strong> ${scm.whiteSpaceReasoning}</div>` : ''}
+      ${scm.differentiationStrategy ? `<div style="font-size:14px;color:#444;"><strong>אסטרטגיית בידול:</strong> ${scm.differentiationStrategy}</div>` : ''}
+    </div>
+
+    <!-- Emotional Journey -->
+    <div style="background:#f8f8f9;border-radius:12px;padding:28px;margin-bottom:20px;">
+      <div style="font-size:11px;font-weight:700;color:#c8a44e;letter-spacing:2px;text-transform:uppercase;margin-bottom:16px;">מסע רגשי</div>
+      <div style="display:flex;gap:0;flex-direction:column;">
+        ${ej.map((stage, i) => `
+        <div style="display:flex;gap:16px;margin-bottom:16px;align-items:flex-start;">
+          <div style="background:#c8a44e;color:#000;border-radius:50%;width:32px;height:32px;display:flex;align-items:center;justify-content:center;font-size:14px;flex-shrink:0;font-weight:700;">${i+1}</div>
+          <div style="flex:1;">
+            <div style="font-size:13px;font-weight:700;color:#111;margin-bottom:4px;">${stage.stage||''}</div>
+            <div style="font-size:13px;color:#444;margin-bottom:4px;">${stage.emotionGoal||''}</div>
+            <div style="font-size:13px;color:#c8a44e;font-weight:600;">${stage.musicDirection||''}</div>
+            ${stage.reasoning ? `<div style="font-size:11px;color:#888;margin-top:4px;">${stage.reasoning}</div>` : ''}
           </div>
-        </div>
+        </div>`).join('')}
+      </div>
+    </div>
+
+    <!-- Touchpoint Map -->
+    <div style="background:#f8f8f9;border-radius:12px;padding:28px;margin-bottom:20px;">
+      <div style="font-size:11px;font-weight:700;color:#c8a44e;letter-spacing:2px;text-transform:uppercase;margin-bottom:16px;">מפת נקודות מגע</div>
+      ${tp.map(t => `
+      <div style="margin-bottom:14px;padding-bottom:14px;border-bottom:1px solid #e5e5e5;">
+        <div style="font-size:13px;font-weight:700;color:#111;">${t.touchpoint||''}</div>
+        <div style="font-size:14px;color:#c8a44e;font-weight:600;margin:4px 0;">${t.musicStyle||''}</div>
+        ${t.reasoning ? `<div style="font-size:12px;color:#666;">${t.reasoning}</div>` : ''}
+      </div>`).join('')}
+    </div>
+
+    <!-- Music Brief -->
+    <div style="background:linear-gradient(135deg,#09090b,#1a1a1f);color:#fff;border-radius:16px;padding:36px;margin-bottom:20px;border:2px solid #c8a44e;">
+      <div style="font-size:11px;font-weight:700;color:#c8a44e;letter-spacing:2px;text-transform:uppercase;margin-bottom:20px;">🎵 בריף מוסיקלי</div>
+
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:20px;margin-bottom:20px;">
+        <div><div style="font-size:11px;color:#888;text-transform:uppercase;letter-spacing:1px;margin-bottom:4px;">ז׳אנר עיקרי</div><div style="font-size:20px;font-weight:800;color:#e2c06e;">${m.primaryGenre||''}</div></div>
+        <div><div style="font-size:11px;color:#888;text-transform:uppercase;letter-spacing:1px;margin-bottom:4px;">BPM</div><div style="font-size:20px;font-weight:800;color:#e2c06e;">${m.bpm||''}</div></div>
+        <div><div style="font-size:11px;color:#888;text-transform:uppercase;letter-spacing:1px;margin-bottom:4px;">מצב רוח</div><div style="font-size:15px;color:#fff;">${m.mood||''}</div></div>
+        <div><div style="font-size:11px;color:#888;text-transform:uppercase;letter-spacing:1px;margin-bottom:4px;">סגנון הפקה</div><div style="font-size:15px;color:#fff;">${m.productionStyle||''}</div></div>
+      </div>
+
+      <div style="margin-bottom:16px;">
+        <div style="font-size:11px;color:#888;text-transform:uppercase;letter-spacing:1px;margin-bottom:6px;">כלי נגינה</div>
+        <div style="font-size:14px;color:#c8a44e;">${(m.instruments||[]).join(' · ')}</div>
+      </div>
+
+      <div style="margin-bottom:16px;">
+        <div style="font-size:11px;color:#888;text-transform:uppercase;letter-spacing:1px;margin-bottom:6px;">אמנים לרפרנס</div>
+        <div style="font-size:14px;color:#fff;">${(m.referenceArtists||[]).join(' · ')}</div>
+      </div>
+
+      <div style="margin-bottom:20px;">
+        <div style="font-size:11px;color:#888;text-transform:uppercase;letter-spacing:1px;margin-bottom:6px;">שירים לרפרנס</div>
+        <div style="font-size:14px;color:#9898a0;">${(m.referenceTracks||[]).join(' · ')}</div>
+      </div>
+
+      <div style="background:rgba(200,164,78,0.1);border:1px solid rgba(200,164,78,0.3);border-radius:10px;padding:20px;">
+        <div style="font-size:11px;color:#c8a44e;text-transform:uppercase;letter-spacing:1px;margin-bottom:8px;">סיכום הבריף</div>
+        <div style="font-size:15px;line-height:1.9;color:#e8e8ec;">${m.briefSummary||''}</div>
       </div>
     </div>
 
     <!-- Audience Expansion -->
     ${ex.length > 0 ? `
-    <div class="result-card sound-gen-card">
-      <div class="card-header">
-        <div class="card-icon" style="background: rgba(16,185,129,0.15);">🚀</div>
-        <div class="card-title">הרחבת קהלים — לאן אפשר לצמוח?</div>
-      </div>
-      <div class="card-content">
-        ${ex.map((seg, i) => `
-        <div class="section-block">
-          <div class="section-label">קהל ${i+1}: ${seg.segmentName}</div>
-          <div class="card-content">${seg.description}</div>
-          ${R(seg.expansionReasoning)}
-          <div style="margin-top: 10px;">
-            <strong>סגנון מוסיקלי מומלץ:</strong> ${seg.musicStyle}
-            ${R(seg.musicReasoning)}
-            <strong>אמנים לרפרנס:</strong> ${(seg.referenceArtists||[]).join(' · ')}<br>
-            <strong>מה השוני מהקהל הנוכחי:</strong> ${seg.keyDifference}
-          </div>
-        </div>
-        `).join('')}
-      </div>
+    <div style="background:#f8f8f9;border-radius:12px;padding:28px;margin-bottom:20px;">
+      <div style="font-size:11px;font-weight:700;color:#10b981;letter-spacing:2px;text-transform:uppercase;margin-bottom:16px;">🚀 הרחבת קהלים</div>
+      ${ex.map((seg, i) => `
+      <div style="margin-bottom:20px;padding-bottom:20px;border-bottom:1px solid #e5e5e5;">
+        <div style="font-size:15px;font-weight:700;color:#111;margin-bottom:6px;">קהל ${i+1}: ${seg.segmentName||''}</div>
+        <div style="font-size:14px;color:#444;margin-bottom:8px;">${seg.description||''}</div>
+        <div style="font-size:14px;color:#c8a44e;font-weight:600;margin-bottom:4px;">סגנון מוסיקלי: ${seg.musicStyle||''}</div>
+        ${seg.referenceArtists && seg.referenceArtists.length ? `<div style="font-size:13px;color:#666;">אמנים: ${seg.referenceArtists.join(' · ')}</div>` : ''}
+        ${seg.keyDifference ? `<div style="font-size:13px;color:#888;margin-top:4px;">שוני מהקהל הנוכחי: ${seg.keyDifference}</div>` : ''}
+      </div>`).join('')}
+    </div>` : ''}
+
+    <div style="text-align:center;padding:20px 0;font-size:12px;color:#aaa;">
+      נוצר על ידי BrandSync AI · ${new Date().toLocaleDateString('he-IL')}
     </div>
-    ` : ''}
+  </div>`;
 
-    <!-- Actions -->
-    <div class="export-bar">
-      <button class="export-btn" onclick="exportJSON()">ייצוא JSON</button>
-      <button class="export-btn" onclick="copyBrief()">העתק בריף</button>
-      <button class="new-search-btn" onclick="newSearch()">ניתוח מותג חדש →</button>
-    </div>
-  `;
+  const container = document.createElement('div');
+  container.innerHTML = pdfHtml;
+  document.body.appendChild(container);
 
-  results.classList.add('active');
+  const opt = {
+    margin: [10, 10, 10, 10],
+    filename: `BrandSync-${d.brandName}-${new Date().toLocaleDateString('he-IL').replace(/\//g,'-')}.pdf`,
+    image: { type: 'jpeg', quality: 0.97 },
+    html2canvas: { scale: 2, useCORS: true, letterRendering: true },
+    jsPDF: { unit: 'mm', format: 'a4', orientation: 'portrait' },
+    pagebreak: { mode: ['avoid-all', 'css', 'legacy'] }
+  };
 
-  // Store for export
-  window._lastResult = d;
+  const btn = document.querySelector('.export-pdf-btn');
+  if (btn) { btn.disabled = true; btn.textContent = '⏳ יוצר PDF...'; }
+
+  html2pdf().set(opt).from(container).save().then(() => {
+    document.body.removeChild(container);
+    if (btn) { btn.disabled = false; btn.textContent = '📄 ייצוא PDF'; }
+  }).catch(err => {
+    document.body.removeChild(container);
+    if (btn) { btn.disabled = false; btn.textContent = '📄 ייצוא PDF'; }
+    alert('שגיאה ביצירת PDF: ' + err.message);
+  });
 }
 
 function exportJSON() {
