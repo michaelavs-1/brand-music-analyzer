@@ -996,8 +996,10 @@ function startProgressAnimation() {
   const pct  = document.getElementById('progressPct');
   const lbl  = document.getElementById('loadingLabel');
   let stageIdx = 0;
+  let currentPct = 0;
 
   function applyStage(s) {
+    currentPct = s.pct;
     fill.style.width = s.pct + '%';
     pct.textContent  = s.pct + '%';
     lbl.textContent  = s.label;
@@ -1006,9 +1008,24 @@ function startProgressAnimation() {
   applyStage(_loadingStages[0]);
 
   _progressInterval = setInterval(() => {
-    stageIdx = Math.min(stageIdx + 1, _loadingStages.length - 1);
-    applyStage(_loadingStages[stageIdx]);
-    if (stageIdx === _loadingStages.length - 1) clearInterval(_progressInterval);
+    if (stageIdx < _loadingStages.length - 1) {
+      stageIdx++;
+      applyStage(_loadingStages[stageIdx]);
+    } else {
+      // Creep slowly toward 99.5% — never quite arriving
+      currentPct = Math.min(currentPct + 0.15, 99.5);
+      const display = Math.floor(currentPct);
+      fill.style.width = currentPct + '%';
+      pct.textContent  = display + '%';
+      // Rotate through waiting messages so it doesn't look frozen
+      const waiting = [
+        '💿 מנתח רפרנסים מוסיקליים...',
+        '🎵 מעמיק בבריף המוסיקלי...',
+        '🧠 מסכם את הניתוח...',
+        '⏳ עוד רגע...',
+      ];
+      lbl.textContent = waiting[Math.floor(Date.now() / 4000) % waiting.length];
+    }
   }, 1600);
 }
 
@@ -1040,15 +1057,36 @@ async function analyze() {
 
   startProgressAnimation();
 
-  const prompt = `אתה אסטרטג מותגים, מפיק מוסיקלי ומעצב סאונד ברמה עולמית. עליך לנתח את המותג "${brand}" לעומק.
+  const prompt = `אתה שלושה אנשים בו זמנית:
+1. אסטרטג מותגים בכיר — מבין עמוק את הקטגוריה, הקהל, הפסיכולוגיה, המיצוב התחרותי
+2. מפיק מוסיקה ברמה עולמית — מכיר כל ז׳אנר, יודע לאמן שמות שירים ספציפיים, מפיקים, אלבומים, BPM, טקסטורה
+3. מעצב סאונד — מבין כיצד מוסיקה יוצרת רגש, זהות מותגית, חיבור פסיכולוגי לקהל
 
-חשוב בשלבים לפני כל מסקנה:
-1. מה אתה יודע על המותג — קטגוריה, היסטוריה, מיצוב, קהל, מתחרים
-2. מה זה אומר על הקהל — מי הם, מה מניע אותם, מה הם מחפשים
-3. מה זה אומר על הסאונד — איזה מוסיקה מדברת לקהל הזה ומייצגת את המותג הזה
-4. רק אז — הסק מסקנות
+משימתך: לנתח לעומק את המותג "${brand}".
+
+שלב 1 — מחקר מותג:
+- מה קטגוריית המוצר, מה ההיסטוריה, מה המיצוב, מה המסרים הפרסומיים
+- מי המתחרים ואיך הם ממוצבים
+- מה נתחי השוק, הכנסות, מוצרים מובילים — כל עובדה ידועה
+
+שלב 2 — פרופיל קהל:
+- מי קונה את המוצר הזה? מה הגיל, המגדר, המעמד, אורח החיים
+- מה הפסיכוגרפיה — מה מניע אותם, מה הם מרגישים, מה הם מחפשים
+- מה הקשר הרגשי שלהם למותג
+
+שלב 3 — DNA מוסיקלי (הכי קריטי):
+חשוב בשלבים:
+א. מה הארכיטיפ של המותג? Hero / Rebel / Caregiver / וכו׳ — וכיצד ארכיטיפ זה מתורגם לסאונד?
+ב. מה הקהל הזה מאזין לו? איזה ז׳אנרים, איזו אנרגיה, איזו תקופה מוסיקלית?
+ג. מה הרגש המרכזי שהמוסיקה צריכה לגרום — ביטחון? הנאה? שייכות? גאווה?
+ד. עכשיו — חפש בזיכרון שלך שירים ספציפיים שנשמעים כמו שהמותג הזה צריך להישמע.
+   חייב לתת: שם שיר אמיתי, שם אמן אמיתי, שנה, ומה ספציפית ברצועה מתאים.
+ה. אמנים — מי כותב את המוסיקה שהקהל הזה אוהב? שמות אמיתיים + למה.
+ו. מפיקים — מי הפיק את הסאונד שמתאים? שמות אמיתיים.
+ז. אלבומים — אילו אלבומים שלמים מייצגים את העולם הסוני הנכון?
 
 כלל ברזל: כל שדה מסקנה מלווה בנימוק מפורט. לא רק מה — אלא כל תהליך החשיבה שהוביל לשם.
+כלל ברזל לבריף מוסיקלי: ללא שמות אמיתיים וספציפיים — אין ערך. לא "אמן בסגנון פופ" אלא "Taylor Swift". לא "שיר אנרגטי" אלא "Blinding Lights — The Weeknd, 2019".
 
 החזר JSON בלבד, הכל בעברית:
 {
