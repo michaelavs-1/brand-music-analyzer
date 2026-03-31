@@ -235,46 +235,40 @@
 
   .loading.active { display: block; }
 
-  .loading-spinner {
-    width: 48px;
-    height: 48px;
-    border: 3px solid var(--border);
-    border-top-color: var(--accent);
-    border-radius: 50%;
-    animation: spin 0.8s linear infinite;
-    margin: 0 auto 20px;
-  }
-
   @keyframes spin { to { transform: rotate(360deg); } }
 
-  .loading-text {
+  .loading-label {
+    font-size: 15px;
     color: var(--text2);
-    font-size: 16px;
+    margin-bottom: 20px;
+    min-height: 24px;
+    transition: all 0.4s;
   }
 
-  .loading-steps {
-    margin-top: 20px;
-    display: flex;
-    flex-direction: column;
-    gap: 8px;
-    align-items: center;
+  .progress-wrap {
+    width: 100%;
+    max-width: 440px;
+    margin: 0 auto 16px;
+    background: var(--surface2);
+    border-radius: 999px;
+    height: 8px;
+    overflow: hidden;
+    border: 1px solid var(--border);
   }
 
-  .loading-step {
-    font-size: 13px;
-    color: var(--text2);
-    opacity: 0.4;
-    transition: all 0.5s;
+  .progress-fill {
+    height: 100%;
+    border-radius: 999px;
+    background: linear-gradient(90deg, var(--accent), var(--accent2));
+    width: 0%;
+    transition: width 0.6s cubic-bezier(.4,0,.2,1);
   }
 
-  .loading-step.active {
-    opacity: 1;
+  .progress-pct {
+    font-size: 28px;
+    font-weight: 800;
     color: var(--accent2);
-  }
-
-  .loading-step.done {
-    opacity: 0.7;
-    color: var(--success);
+    margin-bottom: 8px;
   }
 
   /* Results */
@@ -871,14 +865,11 @@
 
   <!-- Loading -->
   <div class="loading" id="loading">
-    <div class="loading-spinner"></div>
-    <div class="loading-text">מנתח את המותג...</div>
-    <div class="loading-steps">
-      <div class="loading-step" id="step1">🔍 איסוף מידע על המותג</div>
-      <div class="loading-step" id="step2">👥 מיפוי קהל יעד ופסיכוגרפיה</div>
-      <div class="loading-step" id="step3">🎵 בניית בריף מוסיקלי</div>
-      <div class="loading-step" id="step4">🚀 מיפוי קהלים לצמיחה</div>
+    <div class="progress-pct" id="progressPct">0%</div>
+    <div class="progress-wrap">
+      <div class="progress-fill" id="progressFill"></div>
     </div>
+    <div class="loading-label" id="loadingLabel">מתחיל ניתוח...</div>
   </div>
 
   <!-- Results -->
@@ -986,13 +977,49 @@ function showError(msg) {
   setTimeout(() => el.classList.remove('active'), 5000);
 }
 
-async function animateSteps() {
-  const steps = ['step1', 'step2', 'step3', 'step4'];
-  for (let i = 0; i < steps.length; i++) {
-    await new Promise(r => setTimeout(r, 1500));
-    if (i > 0) document.getElementById(steps[i - 1]).classList.replace('active', 'done');
-    document.getElementById(steps[i]).classList.add('active');
+const _loadingStages = [
+  { pct: 5,  label: '🔍 איסוף נתוני חברה ומותג...' },
+  { pct: 18, label: '📊 ניתוח פיננסי ונתחי שוק...' },
+  { pct: 32, label: '🎭 זיהוי ארכיטיפ ו-DNA מותגי...' },
+  { pct: 47, label: '👥 מיפוי קהל יעד ופסיכוגרפיה...' },
+  { pct: 60, label: '🗺️ מיצוב תחרותי ו-White Space...' },
+  { pct: 72, label: '🎯 בניית מסע רגשי...' },
+  { pct: 83, label: '🎵 עיצוב בריף מוסיקלי מעמיק...' },
+  { pct: 92, label: '💿 חיפוש רפרנסים — שירים, אמנים, מפיקים...' },
+  { pct: 97, label: '🚀 מיפוי קהלים לצמיחה...' },
+];
+
+let _progressInterval = null;
+
+function startProgressAnimation() {
+  const fill = document.getElementById('progressFill');
+  const pct  = document.getElementById('progressPct');
+  const lbl  = document.getElementById('loadingLabel');
+  let stageIdx = 0;
+
+  function applyStage(s) {
+    fill.style.width = s.pct + '%';
+    pct.textContent  = s.pct + '%';
+    lbl.textContent  = s.label;
   }
+
+  applyStage(_loadingStages[0]);
+
+  _progressInterval = setInterval(() => {
+    stageIdx = Math.min(stageIdx + 1, _loadingStages.length - 1);
+    applyStage(_loadingStages[stageIdx]);
+    if (stageIdx === _loadingStages.length - 1) clearInterval(_progressInterval);
+  }, 1600);
+}
+
+function finishProgress() {
+  clearInterval(_progressInterval);
+  const fill = document.getElementById('progressFill');
+  const pct  = document.getElementById('progressPct');
+  const lbl  = document.getElementById('loadingLabel');
+  fill.style.width = '100%';
+  pct.textContent  = '100%';
+  lbl.textContent  = '✓ הניתוח הושלם';
 }
 
 async function analyze() {
@@ -1011,11 +1038,7 @@ async function analyze() {
   results.innerHTML = '';
   loading.classList.add('active');
 
-  // Reset steps
-  ['step1','step2','step3','step4'].forEach(s => {
-    document.getElementById(s).classList.remove('active','done');
-  });
-  animateSteps();
+  startProgressAnimation();
 
   const prompt = `אתה אסטרטג מותגים, מפיק מוסיקלי ומעצב סאונד ברמה עולמית. עליך לנתח את המותג "${brand}" לעומק.
 
@@ -1154,30 +1177,56 @@ async function analyze() {
     }
   ],
   "musicBrief": {
+    "sonicOneLiner": "משפט אחד שמסכם את כל ה-DNA המוסיקלי של המותג — מה הסאונד שלו בעצם",
     "primaryGenre": "ז׳אנר מוסיקלי עיקרי",
     "primaryGenreReasoning": "למה הז׳אנר הזה? איך הוא נגזר מהארכיטיפ, מהקהל, ומהמיצוב התחרותי?",
     "subGenres": ["תת-ז׳אנר1", "תת-ז׳אנר2"],
-    "bpm": "טווח BPM מומלץ",
+    "eraInfluence": "השפעת תקופה מוסיקלית — איזו עידן/עשור מהדהד (למשל: 'אנרגיית שנות ה-90 עם פיניש מודרני 2020s')",
+    "bpm": "טווח BPM מומלץ (למשל: 95-105)",
     "bpmReasoning": "למה הטמפו הזה? מה באנרגיה של המותג ובציפיות הקהל מצדיק אותו?",
-    "mood": "מצב רוח מוסיקלי",
+    "groove": "סוג הגרוב — straight / swung / half-time / syncopated / rubato + הסבר",
+    "keyTonality": "טונליות — major / minor / modal / ambiguous + אפקט רגשי",
+    "mood": "מצב רוח מוסיקלי מדויק (שני-שלושה תארים)",
     "moodReasoning": "למה מצב הרוח הזה? איך הוא משקף את החוויה שהמותג רוצה ליצור?",
     "energy": 75,
     "energyReasoning": "למה רמת האנרגיה הזו? מה בקהל ובהקשר השימוש קובע את העוצמה?",
-    "instruments": ["כלי1", "כלי2", "כלי3"],
+    "frequencyProfile": "פרופיל תדרים — bass-heavy / mid-focused / bright-treble / balanced + מה זה אומר על הצליל",
+    "sonicTexture": "תיאור מילולי מפורט של הטקסטורה הסונית — איך זה נשמע בדיוק, מה מרגישים כשהמוסיקה מתנגנת",
+    "instruments": [
+      { "name": "שם כלי", "detail": "פרט על הצליל הספציפי המבוקש — למשל: 'גיטרה חשמלית עם קורוס קל, ללא דיסטורשן'" }
+    ],
     "instrumentsReasoning": "למה הכלים האלה? מה בצליל שלהם מתחבר לאופי המותג ולארכיטיפ שלו?",
-    "vocalStyle": "סגנון שירה מומלץ",
+    "vocalStyle": "סגנון שירה מדויק — מין, טונליות, style (belting/falsetto/spoken word/no vocals), שפה",
     "vocalStyleReasoning": "למה הקול הזה? איך הוא מדבר לקהל ומייצג את הארכיטיפ?",
-    "productionStyle": "סגנון הפקה מוסיקלית",
+    "productionStyle": "סגנון הפקה — dry/wet, analog/digital, sparse/layered, clean/lo-fi",
     "productionStyleReasoning": "למה סגנון ההפקה הזה? מה בעולם המותג מחייב את הגישה הזו?",
-    "referenceArtists": ["אמן1", "אמן2", "אמן3"],
-    "referenceArtistsReasoning": "למה האמנים האלה? מה באסתטיקה שלהם תואם את המותג?",
-    "referenceTracks": ["שיר1 - אמן", "שיר2 - אמן"],
-    "referenceTracksReasoning": "מה ספציפית בכל שיר מייצג את הסאונד שהמותג צריך?",
+    "productionTechniques": ["טכניקת הפקה ספציפית1", "טכניקה2", "טכניקה3"],
+    "referenceArtists": [
+      { "name": "שם אמן", "why": "למה הוא רלוונטי — מה ספציפית באסתטיקה שלו מתחבר למותג" }
+    ],
+    "referenceArtistsReasoning": "מה המכנה המשותף בין כל האמנים האלה ואיך הוא מגדיר את הסאונד של המותג?",
+    "referenceTracks": [
+      {
+        "track": "שם השיר",
+        "artist": "שם האמן",
+        "year": "שנה",
+        "element": "מה ספציפית ברצועה הזו מייצג את הסאונד הרצוי — BPM? הפקה? קול? אווירה? מבנה?"
+      }
+    ],
+    "referenceAlbums": [
+      { "album": "שם אלבום", "artist": "אמן", "why": "מה באלבום הזה כולו — גישה, פלטה, עולם — רלוונטי למותג" }
+    ],
+    "referenceProducers": [
+      { "name": "שם מפיק", "knownFor": "עבד עם / ידוע בזכות", "relevance": "מה הסאונד שלו נותן למותג" }
+    ],
     "lyricalThemes": ["נושא1", "נושא2", "נושא3"],
     "lyricalThemesReasoning": "איך הנושאים האלה מתחברים לערכי המותג ולמסע הרגשי של הקהל?",
     "avoidElements": ["להימנע1", "להימנע2"],
     "avoidElementsReasoning": "מה הסיכון בכל אלמנט? איך הוא עלול לפגוע במותג?",
-    "briefSummary": "סיכום בריף מוסיקלי ב-3-4 משפטים — מה הסאונד, למה הוא מתאים, ומה הוא אמור לגרום לקהל להרגיש"
+    "avoidArtists": [
+      { "name": "אמן להימנע", "reason": "למה הסאונד/תדמית שלו לא מתאים למותג" }
+    ],
+    "briefSummary": "סיכום בריף מוסיקלי ב-4-5 משפטים — מה הסאונד המדויק, מה ה-DNA שלו, למה הוא מתאים לקהל הזה ולמותג הזה, ומה הוא אמור לגרום לקהל להרגיש"
   },
   "audienceExpansion": [
     {
@@ -1197,6 +1246,7 @@ async function analyze() {
 - הכל בעברית
 - companyFacts: מידע עובדתי בלבד — מספרים, תאריכים, עובדות. אם אין נתון מדויק — ציין הערכה מקצועית עם סימן ~. אל תמציא מספרים בצורה ודאית.
 - כל reasoning — מינימום 2-3 משפטים מפורטים
+- musicBrief: חובה לכלול לפחות 5 referenceTracks ספציפיים (track, artist, year, element), לפחות 4 referenceArtists עם why, לפחות 2 referenceAlbums ו-2 referenceProducers. כל רפרנס — ספציפי ומנומק
 - audienceExpansion: בדיוק 3 קהלים עם סגנונות מוסיקה שונים לחלוטין
 - touchpointMap: 5 נקודות מגע
 - emotionalJourney: 4 שלבים`;
@@ -1213,7 +1263,7 @@ async function analyze() {
         max_tokens: 12000,
         response_format: { type: 'json_object' },
         messages: [
-          { role: 'system', content: 'אתה אסטרטג מותגים, מפיק מוסיקלי ומעצב סאונד ברמה עולמית. הכלל החשוב ביותר: כל מסקנה חייבת להיות מלווה בנימוק מפורט שמסביר את כל תהליך החשיבה שהוביל אליה. לא רק מה — אלא למה. תמיד מחזיר JSON תקין בלבד, הכל בעברית.' },
+          { role: 'system', content: 'אתה אסטרטג מותגים, מפיק מוסיקלי ומעצב סאונד ברמה עולמית. הכלל החשוב ביותר: כל מסקנה חייבת להיות מלווה בנימוק מפורט שמסביר את כל תהליך החשיבה שהוביל אליה. לא רק מה — אלא למה. בבריף המוסיקלי: אתה חייב לתת רפרנסים מדויקים — שמות שירים ספציפיים, שמות אמנים ספציפיים, שמות אלבומים ספציפיים, שמות מפיקים ספציפיים — עם הסבר מדויק מה ספציפית בכל אחד מהם. לא ז׳אנרים כלליים. שמות אמיתיים. תמיד מחזיר JSON תקין בלבד, הכל בעברית.' },
           { role: 'user', content: prompt }
         ]
       })
@@ -1237,10 +1287,14 @@ async function analyze() {
       else throw new Error('תשובה לא תקינה מה-AI');
     }
 
-    loading.classList.remove('active');
-    renderResults(json);
+    finishProgress();
+    setTimeout(() => {
+      loading.classList.remove('active');
+      renderResults(json);
+    }, 400);
 
   } catch (err) {
+    clearInterval(_progressInterval);
     loading.classList.remove('active');
     showError('שגיאה: ' + err.message);
   }
@@ -1479,44 +1533,121 @@ function renderResults(d) {
   )).join('');
 
   // ── TAB 5: בריף מוסיקלי ──────────────────────────────────────
+  const instrumentsHtml = Array.isArray(m.instruments)
+    ? (typeof m.instruments[0] === 'object'
+        ? (m.instruments||[]).map(i=>`<div style="padding:8px 0;border-bottom:1px solid var(--border);"><strong style="color:var(--text);">${i.name||''}</strong><div style="font-size:13px;color:var(--text2);margin-top:2px;">${i.detail||''}</div></div>`).join('')
+        : `<div class="tags">${(m.instruments||[]).map(v=>'<span class="tag">'+v+'</span>').join('')}</div>`)
+    : '';
+
+  const refArtistsHtml = Array.isArray(m.referenceArtists)
+    ? (typeof m.referenceArtists[0] === 'object'
+        ? (m.referenceArtists||[]).map(a=>`<div style="padding:8px 0;border-bottom:1px solid var(--border);"><strong style="color:var(--accent2);">${a.name||''}</strong><div style="font-size:13px;color:var(--text2);margin-top:2px;">${a.why||''}</div></div>`).join('')
+        : `<div class="tags">${(m.referenceArtists||[]).map(v=>'<span class="tag">'+v+'</span>').join('')}</div>`)
+    : '';
+
+  const refTracksHtml = (m.referenceTracks||[]).map(t => {
+    if (typeof t === 'object') {
+      return `<div style="background:var(--surface2);border-radius:8px;padding:12px 14px;margin-bottom:8px;">
+        <div style="display:flex;align-items:center;gap:10px;margin-bottom:6px;">
+          <span style="font-size:18px;">▶</span>
+          <div>
+            <div style="font-size:14px;font-weight:700;color:var(--text);">${t.track||''}</div>
+            <div style="font-size:13px;color:var(--accent2);">${t.artist||''}${t.year ? ' · '+t.year : ''}</div>
+          </div>
+        </div>
+        <div style="font-size:13px;color:var(--text2);padding-right:28px;line-height:1.7;">${t.element||''}</div>
+      </div>`;
+    }
+    return `<div style="padding:5px 0;color:var(--text2);">▶ ${t}</div>`;
+  }).join('');
+
+  const refAlbumsHtml = (m.referenceAlbums||[]).map(a => typeof a === 'object'
+    ? `<div style="padding:8px 0;border-bottom:1px solid var(--border);">
+        <strong style="color:var(--text);">${a.album||''}</strong> <span style="color:var(--text2);font-size:13px;">— ${a.artist||''}</span>
+        <div style="font-size:13px;color:var(--text2);margin-top:3px;">${a.why||''}</div>
+      </div>`
+    : `<div style="padding:5px 0;color:var(--text2);">📀 ${a}</div>`
+  ).join('');
+
+  const refProducersHtml = (m.referenceProducers||[]).map(p => typeof p === 'object'
+    ? `<div style="padding:8px 0;border-bottom:1px solid var(--border);">
+        <strong style="color:var(--accent2);">${p.name||''}</strong>
+        <div style="font-size:12px;color:var(--text2);margin-top:2px;">${p.knownFor||''}</div>
+        <div style="font-size:13px;color:var(--text);margin-top:3px;">${p.relevance||''}</div>
+      </div>`
+    : `<div style="padding:5px 0;color:var(--text2);">${p}</div>`
+  ).join('');
+
+  const avoidArtistsHtml = (m.avoidArtists||[]).map(a => typeof a === 'object'
+    ? `<div style="padding:7px 0;border-bottom:1px solid var(--border);">
+        <strong style="color:#f87171;">${a.name||''}</strong>
+        <div style="font-size:13px;color:var(--text2);margin-top:2px;">${a.reason||''}</div>
+      </div>`
+    : `<span class="tag" style="border-color:rgba(239,68,68,.3);color:#f87171;">${a}</span>`
+  ).join('');
+
   const tab5 = `
-    ${acc('mb-genre','🎼','ז׳אנר, טמפו, מצב רוח',`
+    ${m.sonicOneLiner ? `<div style="background:linear-gradient(135deg,rgba(200,164,78,.12),rgba(226,192,110,.06));border:1px solid var(--accent);border-radius:12px;padding:18px 20px;margin-bottom:16px;font-size:17px;font-weight:600;color:var(--accent2);line-height:1.6;">״${m.sonicOneLiner}״</div>` : ''}
+
+    ${acc('mb-dna','🎼','ז׳אנר · טמפו · טקסטורה',`
       <div class="card-content" style="padding-top:12px;">
         <div class="section-block"><div class="section-label">ז׳אנר עיקרי</div><strong style="font-size:17px;color:var(--accent2);">${m.primaryGenre||''}</strong>${R(m.primaryGenreReasoning)}</div>
         <div class="section-block"><div class="section-label">תת-ז׳אנרים</div><div class="tags">${(m.subGenres||[]).map(v=>'<span class="tag">'+v+'</span>').join('')}</div></div>
-        <div class="section-block"><div class="section-label">BPM</div><strong>${m.bpm||''}</strong>${R(m.bpmReasoning)}</div>
+        <div class="section-block"><div class="section-label">השפעת תקופה</div>${m.eraInfluence||''}</div>
+        <div class="section-block"><div class="section-label">BPM</div><strong>${m.bpm||''}</strong> &nbsp;|&nbsp; <span style="color:var(--text2);">${m.groove||''}</span>${R(m.bpmReasoning)}</div>
+        <div class="section-block"><div class="section-label">טונליות</div>${m.keyTonality||''}</div>
         <div class="section-block"><div class="section-label">מצב רוח</div><strong>${m.mood||''}</strong>${R(m.moodReasoning)}</div>
         <div class="section-block">
           <div class="section-label">אנרגיה</div>
-          <div class="meter">
-            <div class="meter-label"><span>נמוכה</span><span>${m.energy||0}%</span><span>גבוהה</span></div>
-            <div class="meter-bar"><div class="meter-fill" style="width:${m.energy||0}%"></div></div>
-          </div>
+          <div class="meter"><div class="meter-label"><span>נמוכה</span><span>${m.energy||0}%</span><span>גבוהה</span></div><div class="meter-bar"><div class="meter-fill" style="width:${m.energy||0}%"></div></div></div>
           ${R(m.energyReasoning)}
         </div>
+        <div class="section-block"><div class="section-label">פרופיל תדרים</div>${m.frequencyProfile||''}</div>
+        <div class="section-block"><div class="section-label">טקסטורה סונית</div><div style="font-size:14px;color:var(--text);line-height:1.8;">${m.sonicTexture||''}</div></div>
       </div>
     `, false)}
-    ${acc('mb-prod','🎚️','הפקה, שירה, כלי נגינה',`
+
+    ${acc('mb-prod','🎚️','הפקה · שירה · כלי נגינה',`
       <div class="card-content" style="padding-top:12px;">
         <div class="section-block"><div class="section-label">סגנון הפקה</div><strong>${m.productionStyle||''}</strong>${R(m.productionStyleReasoning)}</div>
+        ${m.productionTechniques && m.productionTechniques.length ? `<div class="section-block"><div class="section-label">טכניקות הפקה</div><div class="tags">${(m.productionTechniques||[]).map(v=>'<span class="tag">'+v+'</span>').join('')}</div></div>` : ''}
         <div class="section-block"><div class="section-label">סגנון שירה</div><strong>${m.vocalStyle||''}</strong>${R(m.vocalStyleReasoning)}</div>
-        <div class="section-block"><div class="section-label">כלי נגינה</div><div class="tags">${(m.instruments||[]).map(v=>'<span class="tag">'+v+'</span>').join('')}</div>${R(m.instrumentsReasoning)}</div>
+        <div class="section-block"><div class="section-label">כלי נגינה</div>${instrumentsHtml}${R(m.instrumentsReasoning)}</div>
       </div>
     `, false)}
-    ${acc('mb-ref','🎧','רפרנסים מוסיקליים',`
+
+    ${acc('mb-ref-tracks','🎧','רפרנסים — שירים ספציפיים',`
+      <div style="padding-top:12px;">${refTracksHtml || '<div style="color:var(--text2);font-size:14px;">אין רפרנסים</div>'}</div>
+    `, false)}
+
+    ${acc('mb-ref-artists','🎤','רפרנסים — אמנים',`
+      <div style="padding-top:12px;">${refArtistsHtml}${R(m.referenceArtistsReasoning)}</div>
+    `, false)}
+
+    ${refAlbumsHtml ? acc('mb-ref-albums','💿','רפרנסים — אלבומים',`
+      <div style="padding-top:12px;">${refAlbumsHtml}</div>
+    `, false) : ''}
+
+    ${refProducersHtml ? acc('mb-ref-prod','🎛️','רפרנסים — מפיקים',`
+      <div style="padding-top:12px;">${refProducersHtml}</div>
+    `, false) : ''}
+
+    ${acc('mb-lyrics','✍️','נושאים לטקסטים',`
       <div class="card-content" style="padding-top:12px;">
-        <div class="section-block"><div class="section-label">אמנים לרפרנס</div><div class="tags">${(m.referenceArtists||[]).map(v=>'<span class="tag">'+v+'</span>').join('')}</div>${R(m.referenceArtistsReasoning)}</div>
-        <div class="section-block"><div class="section-label">שירים לרפרנס</div>${(m.referenceTracks||[]).map(v=>'<div style="padding:4px 0;color:var(--text2)">▶ '+v+'</div>').join('')}${R(m.referenceTracksReasoning)}</div>
+        <div class="tags">${(m.lyricalThemes||[]).map(v=>'<span class="tag">'+v+'</span>').join('')}</div>
+        ${R(m.lyricalThemesReasoning)}
       </div>
     `, false)}
-    ${acc('mb-lyrics','✍️','טקסטים ומה להימנע',`
+
+    ${acc('mb-avoid','🚫','מה להימנע ממנו',`
       <div class="card-content" style="padding-top:12px;">
-        <div class="section-block"><div class="section-label">נושאים לטקסטים</div><div class="tags">${(m.lyricalThemes||[]).map(v=>'<span class="tag">'+v+'</span>').join('')}</div>${R(m.lyricalThemesReasoning)}</div>
-        <div class="section-block"><div class="section-label">מה להימנע ממנו</div><div class="tags">${(m.avoidElements||[]).map(v=>'<span class="tag" style="border-color:rgba(239,68,68,.3);color:#f87171">'+v+'</span>').join('')}</div>${R(m.avoidElementsReasoning)}</div>
+        <div class="section-block"><div class="section-label">אלמנטים להימנע</div><div class="tags">${(m.avoidElements||[]).map(v=>'<span class="tag" style="border-color:rgba(239,68,68,.3);color:#f87171">'+v+'</span>').join('')}</div>${R(m.avoidElementsReasoning)}</div>
+        ${avoidArtistsHtml ? `<div class="section-block"><div class="section-label">אמנים להימנע</div>${avoidArtistsHtml}</div>` : ''}
       </div>
     `, false)}
+
     ${acc('mb-summary','📄','סיכום הבריף',`
-      <div style="background:var(--surface2);border-radius:10px;padding:16px;margin-top:12px;font-size:15px;line-height:1.9;color:var(--text);">${m.briefSummary||''}</div>
+      <div style="background:var(--surface2);border-radius:10px;padding:18px;margin-top:12px;font-size:15px;line-height:1.9;color:var(--text);">${m.briefSummary||''}</div>
     `, false)}
   `;
 
