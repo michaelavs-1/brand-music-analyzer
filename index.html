@@ -1030,6 +1030,32 @@ async function analyze() {
 החזר JSON בלבד, הכל בעברית:
 {
   "brandName": "${brand}",
+  "companyFacts": {
+    "founded": "שנת הקמה",
+    "headquarters": "מטה החברה",
+    "parentCompany": "חברת אם (אם רלוונטי, אחרת null)",
+    "subsidiaries": ["חברת בת1", "חברת בת2"],
+    "revenue": "הכנסות שנתיות (ציין שנה)",
+    "revenueGrowth": "צמיחה בהכנסות YoY",
+    "marketCap": "שווי שוק (אם ציבורית)",
+    "stockSymbol": "סימול בורסה (אם ציבורית, אחרת null)",
+    "employeeCount": "מספר עובדים",
+    "marketShare": "נתח שוק בקטגוריה הראשית + שם הקטגוריה",
+    "marketPosition": "מיקום בשוק (#1, #2, וכו׳) ומה הבסיס לכך",
+    "keyProducts": [
+      { "name": "שם מוצר/קטגוריה", "detail": "פרט קצר — מחיר, נתח, מה מיוחד בו" }
+    ],
+    "recentLaunches": [
+      { "name": "שם השקה", "year": "שנה", "detail": "מה זה ולמה זה חשוב" }
+    ],
+    "geographicPresence": "אזורי פעילות עיקריים + מספר מדינות",
+    "mainCompetitors": [
+      { "name": "שם מתחרה", "marketShare": "נתח שוק משוער" }
+    ],
+    "notableAchievements": ["הישג1", "הישג2", "הישג3"],
+    "recentNews": ["חדשות/אירוע עסקי מהשנה האחרונה", "חדשות2"],
+    "challenges": "אתגרים עסקיים נוכחיים — תחרות, רגולציה, שוק"
+  },
   "brandArchetype": {
     "primary": "ארכיטיפ ראשי (Hero / Rebel / Caregiver / Sage / Creator / Ruler / Innocent / Explorer / Jester / Lover / Everyman / Magician)",
     "secondary": "ארכיטיפ משני",
@@ -1169,6 +1195,7 @@ async function analyze() {
 כללים:
 - JSON בלבד, ללא markdown
 - הכל בעברית
+- companyFacts: מידע עובדתי בלבד — מספרים, תאריכים, עובדות. אם אין נתון מדויק — ציין הערכה מקצועית עם סימן ~. אל תמציא מספרים בצורה ודאית.
 - כל reasoning — מינימום 2-3 משפטים מפורטים
 - audienceExpansion: בדיוק 3 קהלים עם סגנונות מוסיקה שונים לחלוטין
 - touchpointMap: 5 נקודות מגע
@@ -1247,6 +1274,97 @@ function renderResults(d) {
   const scm = d.sonicCompetitiveMap || {};
   const ej = d.emotionalJourney || [];
   const tp = d.touchpointMap || [];
+  const cf = d.companyFacts || {};
+
+  // ── TAB 0: נתונים ─────────────────────────────────────────────
+  function factRow(label, value) {
+    if (!value || value === 'null') return '';
+    return `<tr style="border-bottom:1px solid var(--border);">
+      <td style="padding:9px 4px;font-size:12px;font-weight:700;color:var(--accent2);text-transform:uppercase;letter-spacing:.5px;width:38%;vertical-align:top;">${label}</td>
+      <td style="padding:9px 4px;font-size:14px;color:var(--text);line-height:1.6;">${value}</td>
+    </tr>`;
+  }
+
+  const keyProductsHtml = (cf.keyProducts||[]).map(p => `
+    <div style="background:var(--surface2);border-radius:8px;padding:10px 14px;margin-bottom:8px;">
+      <div style="font-size:14px;font-weight:700;color:var(--text);">${p.name||''}</div>
+      <div style="font-size:13px;color:var(--text2);margin-top:2px;">${p.detail||''}</div>
+    </div>`).join('');
+
+  const launchesHtml = (cf.recentLaunches||[]).map(l => `
+    <div style="background:var(--surface2);border-radius:8px;padding:10px 14px;margin-bottom:8px;display:flex;gap:12px;align-items:flex-start;">
+      <div style="background:var(--accent);color:#000;border-radius:6px;padding:2px 8px;font-size:11px;font-weight:700;white-space:nowrap;flex-shrink:0;">${l.year||''}</div>
+      <div>
+        <div style="font-size:14px;font-weight:700;color:var(--text);">${l.name||''}</div>
+        <div style="font-size:13px;color:var(--text2);margin-top:2px;">${l.detail||''}</div>
+      </div>
+    </div>`).join('');
+
+  const competitorsHtml = (cf.mainCompetitors||[]).map(c => `
+    <div style="display:flex;justify-content:space-between;align-items:center;padding:8px 0;border-bottom:1px solid var(--border);">
+      <span style="font-size:14px;color:var(--text);">${c.name||''}</span>
+      <span style="font-size:13px;color:var(--text2);">${c.marketShare||''}</span>
+    </div>`).join('');
+
+  const tab0 = `
+    <div style="margin-bottom:12px;">
+      <div class="brand-highlight" style="font-size:32px;">${d.brandName}</div>
+    </div>
+
+    ${acc('cf-identity','🏢','זהות החברה', `
+      <div style="padding-top:12px;">
+        <table style="width:100%;border-collapse:collapse;">
+          ${factRow('הוקמה', cf.founded)}
+          ${factRow('מטה', cf.headquarters)}
+          ${factRow('חברת אם', cf.parentCompany)}
+          ${factRow('חברות בת', (cf.subsidiaries||[]).filter(s=>s&&s!=='null').join(' · ') || null)}
+          ${factRow('עובדים', cf.employeeCount)}
+          ${factRow('נוכחות גיאוגרפית', cf.geographicPresence)}
+        </table>
+      </div>
+    `, false)}
+
+    ${acc('cf-finance','💰','פיננסים ושוק', `
+      <div style="padding-top:12px;">
+        <table style="width:100%;border-collapse:collapse;">
+          ${factRow('הכנסות', cf.revenue)}
+          ${factRow('צמיחה YoY', cf.revenueGrowth)}
+          ${factRow('שווי שוק', cf.marketCap)}
+          ${factRow('סימול בורסה', cf.stockSymbol)}
+          ${factRow('נתח שוק', cf.marketShare)}
+          ${factRow('מיקום בשוק', cf.marketPosition)}
+        </table>
+      </div>
+    `, false)}
+
+    ${cf.keyProducts && cf.keyProducts.length ? acc('cf-products','📦','מוצרים מובילים', `
+      <div style="padding-top:12px;">${keyProductsHtml}</div>
+    `, false) : ''}
+
+    ${cf.recentLaunches && cf.recentLaunches.length ? acc('cf-launches','🚀','השקות אחרונות', `
+      <div style="padding-top:12px;">${launchesHtml}</div>
+    `, false) : ''}
+
+    ${cf.mainCompetitors && cf.mainCompetitors.length ? acc('cf-comp','⚔️','מתחרים ונתחי שוק', `
+      <div style="padding-top:12px;">${competitorsHtml}</div>
+    `, false) : ''}
+
+    ${cf.notableAchievements && cf.notableAchievements.length ? acc('cf-achieve','🏆','הישגים בולטים', `
+      <div style="padding-top:12px;">
+        ${(cf.notableAchievements||[]).map(a=>`<div style="padding:7px 0;border-bottom:1px solid var(--border);font-size:14px;color:var(--text);">✦ ${a}</div>`).join('')}
+      </div>
+    `, false) : ''}
+
+    ${cf.recentNews && cf.recentNews.length ? acc('cf-news','📰','חדשות אחרונות', `
+      <div style="padding-top:12px;">
+        ${(cf.recentNews||[]).map(n=>`<div style="padding:7px 0;border-bottom:1px solid var(--border);font-size:14px;color:var(--text2);">▸ ${n}</div>`).join('')}
+      </div>
+    `, false) : ''}
+
+    ${cf.challenges ? acc('cf-challenges','⚠️','אתגרים עסקיים', `
+      <div style="padding:12px 0;font-size:14px;color:var(--text2);line-height:1.8;">${cf.challenges}</div>
+    `, false) : ''}
+  `;
 
   // ── TAB 1: מותג ──────────────────────────────────────────────
   const tab1 = `
@@ -1417,12 +1535,13 @@ function renderResults(d) {
   )).join('') : '<p style="color:var(--text2);padding:20px 0;">אין נתוני הרחבת קהלים</p>';
 
   const tabs = [
-    { id:'tab-brand',   label:'🎭 מותג',          content: tab1 },
-    { id:'tab-aud',     label:'👥 קהל יעד',        content: tab2 },
-    { id:'tab-sonic',   label:'🗺️ מפת סאונד',     content: tab3 },
-    { id:'tab-journey', label:'🎯 מסע רגשי',       content: tab4 },
-    { id:'tab-brief',   label:'🎵 בריף מוסיקלי',  content: tab5 },
-    { id:'tab-growth',  label:'🚀 צמיחה',          content: tab6 },
+    { id:'tab-facts',   label:'📊 נתונים',         content: tab0 },
+    { id:'tab-brand',   label:'🎭 מותג',            content: tab1 },
+    { id:'tab-aud',     label:'👥 קהל יעד',         content: tab2 },
+    { id:'tab-sonic',   label:'🗺️ מפת סאונד',      content: tab3 },
+    { id:'tab-journey', label:'🎯 מסע רגשי',        content: tab4 },
+    { id:'tab-brief',   label:'🎵 בריף מוסיקלי',   content: tab5 },
+    { id:'tab-growth',  label:'🚀 צמיחה',           content: tab6 },
   ];
 
   results.innerHTML = `
