@@ -423,6 +423,153 @@
     margin-bottom: 6px;
   }
 
+  /* Settings */
+  .settings-toggle {
+    position: fixed;
+    top: 20px;
+    left: 20px;
+    width: 44px;
+    height: 44px;
+    border-radius: 12px;
+    background: var(--surface);
+    border: 1px solid var(--border);
+    color: var(--text2);
+    font-size: 20px;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 100;
+    transition: all 0.3s;
+  }
+
+  .settings-toggle:hover {
+    border-color: var(--accent);
+    color: var(--accent2);
+  }
+
+  .settings-panel {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0,0,0,0.7);
+    z-index: 200;
+    display: none;
+    align-items: center;
+    justify-content: center;
+  }
+
+  .settings-panel.active {
+    display: flex;
+  }
+
+  .settings-box {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 20px;
+    padding: 36px;
+    width: 90%;
+    max-width: 460px;
+    position: relative;
+  }
+
+  .settings-box h2 {
+    font-size: 22px;
+    font-weight: 700;
+    margin-bottom: 8px;
+  }
+
+  .settings-box p {
+    color: var(--text2);
+    font-size: 14px;
+    margin-bottom: 24px;
+  }
+
+  .settings-close {
+    position: absolute;
+    top: 16px;
+    left: 16px;
+    background: none;
+    border: none;
+    color: var(--text2);
+    font-size: 22px;
+    cursor: pointer;
+  }
+
+  .settings-close:hover { color: var(--text); }
+
+  .settings-saved {
+    display: inline-block;
+    color: var(--success);
+    font-size: 14px;
+    font-weight: 600;
+    margin-right: 12px;
+    opacity: 0;
+    transition: opacity 0.3s;
+  }
+
+  .settings-saved.show { opacity: 1; }
+
+  .api-status {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    margin-top: 16px;
+    font-size: 13px;
+    color: var(--text2);
+  }
+
+  .api-status-dot {
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+    background: rgba(239,68,68,0.8);
+  }
+
+  .api-status-dot.connected {
+    background: var(--success);
+  }
+
+  .save-key-btn {
+    background: linear-gradient(135deg, var(--accent), var(--accent2));
+    border: none;
+    border-radius: 10px;
+    padding: 12px 28px;
+    font-size: 15px;
+    font-weight: 700;
+    font-family: 'Heebo', sans-serif;
+    color: white;
+    cursor: pointer;
+    transition: all 0.3s;
+    margin-top: 16px;
+    width: 100%;
+  }
+
+  .save-key-btn:hover {
+    transform: translateY(-1px);
+    box-shadow: 0 4px 20px var(--accent-glow);
+  }
+
+  .delete-key-btn {
+    background: none;
+    border: 1px solid rgba(239,68,68,0.3);
+    border-radius: 10px;
+    padding: 10px 20px;
+    font-size: 13px;
+    font-family: 'Heebo', sans-serif;
+    color: #f87171;
+    cursor: pointer;
+    transition: all 0.3s;
+    margin-top: 10px;
+    width: 100%;
+  }
+
+  .delete-key-btn:hover {
+    background: rgba(239,68,68,0.1);
+  }
+
   /* Export button */
   .export-bar {
     display: flex;
@@ -503,22 +650,41 @@
 </head>
 <body>
 
+<!-- Settings Toggle -->
+<button class="settings-toggle" onclick="toggleSettings()">⚙</button>
+
+<!-- Settings Panel -->
+<div class="settings-panel" id="settingsPanel">
+  <div class="settings-box">
+    <button class="settings-close" onclick="toggleSettings()">✕</button>
+    <h2>⚙ הגדרות</h2>
+    <p>הזן את מפתח ה-API פעם אחת — הוא יישמר בדפדפן</p>
+    <div class="input-group">
+      <label>OpenAI API Key</label>
+      <input type="password" class="api-input" id="apiKeySettings" placeholder="sk-..." />
+    </div>
+    <button class="save-key-btn" onclick="saveApiKey()">שמור מפתח</button>
+    <button class="delete-key-btn" id="deleteKeyBtn" onclick="deleteApiKey()" style="display:none;">מחק מפתח שמור</button>
+    <div class="api-status" id="apiStatus">
+      <span class="api-status-dot" id="apiDot"></span>
+      <span id="apiStatusText">לא מוגדר מפתח</span>
+    </div>
+    <span class="settings-saved" id="savedMsg">✓ נשמר!</span>
+  </div>
+</div>
+
 <div class="container">
   <!-- Header -->
   <div class="header">
     <div class="logo">BrandSync AI</div>
     <h1>מותג → בריף מוסיקלי</h1>
-    <p>הזן שם מՕתג — ה-AI ינתח את הקהל ויתאים סגנון מוסיקלי מדויק</p>
+    <p>הזן שם מותג — ה-AI ינתח את הקהל ויתאים סגנון מוסיקלי מדויק</p>
   </div>
 
   <!-- Input -->
   <div class="input-section">
     <div class="input-group">
-      <label>OpenAI API Key</label>
-      <input type="password" class="api-input" id="apiKey" placeholder="sk-..." />
-    </div>
-    <div class="input-group">
-      <label>שם המՕתג</label>
+      <label>שם המותג</label>
       <div class="input-row">
         <input type="text" class="brand-input" id="brandInput" placeholder="הקלד שם מותג..." />
         <button class="analyze-btn" id="analyzeBtn" onclick="analyze()">נתח מותג ←</button>
@@ -543,7 +709,7 @@
     <div class="loading-spinner"></div>
     <div class="loading-text">מנתח את המותג...</div>
     <div class="loading-steps">
-      <div class="loading-step" id="step1">🔍 איסוף מידע על המՕתג</div>
+      <div class="loading-step" id="step1">🔍 איסוף מידע על המותג</div>
       <div class="loading-step" id="step2">👥 מיפוי קהל יעד</div>
       <div class="loading-step" id="step3">📊 ניתוח דמוגרפי ופסיכוגרפי</div>
       <div class="loading-step" id="step4">🎵 בניית בריף מוסיקלי</div>
@@ -555,6 +721,62 @@
 </div>
 
 <script>
+// --- API Key Management ---
+function getApiKey() {
+  return localStorage.getItem('brandsync_api_key') || '';
+}
+
+function saveApiKey() {
+  const key = document.getElementById('apiKeySettings').value.trim();
+  if (!key) { return; }
+  localStorage.setItem('brandsync_api_key', key);
+  updateApiStatus();
+  const msg = document.getElementById('savedMsg');
+  msg.classList.add('show');
+  setTimeout(() => msg.classList.remove('show'), 2000);
+}
+
+function deleteApiKey() {
+  localStorage.removeItem('brandsync_api_key');
+  document.getElementById('apiKeySettings').value = '';
+  updateApiStatus();
+}
+
+function updateApiStatus() {
+  const key = getApiKey();
+  const dot = document.getElementById('apiDot');
+  const text = document.getElementById('apiStatusText');
+  const delBtn = document.getElementById('deleteKeyBtn');
+  if (key) {
+    dot.classList.add('connected');
+    text.textContent = 'מפתח מוגדר — ' + key.slice(0, 7) + '...' + key.slice(-4);
+    delBtn.style.display = 'block';
+  } else {
+    dot.classList.remove('connected');
+    text.textContent = 'לא מוגדר מפתח';
+    delBtn.style.display = 'none';
+  }
+}
+
+function toggleSettings() {
+  const panel = document.getElementById('settingsPanel');
+  panel.classList.toggle('active');
+  if (panel.classList.contains('active')) {
+    const key = getApiKey();
+    if (key) document.getElementById('apiKeySettings').value = key;
+    updateApiStatus();
+  }
+}
+
+// Init on load
+document.addEventListener('DOMContentLoaded', () => {
+  updateApiStatus();
+  // If no key saved, auto-open settings
+  if (!getApiKey()) {
+    setTimeout(() => toggleSettings(), 600);
+  }
+});
+
 function quickFill(brand) {
   document.getElementById('brandInput').value = brand;
   document.getElementById('brandInput').focus();
@@ -578,10 +800,10 @@ async function animateSteps() {
 
 async function analyze() {
   const brand = document.getElementById('brandInput').value.trim();
-  const apiKey = document.getElementById('apiKey').value.trim();
+  const apiKey = getApiKey();
 
   if (!brand) { showError('הזן שם מותג'); return; }
-  if (!apiKey) { showError('הזן OpenAI API Key'); return; }
+  if (!apiKey) { showError('לא מוגדר מפתח API — לחץ על ⚙ כדי להגדיר'); toggleSettings(); return; }
 
   const btn = document.getElementById('analyzeBtn');
   const loading = document.getElementById('loading');
@@ -598,7 +820,7 @@ async function analyze() {
   });
   animateSteps();
 
-  const prompt = `אתה מומחה לניתוח מותגים, שיווק, דמוגרפיה ומוסיקה. נתח את המՕתג "${brand}" והחזר תשובה בפורמט JSON בלבד (בלי טקסט נוסף, רק JSON תקין).
+  const prompt = `אתה מומחה לניתוח מותגים, שיווק, דמוגרפיה ומוסיקה. נתח את המותג "${brand}" והחזר תשובה בפורמט JSON בלבד (בלי טקסט נוסף, רק JSON תקין).
 
 המבנה הנדרש:
 {
@@ -619,7 +841,7 @@ async function analyze() {
   "psychographics": {
     "personality": "תיאור האישיות הטיפוסית של הקהל",
     "emotionalDrivers": "מה מניע אותם רגשית",
-    "brandRelationship": "מה הקשר הרגשי שלהם למՕתג"
+    "brandRelationship": "מה הקשר הרגשי שלהם למותג"
   },
   "musicBrief": {
     "primaryGenre": "ז׳אנר מוסיקלי עיקרי",
