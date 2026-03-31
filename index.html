@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>BrandSync â × ××ª×× ×××ª× â ××¨××£ ×××¡××§××</title>
+<title>BrandSync — ניתוח מותג → בריף מוסיקלי</title>
 <style>
   @import url('https://fonts.googleapis.com/css2?family=Heebo:wght@300;400;500;600;700;800;900&display=swap');
 
@@ -507,8 +507,8 @@
   <!-- Header -->
   <div class="header">
     <div class="logo">BrandSync AI</div>
-    <h1>×××ª× â ××¨××£ ×××¡××§××</h1>
-    <p>××× ×©× ×Õ×ª× â ×-AI ×× ×ª× ××ª ××§×× ×××ª××× ×¡×× ×× ×××¡××§×× ×××××§</p>
+    <h1>מותג → בריף מוסיקלי</h1>
+    <p>הזן שם מՕתג — ה-AI ינתח את הקהל ויתאים סגנון מוסיקלי מדויק</p>
   </div>
 
   <!-- Input -->
@@ -518,22 +518,22 @@
       <input type="password" class="api-input" id="apiKey" placeholder="sk-..." />
     </div>
     <div class="input-group">
-      <label>×©× ××Õ×ª×</label>
+      <label>שם המՕתג</label>
       <div class="input-row">
-        <input type="text" class="brand-input" id="brandInput" placeholder="××§×× ×©× ×××ª×..." />
-        <button class="analyze-btn" id="analyzeBtn" onclick="analyze()">× ×ª× ×××ª× â</button>
+        <input type="text" class="brand-input" id="brandInput" placeholder="הקלד שם מותג..." />
+        <button class="analyze-btn" id="analyzeBtn" onclick="analyze()">נתח מותג ←</button>
       </div>
     </div>
     <div class="quick-brands">
-      <button class="quick-brand" onclick="quickFill('×©××¤×¨×¡×')">×©××¤×¨×¡×</button>
-      <button class="quick-brand" onclick="quickFill('×¡××§××')">×¡××§××</button>
+      <button class="quick-brand" onclick="quickFill('שופרסל')">שופרסל</button>
+      <button class="quick-brand" onclick="quickFill('סלקום')">סלקום</button>
       <button class="quick-brand" onclick="quickFill('Nike')">Nike</button>
       <button class="quick-brand" onclick="quickFill('Apple')">Apple</button>
       <button class="quick-brand" onclick="quickFill('Red Bull')">Red Bull</button>
       <button class="quick-brand" onclick="quickFill('IKEA')">IKEA</button>
-      <button class="quick-brand" onclick="quickFill('×¤×××¤××')">×¤×××¤××</button>
-      <button class="quick-brand" onclick="quickFill('×§×¡××¨×')">×§×¡××¨×</button>
-      <button class="quick-brand" onclick="quickFill('×××××')">×××××</button>
+      <button class="quick-brand" onclick="quickFill('פלאפון')">פלאפון</button>
+      <button class="quick-brand" onclick="quickFill('קסטרו')">קסטרו</button>
+      <button class="quick-brand" onclick="quickFill('אלביט')">אלביט</button>
     </div>
     <div class="error-msg" id="errorMsg"></div>
   </div>
@@ -541,12 +541,12 @@
   <!-- Loading -->
   <div class="loading" id="loading">
     <div class="loading-spinner"></div>
-    <div class="loading-text">×× ×ª× ××ª ××××ª×...</div>
+    <div class="loading-text">מנתח את המותג...</div>
     <div class="loading-steps">
-      <div class="loading-step" id="step1">ð ×××¡××£ ××××¢ ×¢× ××Õ×ª×</div>
-      <div class="loading-step" id="step2">ð¥ ×××¤×× ×§×× ××¢×</div>
-      <div class="loading-step" id="step3">ð × ××ª×× ×××××¨×¤× ××¤×¡×××××¨×¤×</div>
-      <div class="loading-step" id="step4">ðµ ×× ×××ª ××¨××£ ×××¡××§××</div>
+      <div class="loading-step" id="step1">🔍 איסוף מידע על המՕתג</div>
+      <div class="loading-step" id="step2">👥 מיפוי קהל יעד</div>
+      <div class="loading-step" id="step3">📊 ניתוח דמוגרפי ופסיכוגרפי</div>
+      <div class="loading-step" id="step4">🎵 בניית בריף מוסיקלי</div>
     </div>
   </div>
 
@@ -580,8 +580,8 @@ async function analyze() {
   const brand = document.getElementById('brandInput').value.trim();
   const apiKey = document.getElementById('apiKey').value.trim();
 
-  if (!brand) { showError('××× ×©× ×××ª×'); return; }
-  if (!apiKey) { showError('××× OpenAI API Key'); return; }
+  if (!brand) { showError('הזן שם מותג'); return; }
+  if (!apiKey) { showError('הזן OpenAI API Key'); return; }
 
   const btn = document.getElementById('analyzeBtn');
   const loading = document.getElementById('loading');
@@ -598,47 +598,47 @@ async function analyze() {
   });
   animateSteps();
 
-  const prompt = `××ª× ××××× ×× ××ª×× ×××ª×××, ×©××××§, ×××××¨×¤×× ××××¡××§×. × ×ª× ××ª ××Õ×ª× "${brand}" ×××××¨ ×ª×©××× ××¤××¨×× JSON ×××× (××× ××§×¡× × ××¡×£, ×¨×§ JSON ×ª×§××).
+  const prompt = `אתה מומחה לניתוח מותגים, שיווק, דמוגרפיה ומוסיקה. נתח את המՕתג "${brand}" והחזר תשובה בפורמט JSON בלבד (בלי טקסט נוסף, רק JSON תקין).
 
-×××× × ×× ××¨×©:
+המבנה הנדרש:
 {
   "brandName": "${brand}",
-  "brandSummary": "×ª××××¨ ×§×¦×¨ ×©× ××××ª× ×-2-3 ××©×¤×××",
+  "brandSummary": "תיאור קצר של המותג ב-2-3 משפטים",
   "audience": {
-    "primaryAge": "×××× ×××××× ×¢××§×¨× (×××©×: 25-45)",
-    "secondaryAge": "×××× ×××××× ××©× ×",
-    "gender": "××××§× ××××¨××ª ×××××××",
-    "socioeconomic": "××¢×× ×¡××¦××××§×× ××× (× ×××/××× ×× ×-× ×××/××× ×× ×/××× ×× ×-××××/××××)",
-    "education": "×¨××ª ××©××× ×××¤××¡××ª",
-    "lifestyle": "×ª××××¨ ×××¨× ×××× ×-2-3 ××©×¤×××",
-    "values": ["×¢×¨×1", "×¢×¨×2", "×¢×¨×3", "×¢×¨×4", "×¢×¨×5"],
-    "interests": ["×ª××× ×¢× ××× 1", "×ª××× ×¢× ××× 2", "×ª××× ×¢× ××× 3", "×ª××× ×¢× ××× 4"],
-    "painPoints": ["××× 1", "××× 2", "××× 3"],
-    "mediaConsumption": "×××¤× ××§×× ×¦××¨× ×ª××× (×¨×©×ª××ª ×××¨×ª×××ª, ××××××× ××××³)"
+    "primaryAge": "טווח גילאים עיקרי (למשל: 25-45)",
+    "secondaryAge": "טווח גילאים משני",
+    "gender": "חלוקה מגדרית באחוזים",
+    "socioeconomic": "מעמד סוציואקונומי (נמוך/בינוני-נמוך/בינוני/בינוני-גבוה/גבוה)",
+    "education": "רמת השכלה טיפוסית",
+    "lifestyle": "תיאור אורח חיים ב-2-3 משפטים",
+    "values": ["ערך1", "ערך2", "ערך3", "ערך4", "ערך5"],
+    "interests": ["תחום עניין 1", "תחום עניין 2", "תחום עניין 3", "תחום עניין 4"],
+    "painPoints": ["כאב 1", "כאב 2", "כאב 3"],
+    "mediaConsumption": "איפה הקהל צורך תוכן (רשתות חברתיות, טלויזיה וכו׳)"
   },
   "psychographics": {
-    "personality": "×ª××××¨ ××××©×××ª ××××¤××¡××ª ×©× ××§××",
-    "emotionalDrivers": "×× ×× ××¢ ×××ª× ×¨××©××ª",
-    "brandRelationship": "×× ××§×©×¨ ××¨××©× ×©××× ××Õ×ª×"
+    "personality": "תיאור האישיות הטיפוסית של הקהל",
+    "emotionalDrivers": "מה מניע אותם רגשית",
+    "brandRelationship": "מה הקשר הרגשי שלהם למՕתג"
   },
   "musicBrief": {
-    "primaryGenre": "××³×× ×¨ ×××¡××§×× ×¢××§×¨×",
-    "subGenres": ["×ª×ª-××³×× ×¨ 1", "×ª×ª-××³×× ×¨ 2"],
-    "bpm": "×××× BPM ×××××¥",
-    "mood": "××¦× ×¨×× ×××¡××§××",
+    "primaryGenre": "ז׳אנר מוסיקלי עיקרי",
+    "subGenres": ["תת-ז׳אנר 1", "תת-ז׳אנר 2"],
+    "bpm": "טווח BPM מומלץ",
+    "mood": "מצב רוח מוסיקלי",
     "energy": 75,
-    "instruments": ["××× × ××× × 1", "××× × ××× × 2", "××× × ××× × 3"],
-    "vocalStyle": "×¡×× ×× ×©××¨× ×××××¥",
-    "productionStyle": "×¡×× ×× ××¤×§× ×××¡××§×××ª",
-    "referenceArtists": ["××× 1", "××× 2", "××× 3"],
-    "referenceTracks": ["×©××¨ 1 - ×××", "×©××¨ 2 - ×××"],
-    "lyricalThemes": ["× ××©× 1", "× ××©× 2", "× ××©× 3"],
-    "avoidElements": ["×× ××××× ×¢ ××× × 1", "×× ××××× ×¢ ××× × 2"],
-    "briefSummary": "×¤×¡×§× ×©× 3-4 ××©×¤××× ×©××¡×××ª ××ª ×××¨××£ ××××¡××§×× ×××× â ×× ××¡××× ×, ××× ××× ××ª×××, ××× ××× ××××¨ ×××¨×× ××§×× ×××¨×××©"
+    "instruments": ["כלי נגינה 1", "כלי נגינה 2", "כלי נגינה 3"],
+    "vocalStyle": "סגנון שירה מומלץ",
+    "productionStyle": "סגנון הפקה מוסיקלית",
+    "referenceArtists": ["אמן 1", "אמן 2", "אמן 3"],
+    "referenceTracks": ["שיר 1 - אמן", "שיר 2 - אמן"],
+    "lyricalThemes": ["נושא 1", "נושא 2", "נושא 3"],
+    "avoidElements": ["מה להימנע ממנו 1", "מה להימנע ממנו 2"],
+    "briefSummary": "פסקה של 3-4 משפטים שמסכמת את הבריף המוסיקלי המלא — מה הסאונד, למה הוא מתאים, ומה הוא אמור לגרום לקהל להרגיש"
   }
 }
 
-××©××: ××××¨ JSON ××××. ××× markdown, ××× backticks, ××× ××¡××¨××. ×¨×§ ××××××§× JSON ×ª×§××.`;
+חשוב: החזר JSON בלבד. בלי markdown, בלי backticks, בלי הסברים. רק אובייקט JSON תקין.`;
 
   try {
     const response = await fetch('https://api.openai.com/v1/chat/completions', {
@@ -652,7 +652,7 @@ async function analyze() {
         max_tokens: 4000,
         response_format: { type: 'json_object' },
         messages: [
-          { role: 'system', content: '××ª× ××××× ×× ××ª×× ×××ª×××, ×©××××§, ×××××¨×¤×× ××××¡××§×. ×ª××× ×××××¨ JSON ×ª×§×× ××××.' },
+          { role: 'system', content: 'אתה מומחה לניתוח מותגים, שיווק, דמוגרפיה ומוסיקה. תמיד מחזיר JSON תקין בלבד.' },
           { role: 'user', content: prompt }
         ]
       })
@@ -673,7 +673,7 @@ async function analyze() {
     } catch {
       const match = text.match(/\{[\s\S]*\}/);
       if (match) json = JSON.parse(match[0]);
-      else throw new Error('×ª×©××× ×× ×ª×§×× × ××-AI');
+      else throw new Error('תשובה לא תקינה מה-AI');
     }
 
     loading.classList.remove('active');
@@ -681,7 +681,7 @@ async function analyze() {
 
   } catch (err) {
     loading.classList.remove('active');
-    showError('×©××××: ' + err.message);
+    showError('שגיאה: ' + err.message);
   }
 
   btn.disabled = false;
@@ -703,35 +703,35 @@ function renderResults(d) {
     <!-- Audience Profile -->
     <div class="result-card">
       <div class="card-header">
-        <div class="card-icon purple">ð¥</div>
-        <div class="card-title">×¤×¨××¤×× ×§×× ××¢×</div>
+        <div class="card-icon purple">👥</div>
+        <div class="card-title">פרופיל קהל יעד</div>
       </div>
       <div class="card-content">
         <div class="section-block">
-          <div class="section-label">×××××¨×¤××</div>
-          <strong>××× ×¢××§×¨×:</strong> ${a.primaryAge} &nbsp;|&nbsp; <strong>××× ××©× ×:</strong> ${a.secondaryAge}<br>
-          <strong>××××¨:</strong> ${a.gender}<br>
-          <strong>××¢×× ×¡××¦××××§×× ×××:</strong> ${a.socioeconomic}<br>
-          <strong>××©×××:</strong> ${a.education}
+          <div class="section-label">דמוגרפיה</div>
+          <strong>גיל עיקרי:</strong> ${a.primaryAge} &nbsp;|&nbsp; <strong>גיל משני:</strong> ${a.secondaryAge}<br>
+          <strong>מגדר:</strong> ${a.gender}<br>
+          <strong>מעמד סוציואקונומי:</strong> ${a.socioeconomic}<br>
+          <strong>השכלה:</strong> ${a.education}
         </div>
         <div class="section-block">
-          <div class="section-label">×××¨× ××××</div>
+          <div class="section-label">אורח חיים</div>
           ${a.lifestyle}
         </div>
         <div class="section-block">
-          <div class="section-label">×¦×¨×××ª ××××</div>
+          <div class="section-label">צריכת מדיה</div>
           ${a.mediaConsumption}
         </div>
         <div class="section-block">
-          <div class="section-label">×¢×¨×××</div>
+          <div class="section-label">ערכים</div>
           <div class="tags">${a.values.map(v => `<span class="tag">${v}</span>`).join('')}</div>
         </div>
         <div class="section-block">
-          <div class="section-label">×ª×××× ×¢× ×××</div>
+          <div class="section-label">תחומי עניין</div>
           <div class="tags">${a.interests.map(v => `<span class="tag">${v}</span>`).join('')}</div>
         </div>
         <div class="section-block">
-          <div class="section-label">× ×§××××ª ×××</div>
+          <div class="section-label">נקודות כאב</div>
           <div class="tags">${a.painPoints.map(v => `<span class="tag">${v}</span>`).join('')}</div>
         </div>
       </div>
@@ -740,20 +740,20 @@ function renderResults(d) {
     <!-- Psychographics -->
     <div class="result-card">
       <div class="card-header">
-        <div class="card-icon blue">ð§ </div>
-        <div class="card-title">×¤×¨××¤×× ×¤×¡×××××¨×¤×</div>
+        <div class="card-icon blue">🧠</div>
+        <div class="card-title">פרופיל פסיכוגרפי</div>
       </div>
       <div class="card-content">
         <div class="section-block">
-          <div class="section-label">×××©×××ª</div>
+          <div class="section-label">אישיות</div>
           ${p.personality}
         </div>
         <div class="section-block">
-          <div class="section-label">×× ××¢×× ×¨××©×××</div>
+          <div class="section-label">מניעים רגשיים</div>
           ${p.emotionalDrivers}
         </div>
         <div class="section-block">
-          <div class="section-label">×§×©×¨ ×¨××©× ××××ª×</div>
+          <div class="section-label">קשר רגשי למותג</div>
           ${p.brandRelationship}
         </div>
       </div>
@@ -762,25 +762,25 @@ function renderResults(d) {
     <!-- Music Brief -->
     <div class="result-card music-brief">
       <div class="card-header">
-        <div class="card-icon orange">ðµ</div>
-        <div class="card-title">××¨××£ ×××¡××§××</div>
+        <div class="card-icon orange">🎵</div>
+        <div class="card-title">בריף מוסיקלי</div>
       </div>
       <div class="card-content">
         <div class="section-block">
-          <div class="section-label">××³×× ×¨ ×××¦× ×¨××</div>
-          <strong>××³×× ×¨ ×¢××§×¨×:</strong> ${m.primaryGenre}<br>
-          <strong>×ª×ª-××³×× ×¨××:</strong> ${m.subGenres.join(', ')}<br>
-          <strong>××¦× ×¨××:</strong> ${m.mood}<br>
+          <div class="section-label">ז׳אנר ומצב רוח</div>
+          <strong>ז׳אנר עיקרי:</strong> ${m.primaryGenre}<br>
+          <strong>תת-ז׳אנרים:</strong> ${m.subGenres.join(', ')}<br>
+          <strong>מצב רוח:</strong> ${m.mood}<br>
           <strong>BPM:</strong> ${m.bpm}
         </div>
 
         <div class="section-block">
-          <div class="section-label">×× ×¨×××</div>
+          <div class="section-label">אנרגיה</div>
           <div class="meter">
             <div class="meter-label">
-              <span>× ××××</span>
+              <span>נמוכה</span>
               <span>${m.energy}%</span>
-              <span>×××××</span>
+              <span>גבוהה</span>
             </div>
             <div class="meter-bar">
               <div class="meter-fill" style="width: ${m.energy}%"></div>
@@ -789,34 +789,34 @@ function renderResults(d) {
         </div>
 
         <div class="section-block">
-          <div class="section-label">×¡×× ×× ××¤×§× ××©××¨×</div>
-          <strong>×¡×× ×× ××¤×§×:</strong> ${m.productionStyle}<br>
-          <strong>×¡×× ×× ×©××¨×:</strong> ${m.vocalStyle}
+          <div class="section-label">סגנון הפקה ושירה</div>
+          <strong>סגנון הפקה:</strong> ${m.productionStyle}<br>
+          <strong>סגנון שירה:</strong> ${m.vocalStyle}
         </div>
 
         <div class="section-block">
-          <div class="section-label">××× × ××× ×</div>
+          <div class="section-label">כלי נגינה</div>
           <div class="tags">${m.instruments.map(v => `<span class="tag">${v}</span>`).join('')}</div>
         </div>
 
         <div class="section-block">
-          <div class="section-label">××× ×× ××©××¨×× ××¨×¤×¨× ×¡</div>
-          <strong>××× ××:</strong> ${m.referenceArtists.join(' Â· ')}<br>
-          <strong>×©××¨××:</strong> ${m.referenceTracks.join(' Â· ')}
+          <div class="section-label">אמנים ושירים לרפרנס</div>
+          <strong>אמנים:</strong> ${m.referenceArtists.join(' · ')}<br>
+          <strong>שירים:</strong> ${m.referenceTracks.join(' · ')}
         </div>
 
         <div class="section-block">
-          <div class="section-label">× ××©××× ×××§×¡×××</div>
+          <div class="section-label">נושאים לטקסטים</div>
           <div class="tags">${m.lyricalThemes.map(v => `<span class="tag">${v}</span>`).join('')}</div>
         </div>
 
         <div class="section-block">
-          <div class="section-label">×× ××××× ×¢ ××× ×</div>
+          <div class="section-label">מה להימנע ממנו</div>
           <div class="tags">${m.avoidElements.map(v => `<span class="tag" style="border-color: rgba(239,68,68,0.3); color: #f87171;">${v}</span>`).join('')}</div>
         </div>
 
         <div class="section-block">
-          <div class="section-label">×¡×××× ×××¨××£</div>
+          <div class="section-label">סיכום הבריף</div>
           <div style="background: var(--surface2); border-radius: 10px; padding: 16px; margin-top: 8px; font-size: 15px; line-height: 1.9;">
             ${m.briefSummary}
           </div>
@@ -826,9 +826,9 @@ function renderResults(d) {
 
     <!-- Actions -->
     <div class="export-bar">
-      <button class="export-btn" onclick="exportJSON()">×××¦×× JSON</button>
-      <button class="export-btn" onclick="copyBrief()">××¢×ª×§ ××¨××£</button>
-      <button class="new-search-btn" onclick="newSearch()">× ××ª×× ×××ª× ×××© â</button>
+      <button class="export-btn" onclick="exportJSON()">ייצוא JSON</button>
+      <button class="export-btn" onclick="copyBrief()">העתק בריף</button>
+      <button class="new-search-btn" onclick="newSearch()">ניתוח מותג חדש →</button>
     </div>
   `;
 
@@ -852,26 +852,26 @@ function exportJSON() {
 function copyBrief() {
   if (!window._lastResult) return;
   const m = window._lastResult.musicBrief;
-  const text = `ðµ ××¨××£ ×××¡××§×× â ${window._lastResult.brandName}
+  const text = `🎵 בריף מוסיקלי — ${window._lastResult.brandName}
 
-××³×× ×¨: ${m.primaryGenre} (${m.subGenres.join(', ')})
+ז׳אנר: ${m.primaryGenre} (${m.subGenres.join(', ')})
 BPM: ${m.bpm}
-××¦× ×¨××: ${m.mood}
-×× ×¨×××: ${m.energy}%
-×¡×× ×× ××¤×§×: ${m.productionStyle}
-×¡×× ×× ×©××¨×: ${m.vocalStyle}
-××× × ××× ×: ${m.instruments.join(', ')}
-××× ×× ××¨×¤×¨× ×¡: ${m.referenceArtists.join(', ')}
-×©××¨×× ××¨×¤×¨× ×¡: ${m.referenceTracks.join(', ')}
-× ××©××× ×××§×¡×××: ${m.lyricalThemes.join(', ')}
-×× ××××× ×¢ ××× ×: ${m.avoidElements.join(', ')}
+מצב רוח: ${m.mood}
+אנרגיה: ${m.energy}%
+סגנון הפקה: ${m.productionStyle}
+סגנון שירה: ${m.vocalStyle}
+כלי נגינה: ${m.instruments.join(', ')}
+אמנים לרפרנס: ${m.referenceArtists.join(', ')}
+שירים לרפרנס: ${m.referenceTracks.join(', ')}
+נושאים לטקסטים: ${m.lyricalThemes.join(', ')}
+מה להימנע ממנו: ${m.avoidElements.join(', ')}
 
 ${m.briefSummary}`;
 
   navigator.clipboard.writeText(text).then(() => {
     const btns = document.querySelectorAll('.export-btn');
-    btns[1].textContent = 'â ×××¢×ª×§!';
-    setTimeout(() => btns[1].textContent = '××¢×ª×§ ××¨××£', 2000);
+    btns[1].textContent = '✓ הועתק!';
+    setTimeout(() => btns[1].textContent = 'העתק בריף', 2000);
   });
 }
 
