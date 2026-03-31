@@ -721,23 +721,48 @@
 </div>
 
 <script>
-// --- API Key Management ---
+// --- API Key Management (localStorage + cookie fallback) ---
 function getApiKey() {
-  return localStorage.getItem('brandsync_api_key') || '';
+  // Try localStorage first
+  let key = '';
+  try { key = localStorage.getItem('brandsync_api_key') || ''; } catch(e) {}
+  // Cookie fallback for browsers that block localStorage
+  if (!key) {
+    const match = document.cookie.match(/brandsync_key=([^;]+)/);
+    if (match) key = decodeURIComponent(match[1]);
+  }
+  return key;
+}
+
+function persistKey(key) {
+  // Save to localStorage
+  try { localStorage.setItem('brandsync_api_key', key); } catch(e) {}
+  // Also save to cookie (365 days) as fallback
+  const d = new Date(); d.setFullYear(d.getFullYear() + 1);
+  document.cookie = 'brandsync_key=' + encodeURIComponent(key) + ';expires=' + d.toUTCString() + ';path=/;SameSite=Strict';
+}
+
+function removeKey() {
+  try { localStorage.removeItem('brandsync_api_key'); } catch(e) {}
+  document.cookie = 'brandsync_key=;expires=Thu, 01 Jan 1970 00:00:00 GMT;path=/';
 }
 
 function saveApiKey() {
   const key = document.getElementById('apiKeySettings').value.trim();
   if (!key) { return; }
-  localStorage.setItem('brandsync_api_key', key);
+  persistKey(key);
   updateApiStatus();
   const msg = document.getElementById('savedMsg');
   msg.classList.add('show');
-  setTimeout(() => msg.classList.remove('show'), 2000);
+  // Auto-close settings after saving
+  setTimeout(() => {
+    msg.classList.remove('show');
+    document.getElementById('settingsPanel').classList.remove('active');
+  }, 1200);
 }
 
 function deleteApiKey() {
-  localStorage.removeItem('brandsync_api_key');
+  removeKey();
   document.getElementById('apiKeySettings').value = '';
   updateApiStatus();
 }
@@ -771,7 +796,7 @@ function toggleSettings() {
 // Init on load
 document.addEventListener('DOMContentLoaded', () => {
   updateApiStatus();
-  // If no key saved, auto-open settings
+  // ONLY open settings if truly no key saved anywhere
   if (!getApiKey()) {
     setTimeout(() => toggleSettings(), 600);
   }
