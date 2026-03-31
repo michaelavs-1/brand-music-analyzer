@@ -843,6 +843,19 @@
         <button class="analyze-btn" id="analyzeBtn" onclick="analyze()">נתח מותג ←</button>
       </div>
     </div>
+
+    <div style="margin-top:16px;">
+      <button onclick="toggleResearch()" id="researchToggle" style="background:none;border:1px dashed var(--border);border-radius:8px;padding:8px 16px;font-size:13px;font-family:'Heebo',sans-serif;color:var(--text2);cursor:pointer;transition:all 0.2s;width:100%;text-align:right;">
+        + הוסף נתוני מחקר קיימים
+      </button>
+      <div id="researchPanel" style="display:none;margin-top:10px;">
+        <textarea id="researchInput"
+          placeholder="הדבק כאן כל נתון — מחקר קהל, נתוני שוק, ברנד בוק, תובנות מהשטח...&#10;הנתונים האלה יקבלו עדיפות מוחלטת על פני הידע של ה-AI."
+          style="width:100%;min-height:140px;background:var(--surface2);border:1px solid var(--accent);border-radius:10px;padding:14px 16px;font-size:14px;font-family:'Heebo',sans-serif;color:var(--text);resize:vertical;outline:none;line-height:1.7;direction:rtl;"></textarea>
+        <div style="font-size:12px;color:var(--accent2);margin-top:6px;">✦ נתונים שהוזנו יקבלו עדיפות על הידע הכללי של ה-AI</div>
+      </div>
+    </div>
+
     <div class="error-msg" id="errorMsg"></div>
   </div>
 
@@ -946,6 +959,17 @@ document.addEventListener('DOMContentLoaded', () => {
   }
 });
 
+function toggleResearch() {
+  const panel = document.getElementById('researchPanel');
+  const btn   = document.getElementById('researchToggle');
+  const open  = panel.style.display === 'none';
+  panel.style.display = open ? 'block' : 'none';
+  btn.textContent = open ? '− סגור נתוני מחקר' : '+ הוסף נתוני מחקר קיימים';
+  btn.style.borderStyle = open ? 'solid' : 'dashed';
+  btn.style.borderColor = open ? 'var(--accent)' : 'var(--border)';
+  btn.style.color = open ? 'var(--accent2)' : 'var(--text2)';
+}
+
 function quickFill(brand) {
   document.getElementById('brandInput').value = brand;
   document.getElementById('brandInput').focus();
@@ -986,6 +1010,7 @@ function finishProgress() {
 async function analyze() {
   const brand = document.getElementById('brandInput').value.trim();
   const apiKey = getApiKey();
+  const researchData = (document.getElementById('researchInput')?.value || '').trim();
 
   if (!brand) { showError('הזן שם מותג'); return; }
   if (!apiKey) { showError('לא מוגדר מפתח API — לחץ על ⚙ כדי להגדיר'); toggleSettings(); return; }
@@ -1001,7 +1026,21 @@ async function analyze() {
 
   startProgressAnimation();
 
-  const prompt = `אתה שלושה אנשים בו זמנית:
+  const researchBlock = researchData ? `
+═══════════════════════════════════════
+נתוני מחקר שסופקו — עדיפות מוחלטת
+═══════════════════════════════════════
+הנתונים הבאים הם עובדות מאומתות שהוזנו ידנית. הם גוברים על כל ידע כללי שלך.
+אל תסתור אותם. אל תתעלם מהם. בנה את כל הניתוח סביבם קודם, ורק אז השלם פערים עם הידע שלך.
+
+${researchData}
+
+═══════════════════════════════════════
+המשך לנתח לפי הידע שלך את מה שלא כוסה למעלה
+═══════════════════════════════════════
+` : '';
+
+  const prompt = `${researchBlock}אתה שלושה אנשים בו זמנית:
 1. אסטרטג מותגים בכיר — מבין עמוק את הקטגוריה, הקהל, הפסיכולוגיה, המיצוב התחרותי
 2. מפיק מוסיקה ברמה עולמית — מכיר כל ז׳אנר, יודע לאמן שמות שירים ספציפיים, מפיקים, אלבומים, BPM, טקסטורה
 3. מעצב סאונד — מבין כיצד מוסיקה יוצרת רגש, זהות מותגית, חיבור פסיכולוגי לקהל
@@ -1245,7 +1284,7 @@ async function analyze() {
         max_tokens: 12000,
         response_format: { type: 'json_object' },
         messages: [
-          { role: 'system', content: 'אתה אסטרטג מותגים, מפיק מוסיקלי ומעצב סאונד ברמה עולמית. הכלל החשוב ביותר: כל מסקנה חייבת להיות מלווה בנימוק מפורט שמסביר את כל תהליך החשיבה שהוביל אליה. לא רק מה — אלא למה. בבריף המוסיקלי: אתה חייב לתת רפרנסים מדויקים — שמות שירים ספציפיים, שמות אמנים ספציפיים, שמות אלבומים ספציפיים, שמות מפיקים ספציפיים — עם הסבר מדויק מה ספציפית בכל אחד מהם. לא ז׳אנרים כלליים. שמות אמיתיים. תמיד מחזיר JSON תקין בלבד, הכל בעברית.' },
+          { role: 'system', content: `אתה אסטרטג מותגים, מפיק מוסיקלי ומעצב סאונד ברמה עולמית.${researchData ? ' חשוב ביותר: אם הוזנו נתוני מחקר בתחילת ההודעה — הם גוברים על הידע הכללי שלך. התייחס אליהם כאמת מוחלטת ובנה את הניתוח סביבם. השלם רק את מה שחסר מהנתונים.' : ''} כל מסקנה חייבת להיות מלווה בנימוק מפורט. בבריף המוסיקלי: רפרנסים מדויקים בלבד — שמות שירים, אמנים, אלבומים, מפיקים ספציפיים. לא ז׳אנרים כלליים. תמיד מחזיר JSON תקין בלבד, הכל בעברית.` },
           { role: 'user', content: prompt }
         ]
       })
