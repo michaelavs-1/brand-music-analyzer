@@ -1255,7 +1255,7 @@ function renderResults(d) {
     </div>
     ${acc('brand-summary','📋','תקציר המותג',`
       <div class="card-content" style="padding-top:12px;">${d.brandSummary || ''}${R(d.brandSummaryReasoning)}</div>
-    `, true)}
+    `, false)}
     ${acc('brand-archetype','🎭','ארכיטיפ המותג',`
       <div class="card-content" style="padding-top:12px;">
         <div class="section-block">
@@ -1272,7 +1272,7 @@ function renderResults(d) {
           ${arc.sonicImplication || ''}
         </div>
       </div>
-    `, true)}
+    `, false)}
   `;
 
   // ── TAB 2: קהל יעד ───────────────────────────────────────────
@@ -1285,7 +1285,7 @@ function renderResults(d) {
         <div class="section-block"><div class="section-label">מעמד סוציואקונומי</div><strong>${a.socioeconomic||''}</strong>${R(a.socioeconomicReasoning)}</div>
         <div class="section-block"><div class="section-label">השכלה</div>${a.education||''}</div>
       </div>
-    `, true)}
+    `, false)}
     ${acc('aud-life','🌍','אורח חיים וצריכת מדיה',`
       <div class="card-content" style="padding-top:12px;">
         <div class="section-block"><div class="section-label">אורח חיים</div>${a.lifestyle||''}${R(a.lifestyleReasoning)}</div>
@@ -1332,7 +1332,7 @@ function renderResults(d) {
         <div class="section-block"><div class="section-label">חלל פנוי — White Space</div><strong>${scm.whiteSpace||''}</strong>${R(scm.whiteSpaceReasoning)}</div>
         <div class="section-block"><div class="section-label">אסטרטגיית בידול</div>${scm.differentiationStrategy||''}</div>
       </div>
-    `, true)}
+    `, false)}
     ${acc('sonic-touch','📍','מפת נקודות מגע',`
       <div class="card-content" style="padding-top:12px;">
         ${tp.map(t => `
@@ -1357,7 +1357,7 @@ function renderResults(d) {
       <div class="section-block"><div class="section-label">כיוון מוסיקלי</div><strong>${stage.musicDirection||''}</strong></div>
       ${R(stage.reasoning)}
     </div>`,
-    i === 0
+    false
   )).join('');
 
   // ── TAB 5: בריף מוסיקלי ──────────────────────────────────────
@@ -1377,7 +1377,7 @@ function renderResults(d) {
           ${R(m.energyReasoning)}
         </div>
       </div>
-    `, true)}
+    `, false)}
     ${acc('mb-prod','🎚️','הפקה, שירה, כלי נגינה',`
       <div class="card-content" style="padding-top:12px;">
         <div class="section-block"><div class="section-label">סגנון הפקה</div><strong>${m.productionStyle||''}</strong>${R(m.productionStyleReasoning)}</div>
