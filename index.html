@@ -228,30 +228,17 @@
 
   /* Loading */
   .loading {
-    text-align: center;
     padding: 60px 20px;
     display: none;
   }
 
   .loading.active { display: block; }
 
-  @keyframes spin { to { transform: rotate(360deg); } }
-
-  .loading-label {
-    font-size: 15px;
-    color: var(--text2);
-    margin-bottom: 20px;
-    min-height: 24px;
-    transition: all 0.4s;
-  }
-
   .progress-wrap {
     width: 100%;
-    max-width: 440px;
-    margin: 0 auto 16px;
     background: var(--surface2);
     border-radius: 999px;
-    height: 8px;
+    height: 6px;
     overflow: hidden;
     border: 1px solid var(--border);
   }
@@ -261,14 +248,7 @@
     border-radius: 999px;
     background: linear-gradient(90deg, var(--accent), var(--accent2));
     width: 0%;
-    transition: width 0.6s cubic-bezier(.4,0,.2,1);
-  }
-
-  .progress-pct {
-    font-size: 28px;
-    font-weight: 800;
-    color: var(--accent2);
-    margin-bottom: 8px;
+    transition: width 0.2s linear;
   }
 
   /* Results */
@@ -865,11 +845,9 @@
 
   <!-- Loading -->
   <div class="loading" id="loading">
-    <div class="progress-pct" id="progressPct">0%</div>
     <div class="progress-wrap">
       <div class="progress-fill" id="progressFill"></div>
     </div>
-    <div class="loading-label" id="loadingLabel">מתחיל ניתוח...</div>
   </div>
 
   <!-- Results -->
@@ -977,66 +955,29 @@ function showError(msg) {
   setTimeout(() => el.classList.remove('active'), 5000);
 }
 
-const _loadingStages = [
-  { pct: 5,  label: '🔍 איסוף נתוני חברה ומותג...' },
-  { pct: 18, label: '📊 ניתוח פיננסי ונתחי שוק...' },
-  { pct: 32, label: '🎭 זיהוי ארכיטיפ ו-DNA מותגי...' },
-  { pct: 47, label: '👥 מיפוי קהל יעד ופסיכוגרפיה...' },
-  { pct: 60, label: '🗺️ מיצוב תחרותי ו-White Space...' },
-  { pct: 72, label: '🎯 בניית מסע רגשי...' },
-  { pct: 83, label: '🎵 עיצוב בריף מוסיקלי מעמיק...' },
-  { pct: 92, label: '💿 חיפוש רפרנסים — שירים, אמנים, מפיקים...' },
-  { pct: 97, label: '🚀 מיפוי קהלים לצמיחה...' },
-];
-
+// Progress bar — smooth 50s fill, nothing else
 let _progressInterval = null;
 
 function startProgressAnimation() {
   const fill = document.getElementById('progressFill');
-  const pct  = document.getElementById('progressPct');
-  const lbl  = document.getElementById('loadingLabel');
-  let stageIdx = 0;
-  let currentPct = 0;
-
-  function applyStage(s) {
-    currentPct = s.pct;
-    fill.style.width = s.pct + '%';
-    pct.textContent  = s.pct + '%';
-    lbl.textContent  = s.label;
-  }
-
-  applyStage(_loadingStages[0]);
-
+  fill.style.width = '0%';
+  let current = 0;
+  // Target: reach ~98% in 50 seconds
+  // Interval: every 200ms → 250 ticks in 50s → 98/250 = 0.392% per tick
+  const increment = 98 / 250;
+  clearInterval(_progressInterval);
   _progressInterval = setInterval(() => {
-    if (stageIdx < _loadingStages.length - 1) {
-      stageIdx++;
-      applyStage(_loadingStages[stageIdx]);
-    } else {
-      // Creep slowly toward 99.5% — never quite arriving
-      currentPct = Math.min(currentPct + 0.15, 99.5);
-      const display = Math.floor(currentPct);
-      fill.style.width = currentPct + '%';
-      pct.textContent  = display + '%';
-      // Rotate through waiting messages so it doesn't look frozen
-      const waiting = [
-        '💿 מנתח רפרנסים מוסיקליים...',
-        '🎵 מעמיק בבריף המוסיקלי...',
-        '🧠 מסכם את הניתוח...',
-        '⏳ עוד רגע...',
-      ];
-      lbl.textContent = waiting[Math.floor(Date.now() / 4000) % waiting.length];
-    }
-  }, 1600);
+    current = Math.min(current + increment, 98);
+    fill.style.width = current + '%';
+    if (current >= 98) clearInterval(_progressInterval);
+  }, 200);
 }
 
 function finishProgress() {
   clearInterval(_progressInterval);
   const fill = document.getElementById('progressFill');
-  const pct  = document.getElementById('progressPct');
-  const lbl  = document.getElementById('loadingLabel');
+  fill.style.transition = 'width 0.3s ease-out';
   fill.style.width = '100%';
-  pct.textContent  = '100%';
-  lbl.textContent  = '✓ הניתוח הושלם';
 }
 
 async function analyze() {
