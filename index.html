@@ -779,6 +779,48 @@
 
   .prompt-why strong { color: var(--accent2); }
 
+  /* Client mode — hides reasoning */
+  .client-mode .prompt-why { display: none !important; }
+  .client-mode-active { background: var(--accent) !important; color: #000 !important; border-color: var(--accent) !important; }
+
+  /* History panel */
+  .history-panel {
+    position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+    background: rgba(0,0,0,0.7); z-index: 200; display: none;
+    align-items: center; justify-content: center;
+  }
+  .history-panel.active { display: flex; }
+  .history-box {
+    background: var(--surface); border: 1px solid var(--border);
+    border-radius: 20px; padding: 32px; width: 90%; max-width: 520px;
+    max-height: 80vh; overflow-y: auto; position: relative;
+  }
+  .history-item {
+    display: flex; justify-content: space-between; align-items: center;
+    padding: 12px 0; border-bottom: 1px solid var(--border); cursor: pointer;
+    transition: background 0.15s; border-radius: 8px; padding: 10px 12px; margin-bottom: 4px;
+  }
+  .history-item:hover { background: var(--surface2); }
+  .history-item-brand { font-size: 16px; font-weight: 700; color: var(--text); }
+  .history-item-meta { font-size: 12px; color: var(--text2); margin-top: 2px; }
+  .history-item-del { background: none; border: none; color: #f87171; font-size: 16px; cursor: pointer; padding: 4px 8px; opacity: 0.6; }
+  .history-item-del:hover { opacity: 1; }
+
+  /* Campaign panel */
+  .campaign-badge {
+    display: inline-block; background: rgba(200,164,78,.15);
+    border: 1px solid var(--accent); border-radius: 6px;
+    padding: 2px 8px; font-size: 11px; font-weight: 700;
+    color: var(--accent2); margin-right: 8px; vertical-align: middle;
+  }
+
+  /* Compare split */
+  .compare-grid {
+    display: grid; grid-template-columns: 1fr 1fr; gap: 16px;
+  }
+  .compare-grid .accordion { font-size: 13px; }
+  @media (max-width: 640px) { .compare-grid { grid-template-columns: 1fr; } }
+
   /* Export PDF btn */
   .export-pdf-btn {
     background: linear-gradient(135deg, var(--accent), var(--accent2));
@@ -802,6 +844,19 @@
 
 <!-- Version Badge -->
 <div style="position:fixed;top:20px;right:20px;background:var(--surface);border:1px solid var(--border);border-radius:8px;padding:4px 10px;font-size:11px;font-weight:700;color:var(--accent2);letter-spacing:1px;z-index:100;">V5</div>
+
+<!-- History Button -->
+<button onclick="showHistory()" style="position:fixed;top:20px;right:72px;background:var(--surface);border:1px solid var(--border);border-radius:8px;padding:4px 10px;font-size:13px;color:var(--text2);cursor:pointer;z-index:100;font-family:'Heebo',sans-serif;transition:all 0.2s;" onmouseover="this.style.borderColor='var(--accent)'" onmouseout="this.style.borderColor='var(--border)'">📚</button>
+
+<!-- History Panel -->
+<div class="history-panel" id="historyPanel" onclick="if(event.target===this)closeHistory()">
+  <div class="history-box">
+    <button onclick="closeHistory()" style="position:absolute;top:16px;left:16px;background:none;border:none;color:var(--text2);font-size:22px;cursor:pointer;">✕</button>
+    <h2 style="font-size:20px;font-weight:700;margin-bottom:6px;">📚 היסטוריית ניתוחים</h2>
+    <p style="font-size:13px;color:var(--text2);margin-bottom:20px;">לחץ על ניתוח כדי לשחזר אותו</p>
+    <div id="historyList"></div>
+  </div>
+</div>
 
 <!-- Settings Toggle -->
 <button class="settings-toggle" onclick="toggleSettings()">⚙</button>
@@ -844,9 +899,56 @@
       </div>
     </div>
 
-    <div style="margin-top:16px;">
+    <div style="margin-top:12px;display:flex;gap:8px;flex-wrap:wrap;">
+      <button onclick="toggleResearch()" id="researchToggle" style="background:none;border:1px dashed var(--border);border-radius:8px;padding:8px 16px;font-size:13px;font-family:'Heebo',sans-serif;color:var(--text2);cursor:pointer;transition:all 0.2s;flex:1;text-align:right;">
+        + נתוני מחקר
+      </button>
+      <button onclick="toggleCampaign()" id="campaignToggle" style="background:none;border:1px dashed var(--border);border-radius:8px;padding:8px 16px;font-size:13px;font-family:'Heebo',sans-serif;color:var(--text2);cursor:pointer;transition:all 0.2s;flex:1;text-align:right;">
+        + מצב קמפיין
+      </button>
+      <button onclick="toggleCompare()" id="compareToggle" style="background:none;border:1px dashed var(--border);border-radius:8px;padding:8px 16px;font-size:13px;font-family:'Heebo',sans-serif;color:var(--text2);cursor:pointer;transition:all 0.2s;flex:1;text-align:right;">
+        ⚖️ השווה מותגים
+      </button>
+    </div>
+
+    <!-- Compare input -->
+    <div id="comparePanel" style="display:none;margin-top:10px;">
+      <div class="input-row">
+        <input type="text" class="brand-input" id="brandInput2" placeholder="מותג שני להשוואה..." style="font-size:16px;" />
+      </div>
+    </div>
+
+    <!-- Campaign panel -->
+    <div id="campaignPanel" style="display:none;margin-top:10px;background:var(--surface2);border:1px solid var(--accent);border-radius:10px;padding:16px;">
+      <div style="font-size:12px;font-weight:700;color:var(--accent2);margin-bottom:12px;letter-spacing:1px;text-transform:uppercase;">הגדרות קמפיין</div>
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:10px;">
+        <div>
+          <label style="font-size:11px;color:var(--text2);display:block;margin-bottom:4px;">שם הקמפיין</label>
+          <input id="campaignName" type="text" placeholder='קיץ 2025 / לאומי פרמיום...' style="width:100%;background:var(--surface);border:1px solid var(--border);border-radius:8px;padding:8px 12px;font-size:13px;font-family:'Heebo',sans-serif;color:var(--text);outline:none;" />
+        </div>
+        <div>
+          <label style="font-size:11px;color:var(--text2);display:block;margin-bottom:4px;">עונה / אירוע</label>
+          <input id="campaignSeason" type="text" placeholder='קיץ / חגים / ספורט...' style="width:100%;background:var(--surface);border:1px solid var(--border);border-radius:8px;padding:8px 12px;font-size:13px;font-family:'Heebo',sans-serif;color:var(--text);outline:none;" />
+        </div>
+      </div>
+      <div style="margin-bottom:10px;">
+        <label style="font-size:11px;color:var(--text2);display:block;margin-bottom:6px;">פלטפורמות</label>
+        <div style="display:flex;flex-wrap:wrap;gap:6px;" id="platformCheckboxes">
+          ${['TikTok','Instagram Reels','YouTube','טלוויזיה','רדיו','Spotify Ads','חנות/POS','אירוע לייב'].map(p=>`
+          <label style="display:flex;align-items:center;gap:4px;cursor:pointer;background:var(--surface);border:1px solid var(--border);border-radius:6px;padding:4px 10px;font-size:12px;font-family:'Heebo',sans-serif;color:var(--text2);">
+            <input type="checkbox" value="${p}" style="accent-color:var(--accent);"> ${p}
+          </label>`).join('')}
+        </div>
+      </div>
+      <div>
+        <label style="font-size:11px;color:var(--text2);display:block;margin-bottom:4px;">קהל יעד ספציפי לקמפיין</label>
+        <input id="campaignAudience" type="text" placeholder='גברים 18-30 / אמהות צעירות / Gen Z...' style="width:100%;background:var(--surface);border:1px solid var(--border);border-radius:8px;padding:8px 12px;font-size:13px;font-family:'Heebo',sans-serif;color:var(--text);outline:none;" />
+      </div>
+    </div>
+
+    <div style="margin-top:10px;">
       <button onclick="toggleResearch()" id="researchToggle" style="background:none;border:1px dashed var(--border);border-radius:8px;padding:8px 16px;font-size:13px;font-family:'Heebo',sans-serif;color:var(--text2);cursor:pointer;transition:all 0.2s;width:100%;text-align:right;">
-        + הוסף נתוני מחקר קיימים
+        + נתוני מחקר קיימים
       </button>
       <div id="researchPanel" style="display:none;margin-top:10px;">
         <textarea id="researchInput"
@@ -959,15 +1061,86 @@ document.addEventListener('DOMContentLoaded', () => {
   }
 });
 
-function toggleResearch() {
-  const panel = document.getElementById('researchPanel');
-  const btn   = document.getElementById('researchToggle');
+function _togglePanel(panelId, btnId, openLabel, closeLabel) {
+  const panel = document.getElementById(panelId);
+  const btn   = document.getElementById(btnId);
   const open  = panel.style.display === 'none';
   panel.style.display = open ? 'block' : 'none';
-  btn.textContent = open ? '− סגור נתוני מחקר' : '+ הוסף נתוני מחקר קיימים';
+  btn.textContent = open ? closeLabel : openLabel;
   btn.style.borderStyle = open ? 'solid' : 'dashed';
   btn.style.borderColor = open ? 'var(--accent)' : 'var(--border)';
   btn.style.color = open ? 'var(--accent2)' : 'var(--text2)';
+}
+function toggleResearch() { _togglePanel('researchPanel','researchToggle','+ נתוני מחקר קיימים','− סגור מחקר'); }
+function toggleCampaign() {
+  _togglePanel('campaignPanel','campaignToggle','+ מצב קמפיין','− סגור קמפיין');
+  const btn = document.getElementById('analyzeBtn');
+  const open = document.getElementById('campaignPanel').style.display !== 'none';
+  btn.textContent = open ? 'נתח קמפיין ←' : (document.getElementById('comparePanel').style.display !== 'none' ? 'השווה ←' : 'נתח מותג ←');
+}
+function toggleCompare() {
+  _togglePanel('comparePanel','compareToggle','⚖️ השווה מותגים','⚖️ בטל השוואה');
+  const btn = document.getElementById('analyzeBtn');
+  const open = document.getElementById('comparePanel').style.display !== 'none';
+  btn.textContent = open ? 'השווה ←' : 'נתח מותג ←';
+}
+
+// ── History ─────────────────────────────────────────────────
+function saveToHistory(d) {
+  let hist = [];
+  try { hist = JSON.parse(localStorage.getItem('brandsync_history') || '[]'); } catch(e) {}
+  hist.unshift({ brand: d.brandName, ts: Date.now(), data: d });
+  hist = hist.slice(0, 10);
+  try { localStorage.setItem('brandsync_history', JSON.stringify(hist)); } catch(e) {}
+}
+
+function showHistory() {
+  const hist = getHistory();
+  const list = document.getElementById('historyList');
+  if (!hist.length) {
+    list.innerHTML = '<p style="color:var(--text2);font-size:14px;text-align:center;padding:20px 0;">אין ניתוחים שמורים עדיין</p>';
+  } else {
+    list.innerHTML = hist.map((h, i) => `
+      <div class="history-item" onclick="restoreHistory(${i})">
+        <div>
+          <div class="history-item-brand">${h.brand}</div>
+          <div class="history-item-meta">${new Date(h.ts).toLocaleString('he-IL')}</div>
+        </div>
+        <button class="history-item-del" onclick="event.stopPropagation();deleteHistory(${i})">✕</button>
+      </div>`).join('');
+  }
+  document.getElementById('historyPanel').classList.add('active');
+}
+
+function closeHistory() { document.getElementById('historyPanel').classList.remove('active'); }
+
+function getHistory() {
+  try { return JSON.parse(localStorage.getItem('brandsync_history') || '[]'); } catch(e) { return []; }
+}
+
+function restoreHistory(i) {
+  const hist = getHistory();
+  if (!hist[i]) return;
+  closeHistory();
+  window._lastResult = hist[i].data;
+  renderResults(hist[i].data);
+  document.getElementById('brandInput').value = hist[i].brand;
+}
+
+function deleteHistory(i) {
+  let hist = getHistory();
+  hist.splice(i, 1);
+  try { localStorage.setItem('brandsync_history', JSON.stringify(hist)); } catch(e) {}
+  showHistory();
+}
+
+// ── Client View ──────────────────────────────────────────────
+function toggleClientView() {
+  const results = document.getElementById('results');
+  const btn = document.getElementById('clientViewBtn');
+  const on = results.classList.toggle('client-mode');
+  btn.textContent = on ? '👔 מצב לקוח: פעיל' : '👔 מצב לקוח';
+  btn.classList.toggle('client-mode-active', on);
 }
 
 function quickFill(brand) {
@@ -1007,15 +1180,245 @@ function finishProgress() {
   fill.style.width = '100%';
 }
 
-async function analyze() {
-  const brand = document.getElementById('brandInput').value.trim();
+function buildCampaignBlock() {
+  const name     = (document.getElementById('campaignName')?.value || '').trim();
+  const season   = (document.getElementById('campaignSeason')?.value || '').trim();
+  const audience = (document.getElementById('campaignAudience')?.value || '').trim();
+  const platforms = [...document.querySelectorAll('#platformCheckboxes input:checked')].map(c => c.value);
+  const active = document.getElementById('campaignPanel')?.style.display !== 'none';
+  if (!active || (!name && !season && !audience && !platforms.length)) return '';
+  return `
+═══════════════════════════════════════
+מצב קמפיין — התמקד בפרמטרים הבאים
+═══════════════════════════════════════
+${name ? `שם הקמפיין: ${name}` : ''}
+${season ? `עונה / אירוע: ${season}` : ''}
+${platforms.length ? `פלטפורמות: ${platforms.join(', ')}` : ''}
+${audience ? `קהל יעד ספציפי: ${audience}` : ''}
+
+חשוב: הבריף המוסיקלי צריך להיות ממוקד לקמפיין זה ולפלטפורמות שצוינו.
+לכל פלטפורמה — תן בריף ספציפי בתוך touchpointMap.
+═══════════════════════════════════════
+`;
+}
+
+async function runAnalysis(brand, researchData, campaignBlock, webFactsBlock) {
   const apiKey = getApiKey();
-  const researchData = (document.getElementById('researchInput')?.value || '').trim();
+  const systemMsg = `אתה אסטרטג מותגים, מפיק מוסיקלי ומעצב סאונד ברמה עולמית.${researchData ? ' נתוני המחקר שסופקו גוברים על הידע הכללי שלך.' : ''}${webFactsBlock ? ' נתוני האינטרנט שנאספו מייצגים מידע עדכני — השתמש בהם.' : ''} כל מסקנה — נימוק מפורט. בבריף: שמות ספציפיים בלבד. JSON תקין בלבד, הכל בעברית.`;
+
+  const researchBlock = researchData ? `
+═══════════════════════════════════════
+נתוני מחקר שסופקו — עדיפות מוחלטת
+═══════════════════════════════════════
+${researchData}
+═══════════════════════════════════════
+` : '';
+
+  const prompt = `${researchBlock}${webFactsBlock}${campaignBlock}אתה שלושה אנשים בו זמנית:
+1. אסטרטג מותגים בכיר — מבין עמוק את הקטגוריה, הקהל, הפסיכולוגיה, המיצוב התחרותי
+2. מפיק מוסיקה ברמה עולמית — מכיר כל ז׳אנר, יודע לאמן שמות שירים ספציפיים, מפיקים, אלבומים, BPM, טקסטורה
+3. מעצב סאונד — מבין כיצד מוסיקה יוצרת רגש, זהות מותגית, חיבור פסיכולוגי לקהל
+
+משימתך: לנתח לעומק את המותג "${brand}".
+
+שלב 1 — מחקר מותג:
+- מה קטגוריית המוצר, מה ההיסטוריה, מה המיצוב, מה המסרים הפרסומיים
+- מי המתחרים ואיך הם ממוצבים
+- מה נתחי השוק, הכנסות, מוצרים מובילים — כל עובדה ידועה
+
+שלב 2 — פרופיל קהל:
+- מי קונה? גיל, מגדר, מעמד, אורח חיים, פסיכוגרפיה
+- מה מניע אותם, מה הקשר הרגשי למותג
+
+שלב 3 — DNA מוסיקלי (הכי קריטי):
+א. ארכיטיפ המותג + תרגום לסאונד
+ב. מה הקהל מאזין לו? ז׳אנרים, אנרגיה, תקופה
+ג. הרגש המרכזי שהמוסיקה צריכה לגרום
+ד. שירים ספציפיים: שם אמיתי + אמן + שנה + מה ספציפית בהם
+ה. אמנים ספציפיים + למה
+ו. מפיקים ספציפיים + מה הסאונד שלהם נותן
+ז. אלבומים ספציפיים + למה הם מייצגים את העולם הסוני
+
+כלל ברזל: כל שדה — נימוק מפורט. לא "אמן בסגנון פופ" אלא "Taylor Swift". לא "שיר אנרגטי" אלא "Blinding Lights — The Weeknd, 2019".
+
+החזר JSON בלבד, הכל בעברית:
+{
+  "brandName": "${brand}",
+  "companyFacts": {
+    "founded": "שנת הקמה",
+    "headquarters": "מטה החברה",
+    "parentCompany": "חברת אם (אחרת null)",
+    "subsidiaries": ["חברת בת1"],
+    "revenue": "הכנסות שנתיות (ציין שנה)",
+    "revenueGrowth": "צמיחה YoY",
+    "marketCap": "שווי שוק (אם ציבורית)",
+    "stockSymbol": "סימול (אחרת null)",
+    "employeeCount": "מספר עובדים",
+    "marketShare": "נתח שוק + שם קטגוריה",
+    "marketPosition": "מיקום בשוק",
+    "keyProducts": [{ "name": "מוצר", "detail": "פרט" }],
+    "recentLaunches": [{ "name": "השקה", "year": "שנה", "detail": "מה ולמה" }],
+    "geographicPresence": "אזורי פעילות",
+    "mainCompetitors": [{ "name": "מתחרה", "marketShare": "נתח" }],
+    "notableAchievements": ["הישג1"],
+    "recentNews": ["חדשות1"],
+    "challenges": "אתגרים עסקיים"
+  },
+  "brandArchetype": {
+    "primary": "ארכיטיפ ראשי",
+    "secondary": "ארכיטיפ משני",
+    "archetypeReasoning": "למה הארכיטיפ הזה?",
+    "sonicImplication": "מה זה אומר על הסאונד?"
+  },
+  "brandSummary": "תיאור המותג ב-2-3 משפטים",
+  "brandSummaryReasoning": "בסיס לתיאור",
+  "audience": {
+    "primaryAge": "טווח גילאים עיקרי",
+    "primaryAgeReasoning": "למה?",
+    "secondaryAge": "טווח גילאים משני",
+    "secondaryAgeReasoning": "למה?",
+    "gender": "חלוקה מגדרית",
+    "genderReasoning": "למה?",
+    "socioeconomic": "מעמד סוציואקונומי",
+    "socioeconomicReasoning": "למה?",
+    "education": "רמת השכלה",
+    "lifestyle": "אורח חיים",
+    "lifestyleReasoning": "למה?",
+    "values": ["ערך1","ערך2","ערך3"],
+    "valuesReasoning": "למה?",
+    "interests": ["תחום1","תחום2"],
+    "interestsReasoning": "למה?",
+    "painPoints": ["כאב1","כאב2"],
+    "painPointsReasoning": "למה?",
+    "mediaConsumption": "צריכת מדיה",
+    "mediaConsumptionReasoning": "למה?"
+  },
+  "psychographics": {
+    "personality": "אישיות טיפוסית",
+    "personalityReasoning": "למה?",
+    "emotionalDrivers": "מניעים רגשיים",
+    "emotionalDriversReasoning": "למה?",
+    "brandRelationship": "קשר רגשי למותג",
+    "brandRelationshipReasoning": "למה?"
+  },
+  "sonicCompetitiveMap": {
+    "mainCompetitors": ["מתחרה1","מתחרה2"],
+    "competitorsSonicDescription": "הסאונד הרווח בקטגוריה",
+    "whiteSpace": "חלל פנוי",
+    "whiteSpaceReasoning": "למה?",
+    "differentiationStrategy": "אסטרטגיית בידול"
+  },
+  "emotionalJourney": [
+    { "stage": "Awareness", "emotionGoal": "מטרה", "musicDirection": "כיוון", "reasoning": "למה?" },
+    { "stage": "Consideration", "emotionGoal": "מטרה", "musicDirection": "כיוון", "reasoning": "למה?" },
+    { "stage": "Purchase", "emotionGoal": "מטרה", "musicDirection": "כיוון", "reasoning": "למה?" },
+    { "stage": "Loyalty", "emotionGoal": "מטרה", "musicDirection": "כיוון", "reasoning": "למה?" }
+  ],
+  "touchpointMap": [
+    { "touchpoint": "פרסומת TV/וידאו", "musicStyle": "סגנון", "reasoning": "למה?" },
+    { "touchpoint": "רשתות חברתיות/TikTok", "musicStyle": "סגנון", "reasoning": "למה?" },
+    { "touchpoint": "חנות/POS", "musicStyle": "סגנון", "reasoning": "למה?" },
+    { "touchpoint": "אפליקציה/דיגיטל", "musicStyle": "סגנון", "reasoning": "למה?" },
+    { "touchpoint": "אירועים/פופ-אפ", "musicStyle": "סגנון", "reasoning": "למה?" }
+  ],
+  "musicBrief": {
+    "sonicOneLiner": "משפט DNA אחד",
+    "primaryGenre": "ז׳אנר עיקרי",
+    "primaryGenreReasoning": "למה?",
+    "subGenres": ["תת-ז׳אנר1"],
+    "eraInfluence": "השפעת תקופה",
+    "bpm": "טווח BPM",
+    "bpmReasoning": "למה?",
+    "groove": "סוג גרוב",
+    "keyTonality": "טונליות",
+    "mood": "מצב רוח",
+    "moodReasoning": "למה?",
+    "energy": 75,
+    "energyReasoning": "למה?",
+    "frequencyProfile": "פרופיל תדרים",
+    "sonicTexture": "תיאור טקסטורה",
+    "instruments": [{ "name": "כלי", "detail": "פרט צליל" }],
+    "instrumentsReasoning": "למה?",
+    "vocalStyle": "סגנון שירה",
+    "vocalStyleReasoning": "למה?",
+    "productionStyle": "סגנון הפקה",
+    "productionStyleReasoning": "למה?",
+    "productionTechniques": ["טכניקה1"],
+    "referenceArtists": [{ "name": "אמן", "why": "למה" }],
+    "referenceArtistsReasoning": "מכנה משותף",
+    "referenceTracks": [
+      { "track": "שם שיר", "artist": "אמן", "year": "שנה", "element": "מה ספציפית" }
+    ],
+    "referenceAlbums": [{ "album": "אלבום", "artist": "אמן", "why": "למה" }],
+    "referenceProducers": [{ "name": "מפיק", "knownFor": "ידוע בזכות", "relevance": "רלוונטיות" }],
+    "lyricalThemes": ["נושא1"],
+    "lyricalThemesReasoning": "למה?",
+    "avoidElements": ["להימנע1"],
+    "avoidElementsReasoning": "למה?",
+    "avoidArtists": [{ "name": "אמן", "reason": "למה להימנע" }],
+    "briefSummary": "סיכום 4-5 משפטים"
+  },
+  "audienceExpansion": [
+    {
+      "segmentName": "שם קהל",
+      "description": "מי הם",
+      "expansionReasoning": "הזדמנות עסקית",
+      "musicStyle": "סגנון מוסיקלי",
+      "musicReasoning": "למה יעבוד",
+      "referenceArtists": ["אמן1"],
+      "keyDifference": "שוני מהקהל הנוכחי"
+    }
+  ]
+}
+
+כללים:
+- JSON בלבד, ללא markdown
+- הכל בעברית
+- companyFacts: עובדות בלבד, ~לנתון לא ודאי
+- כל reasoning — מינימום 2-3 משפטים
+- musicBrief: לפחות 5 referenceTracks ספציפיים, 4 referenceArtists עם why, 2 referenceAlbums, 2 referenceProducers
+- audienceExpansion: 3 קהלים שונים
+- touchpointMap: 5 נקודות מגע
+- emotionalJourney: 4 שלבים`;
+
+  const response = await fetch('https://api.openai.com/v1/chat/completions', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${apiKey}` },
+    body: JSON.stringify({
+      model: 'gpt-4o',
+      max_tokens: 12000,
+      response_format: { type: 'json_object' },
+      messages: [
+        { role: 'system', content: systemMsg },
+        { role: 'user', content: prompt }
+      ]
+    })
+  });
+
+  if (!response.ok) {
+    const err = await response.json();
+    throw new Error(err.error?.message || 'API Error');
+  }
+
+  const data = await response.json();
+  const text = data.choices[0].message.content;
+  try { return JSON.parse(text); }
+  catch { const match = text.match(/\{[\s\S]*\}/); if (match) return JSON.parse(match[0]); throw new Error('תשובה לא תקינה'); }
+}
+
+async function analyze() {
+  const brand  = document.getElementById('brandInput').value.trim();
+  const brand2 = (document.getElementById('brandInput2')?.value || '').trim();
+  const apiKey = getApiKey();
+  const researchData  = (document.getElementById('researchInput')?.value || '').trim();
+  const campaignBlock = buildCampaignBlock();
+  const compareMode   = document.getElementById('comparePanel')?.style.display !== 'none' && brand2;
 
   if (!brand) { showError('הזן שם מותג'); return; }
+  if (compareMode && !brand2) { showError('הזן שם מותג שני להשוואה'); return; }
   if (!apiKey) { showError('לא מוגדר מפתח API — לחץ על ⚙ כדי להגדיר'); toggleSettings(); return; }
 
-  const btn = document.getElementById('analyzeBtn');
+  const btn     = document.getElementById('analyzeBtn');
   const loading = document.getElementById('loading');
   const results = document.getElementById('results');
 
@@ -1023,22 +1426,69 @@ async function analyze() {
   results.classList.remove('active');
   results.innerHTML = '';
   loading.classList.add('active');
-
   startProgressAnimation();
 
-  const researchBlock = researchData ? `
+  try {
+    // ── Phase 1: Web search for fresh company data ──────────────
+    let webFactsBlock = '';
+    try {
+      const wsRes = await fetch('https://api.openai.com/v1/chat/completions', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${apiKey}` },
+        body: JSON.stringify({
+          model: 'gpt-4o-search-preview',
+          messages: [{
+            role: 'user',
+            content: `Search for the most current factual data about "${brand}": revenue figures, market share, number of employees, key products, recent product launches or news from the last 12 months, stock price if public. Be concise and factual. Report in Hebrew.`
+          }]
+        })
+      });
+      if (wsRes.ok) {
+        const wsData = await wsRes.json();
+        const wsText = wsData.choices?.[0]?.message?.content || '';
+        if (wsText) {
+          webFactsBlock = `
 ═══════════════════════════════════════
-נתוני מחקר שסופקו — עדיפות מוחלטת
+נתונים עדכניים מהאינטרנט (אמת, לא הנחות)
 ═══════════════════════════════════════
-הנתונים הבאים הם עובדות מאומתות שהוזנו ידנית. הם גוברים על כל ידע כללי שלך.
-אל תסתור אותם. אל תתעלם מהם. בנה את כל הניתוח סביבם קודם, ורק אז השלם פערים עם הידע שלך.
+${wsText}
+═══════════════════════════════════════
+`;
+        }
+      }
+    } catch(e) { /* web search failed — continue without it */ }
 
-${researchData}
+    // ── Phase 2: Main analysis ────────────────────────────────
+    if (compareMode) {
+      const [d1, d2] = await Promise.all([
+        runAnalysis(brand,  researchData, campaignBlock, webFactsBlock),
+        runAnalysis(brand2, '',           campaignBlock, '')
+      ]);
+      finishProgress();
+      setTimeout(() => {
+        loading.classList.remove('active');
+        saveToHistory(d1);
+        saveToHistory(d2);
+        renderComparison(d1, d2);
+      }, 400);
+    } else {
+      const json = await runAnalysis(brand, researchData, campaignBlock, webFactsBlock);
+      finishProgress();
+      setTimeout(() => {
+        loading.classList.remove('active');
+        saveToHistory(json);
+        renderResults(json);
+      }, 400);
+    }
 
-═══════════════════════════════════════
-המשך לנתח לפי הידע שלך את מה שלא כוסה למעלה
-═══════════════════════════════════════
-` : '';
+  } catch(err) {
+    clearInterval(_progressInterval);
+    loading.classList.remove('active');
+    showError('שגיאה: ' + err.message);
+  }
+
+  btn.disabled = false;
+}
 
   const prompt = `${researchBlock}אתה שלושה אנשים בו זמנית:
 1. אסטרטג מותגים בכיר — מבין עמוק את הקטגוריה, הקהל, הפסיכולוגיה, המיצוב התחרותי
@@ -1568,13 +2018,17 @@ function renderResults(d) {
 
   const refTracksHtml = (m.referenceTracks||[]).map(t => {
     if (typeof t === 'object') {
+      const spUrl = 'https://open.spotify.com/search/' + encodeURIComponent((t.track||'') + ' ' + (t.artist||''));
       return `<div style="background:var(--surface2);border-radius:8px;padding:12px 14px;margin-bottom:8px;">
-        <div style="display:flex;align-items:center;gap:10px;margin-bottom:6px;">
-          <span style="font-size:18px;">▶</span>
-          <div>
-            <div style="font-size:14px;font-weight:700;color:var(--text);">${t.track||''}</div>
-            <div style="font-size:13px;color:var(--accent2);">${t.artist||''}${t.year ? ' · '+t.year : ''}</div>
+        <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:6px;">
+          <div style="display:flex;align-items:center;gap:10px;">
+            <span style="font-size:18px;">▶</span>
+            <div>
+              <div style="font-size:14px;font-weight:700;color:var(--text);">${t.track||''}</div>
+              <div style="font-size:13px;color:var(--accent2);">${t.artist||''}${t.year ? ' · '+t.year : ''}</div>
+            </div>
           </div>
+          <a href="${spUrl}" target="_blank" style="background:#1DB954;color:#000;border-radius:20px;padding:4px 10px;font-size:11px;font-weight:700;text-decoration:none;white-space:nowrap;flex-shrink:0;">▶ Spotify</a>
         </div>
         <div style="font-size:13px;color:var(--text2);padding-right:28px;line-height:1.7;">${t.element||''}</div>
       </div>`;
@@ -1704,9 +2158,10 @@ function renderResults(d) {
       ${tabs.map((t,i) => `<div class="tab-panel${i===0?' active':''}" id="${t.id}">${t.content}</div>`).join('')}
     </div>
     <div class="export-bar">
+      <button class="export-btn" id="clientViewBtn" onclick="toggleClientView()">👔 מצב לקוח</button>
       <button class="export-btn" onclick="exportJSON()">⬇ JSON</button>
-      <button class="export-btn" onclick="copyBrief()">📋 העתק בריף</button>
-      <button class="export-pdf-btn" onclick="exportPDF()">📄 ייצוא PDF</button>
+      <button class="export-btn" onclick="copyBrief()">📋 בריף</button>
+      <button class="export-pdf-btn" onclick="exportPDF()">📄 PDF</button>
       <button class="new-search-btn" onclick="newSearch()">ניתוח חדש →</button>
     </div>
   `;
@@ -1725,6 +2180,136 @@ function showTab(id, btn) {
 function toggleAccordion(id) {
   const el = document.getElementById(id);
   if (el) el.classList.toggle('open');
+}
+
+// ── Comparison renderer ──────────────────────────────────────
+function renderComparison(d1, d2) {
+  const results = document.getElementById('results');
+
+  function compRow(label, v1, v2) {
+    return `<tr style="border-bottom:1px solid var(--border);">
+      <td style="padding:8px 4px;font-size:12px;font-weight:700;color:var(--accent2);text-transform:uppercase;letter-spacing:.5px;width:25%;vertical-align:top;">${label}</td>
+      <td style="padding:8px 6px;font-size:13px;color:var(--text);width:37.5%;vertical-align:top;">${v1||'—'}</td>
+      <td style="padding:8px 6px;font-size:13px;color:var(--text);width:37.5%;vertical-align:top;">${v2||'—'}</td>
+    </tr>`;
+  }
+
+  function compTags(arr1, arr2) {
+    const t = a => (a||[]).map(v => `<span class="tag" style="font-size:11px;padding:2px 8px;">${typeof v==='object'?(v.name||''):v}</span>`).join('');
+    return `<td style="padding:8px 6px;vertical-align:top;">${t(arr1)}</td><td style="padding:8px 6px;vertical-align:top;">${t(arr2)}</td>`;
+  }
+
+  const m1 = d1.musicBrief||{}, m2 = d2.musicBrief||{};
+  const a1 = d1.audience||{},   a2 = d2.audience||{};
+  const arc1 = d1.brandArchetype||{}, arc2 = d2.brandArchetype||{};
+  const cf1 = d1.companyFacts||{}, cf2 = d2.companyFacts||{};
+
+  results.innerHTML = `
+    <!-- Compare header -->
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:20px;">
+      <div style="background:var(--surface);border:1px solid var(--accent);border-radius:12px;padding:16px;text-align:center;">
+        <div class="brand-highlight" style="font-size:24px;">${d1.brandName}</div>
+        <div style="font-size:13px;color:var(--text2);margin-top:4px;">${arc1.primary||''}</div>
+      </div>
+      <div style="background:var(--surface);border:1px solid var(--border);border-radius:12px;padding:16px;text-align:center;">
+        <div class="brand-highlight" style="font-size:24px;">${d2.brandName}</div>
+        <div style="font-size:13px;color:var(--text2);margin-top:4px;">${arc2.primary||''}</div>
+      </div>
+    </div>
+
+    <!-- Company facts -->
+    ${acc('cmp-facts','📊','נתוני חברה',`
+      <div style="padding-top:12px;overflow-x:auto;">
+        <table style="width:100%;border-collapse:collapse;">
+          <tr style="border-bottom:2px solid var(--accent);">
+            <th style="padding:6px 4px;font-size:11px;color:var(--text2);text-align:right;width:25%;"></th>
+            <th style="padding:6px 6px;font-size:13px;font-weight:700;color:var(--accent2);text-align:right;">${d1.brandName}</th>
+            <th style="padding:6px 6px;font-size:13px;font-weight:700;color:var(--text2);text-align:right;">${d2.brandName}</th>
+          </tr>
+          ${compRow('הכנסות', cf1.revenue, cf2.revenue)}
+          ${compRow('נתח שוק', cf1.marketShare, cf2.marketShare)}
+          ${compRow('עובדים', cf1.employeeCount, cf2.employeeCount)}
+          ${compRow('מיקום', cf1.marketPosition, cf2.marketPosition)}
+        </table>
+      </div>
+    `, false)}
+
+    <!-- Audience -->
+    ${acc('cmp-aud','👥','קהל יעד',`
+      <div style="padding-top:12px;overflow-x:auto;">
+        <table style="width:100%;border-collapse:collapse;">
+          <tr style="border-bottom:2px solid var(--accent);">
+            <th style="padding:6px 4px;width:25%;"></th>
+            <th style="padding:6px 6px;font-size:13px;font-weight:700;color:var(--accent2);text-align:right;">${d1.brandName}</th>
+            <th style="padding:6px 6px;font-size:13px;font-weight:700;color:var(--text2);text-align:right;">${d2.brandName}</th>
+          </tr>
+          ${compRow('גיל עיקרי', a1.primaryAge, a2.primaryAge)}
+          ${compRow('מגדר', a1.gender, a2.gender)}
+          ${compRow('מעמד', a1.socioeconomic, a2.socioeconomic)}
+          ${compRow('אורח חיים', a1.lifestyle, a2.lifestyle)}
+          <tr style="border-bottom:1px solid var(--border);">
+            <td style="padding:8px 4px;font-size:12px;font-weight:700;color:var(--accent2);text-transform:uppercase;">ערכים</td>
+            ${compTags(a1.values, a2.values)}
+          </tr>
+        </table>
+      </div>
+    `, false)}
+
+    <!-- Music Brief -->
+    ${acc('cmp-music','🎵','בריף מוסיקלי',`
+      <div style="padding-top:12px;overflow-x:auto;">
+        <table style="width:100%;border-collapse:collapse;">
+          <tr style="border-bottom:2px solid var(--accent);">
+            <th style="padding:6px 4px;width:25%;"></th>
+            <th style="padding:6px 6px;font-size:13px;font-weight:700;color:var(--accent2);text-align:right;">${d1.brandName}</th>
+            <th style="padding:6px 6px;font-size:13px;font-weight:700;color:var(--text2);text-align:right;">${d2.brandName}</th>
+          </tr>
+          ${compRow('DNA', m1.sonicOneLiner, m2.sonicOneLiner)}
+          ${compRow('ז׳אנר', m1.primaryGenre, m2.primaryGenre)}
+          ${compRow('BPM', m1.bpm, m2.bpm)}
+          ${compRow('מצב רוח', m1.mood, m2.mood)}
+          ${compRow('אנרגיה', m1.energy ? m1.energy+'%' : '', m2.energy ? m2.energy+'%' : '')}
+          ${compRow('הפקה', m1.productionStyle, m2.productionStyle)}
+          ${compRow('קול', m1.vocalStyle, m2.vocalStyle)}
+          ${compRow('עידן', m1.eraInfluence, m2.eraInfluence)}
+          <tr style="border-bottom:1px solid var(--border);">
+            <td style="padding:8px 4px;font-size:12px;font-weight:700;color:var(--accent2);text-transform:uppercase;">כלים</td>
+            ${compTags(m1.instruments, m2.instruments)}
+          </tr>
+          <tr style="border-bottom:1px solid var(--border);">
+            <td style="padding:8px 4px;font-size:12px;font-weight:700;color:var(--accent2);text-transform:uppercase;">אמנים</td>
+            ${compTags(m1.referenceArtists, m2.referenceArtists)}
+          </tr>
+          <tr>
+            <td style="padding:8px 4px;font-size:12px;font-weight:700;color:#f87171;text-transform:uppercase;">להימנע</td>
+            <td style="padding:8px 6px;vertical-align:top;"><div class="tags">${(m1.avoidElements||[]).map(v=>`<span class="tag" style="border-color:rgba(239,68,68,.3);color:#f87171;font-size:11px;">${v}</span>`).join('')}</div></td>
+            <td style="padding:8px 6px;vertical-align:top;"><div class="tags">${(m2.avoidElements||[]).map(v=>`<span class="tag" style="border-color:rgba(239,68,68,.3);color:#f87171;font-size:11px;">${v}</span>`).join('')}</div></td>
+          </tr>
+        </table>
+      </div>
+    `, false)}
+
+    <!-- White space -->
+    ${acc('cmp-sonic','🗺️','מיצוב סוני תחרותי',`
+      <div style="padding-top:12px;display:grid;grid-template-columns:1fr 1fr;gap:12px;">
+        <div>
+          <div style="font-size:12px;font-weight:700;color:var(--accent2);margin-bottom:6px;">${d1.brandName}</div>
+          <div style="font-size:13px;color:var(--text2);">${(d1.sonicCompetitiveMap||{}).whiteSpace||''}</div>
+        </div>
+        <div>
+          <div style="font-size:12px;font-weight:700;color:var(--text2);margin-bottom:6px;">${d2.brandName}</div>
+          <div style="font-size:13px;color:var(--text2);">${(d2.sonicCompetitiveMap||{}).whiteSpace||''}</div>
+        </div>
+      </div>
+    `, false)}
+
+    <div class="export-bar">
+      <button class="export-btn" onclick="document.getElementById('results').classList.remove('active');document.getElementById('results').innerHTML='';document.getElementById('brandInput').value='';">ניתוח חדש →</button>
+    </div>
+  `;
+
+  results.classList.add('active');
+  window._lastResult = d1;
 }
 
 function exportPDF() {
