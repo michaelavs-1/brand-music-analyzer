@@ -886,7 +886,6 @@
   <div class="header">
     <div class="logo">BrandSync AI</div>
     <h1>Musical Brandbook</h1>
-    <p>הזן שם מותג — ה-AI ינתח את הקהל ויתאים סגנון מוסיקלי מדויק</p>
   </div>
 
   <!-- Input -->
@@ -1581,7 +1580,113 @@ function renderResults(d) {
   const tp = d.touchpointMap || [];
   const cf = d.companyFacts || {};
 
-  // ── TAB 0: נתונים ─────────────────────────────────────────────
+  // ── Translations ────────────────────────────────────────────
+  const L = {
+    // tabs
+    tabData:    _lang==='en' ? '📊 Data'             : '📊 נתונים',
+    tabBrand:   _lang==='en' ? '🎭 Brand'            : '🎭 מותג',
+    tabAud:     _lang==='en' ? '👥 Target Audience'  : '👥 קהל יעד',
+    tabSonic:   _lang==='en' ? '🗺️ Sound Map'       : '🗺️ מפת סאונד',
+    tabJourney: _lang==='en' ? '🎯 Emotional Journey': '🎯 מסע רגשי',
+    tabBrief:   _lang==='en' ? '🎵 Music Brief'      : '🎵 בריף מוסיקלי',
+    tabGrowth:  _lang==='en' ? '🚀 Growth'           : '🚀 צמיחה',
+    // tab0 accordion titles
+    identity:   _lang==='en' ? 'Company Identity'    : 'זהות החברה',
+    finance:    _lang==='en' ? 'Financials & Market' : 'פיננסים ושוק',
+    products:   _lang==='en' ? 'Key Products'        : 'מוצרים מובילים',
+    launches:   _lang==='en' ? 'Recent Launches'     : 'השקות אחרונות',
+    compTitle:  _lang==='en' ? 'Competitors & Market Share' : 'מתחרים ונתחי שוק',
+    achieve:    _lang==='en' ? 'Notable Achievements': 'הישגים בולטים',
+    news:       _lang==='en' ? 'Recent News'         : 'חדשות אחרונות',
+    challenges: _lang==='en' ? 'Business Challenges' : 'אתגרים עסקיים',
+    // factRow labels
+    founded:    _lang==='en' ? 'Founded'             : 'הוקמה',
+    hq:         _lang==='en' ? 'HQ'                  : 'מטה',
+    parent:     _lang==='en' ? 'Parent Company'      : 'חברת אם',
+    subs:       _lang==='en' ? 'Subsidiaries'        : 'חברות בת',
+    employees:  _lang==='en' ? 'Employees'           : 'עובדים',
+    geo:        _lang==='en' ? 'Geographic Presence' : 'נוכחות גיאוגרפית',
+    revenue:    _lang==='en' ? 'Revenue'             : 'הכנסות',
+    growth:     _lang==='en' ? 'YoY Growth'          : 'צמיחה YoY',
+    mktCap:     _lang==='en' ? 'Market Cap'          : 'שווי שוק',
+    stock:      _lang==='en' ? 'Stock Symbol'        : 'סימול בורסה',
+    mktShare:   _lang==='en' ? 'Market Share'        : 'נתח שוק',
+    mktPos:     _lang==='en' ? 'Market Position'     : 'מיקום בשוק',
+    // tab1
+    brandSummaryTitle:  _lang==='en' ? 'Brand Summary'       : 'תקציר המותג',
+    archetypeTitle:     _lang==='en' ? 'Brand Archetype'     : 'ארכיטיפ המותג',
+    arcPrimary:         _lang==='en' ? 'Primary Archetype'   : 'ארכיטיפ ראשי',
+    arcSecondary:       _lang==='en' ? 'Secondary Archetype' : 'ארכיטיפ משני',
+    arcSonic:           _lang==='en' ? 'Sound Implications'  : 'השלכות סאונד מהארכיטיפ',
+    // tab2
+    demographics:  _lang==='en' ? 'Demographics'                  : 'דמוגרפיה',
+    lifestyle:     _lang==='en' ? 'Lifestyle & Media Consumption'  : 'אורח חיים וצריכת מדיה',
+    valuesTitle:   _lang==='en' ? 'Values, Interests & Pain Points': 'ערכים, תחומי עניין, כאבים',
+    psychTitle:    _lang==='en' ? 'Psychographics'                 : 'פסיכוגרפיה',
+    primaryAge:    _lang==='en' ? 'Primary Age'                    : 'גיל עיקרי',
+    secondaryAge:  _lang==='en' ? 'Secondary Age'                  : 'גיל משני',
+    gender:        _lang==='en' ? 'Gender'                         : 'מגדר',
+    socio:         _lang==='en' ? 'Socioeconomic Status'           : 'מעמד סוציואקונומי',
+    education:     _lang==='en' ? 'Education'                      : 'השכלה',
+    lifestyleLbl:  _lang==='en' ? 'Lifestyle'                      : 'אורח חיים',
+    media:         _lang==='en' ? 'Media Consumption'              : 'צריכת מדיה',
+    values:        _lang==='en' ? 'Values'                         : 'ערכים',
+    interests:     _lang==='en' ? 'Interests'                      : 'תחומי עניין',
+    painPoints:    _lang==='en' ? 'Pain Points'                    : 'נקודות כאב',
+    personality:   _lang==='en' ? 'Personality'                    : 'אישיות',
+    emoDrivers:    _lang==='en' ? 'Emotional Drivers'              : 'מניעים רגשיים',
+    brandRel:      _lang==='en' ? 'Emotional Connection to Brand'  : 'קשר רגשי למותג',
+    // tab3
+    compPos:       _lang==='en' ? 'Competitive Positioning'  : 'מיצוב תחרותי',
+    touchMap:      _lang==='en' ? 'Touchpoint Map'           : 'מפת נקודות מגע',
+    mainComp:      _lang==='en' ? 'Main Competitors'         : 'מתחרים עיקריים',
+    catSound:      _lang==='en' ? 'Category Dominant Sound'  : 'הסאונד הרווח בקטגוריה',
+    whiteSpace:    _lang==='en' ? 'White Space'              : 'חלל פנוי — White Space',
+    diffStrat:     _lang==='en' ? 'Differentiation Strategy' : 'אסטרטגיית בידול',
+    // tab4
+    emoGoal:       _lang==='en' ? 'Emotional Goal'   : 'מטרה רגשית',
+    musicDir:      _lang==='en' ? 'Musical Direction': 'כיוון מוסיקלי',
+    stage:         _lang==='en' ? 'Stage'            : 'שלב',
+    // tab5
+    genreTitle:    _lang==='en' ? 'Genre · Tempo · Texture'        : 'ז׳אנר · טמפו · טקסטורה',
+    prodTitle:     _lang==='en' ? 'Production · Vocals · Instruments':'הפקה · שירה · כלי נגינה',
+    tracksTitle:   _lang==='en' ? 'References — Specific Tracks'   : 'רפרנסים — שירים ספציפיים',
+    artistsTitle:  _lang==='en' ? 'References — Artists'           : 'רפרנסים — אמנים',
+    albumsTitle:   _lang==='en' ? 'References — Albums'            : 'רפרנסים — אלבומים',
+    prodsTitle:    _lang==='en' ? 'References — Producers'         : 'רפרנסים — מפיקים',
+    lyricsTitle:   _lang==='en' ? 'Lyrical Themes'                 : 'נושאים לטקסטים',
+    avoidTitle:    _lang==='en' ? 'What to Avoid'                  : 'מה להימנע ממנו',
+    briefSum:      _lang==='en' ? 'Brief Summary'                  : 'סיכום הבריף',
+    primaryGenre:  _lang==='en' ? 'Primary Genre'                  : 'ז׳אנר עיקרי',
+    subGenres:     _lang==='en' ? 'Sub-genres'                     : 'תת-ז׳אנרים',
+    eraInfluence:  _lang==='en' ? 'Era Influence'                  : 'השפעת תקופה',
+    tonality:      _lang==='en' ? 'Tonality'                       : 'טונליות',
+    mood:          _lang==='en' ? 'Mood'                           : 'מצב רוח',
+    energy:        _lang==='en' ? 'Energy'                         : 'אנרגיה',
+    energyLow:     _lang==='en' ? 'Low'                            : 'נמוכה',
+    energyHigh:    _lang==='en' ? 'High'                           : 'גבוהה',
+    freqProfile:   _lang==='en' ? 'Frequency Profile'              : 'פרופיל תדרים',
+    sonicTexture:  _lang==='en' ? 'Sonic Texture'                  : 'טקסטורה סונית',
+    prodStyle:     _lang==='en' ? 'Production Style'               : 'סגנון הפקה',
+    prodTech:      _lang==='en' ? 'Production Techniques'          : 'טכניקות הפקה',
+    vocalStyle:    _lang==='en' ? 'Vocal Style'                    : 'סגנון שירה',
+    instruments:   _lang==='en' ? 'Instruments'                    : 'כלי נגינה',
+    avoidElems:    _lang==='en' ? 'Elements to Avoid'              : 'אלמנטים להימנע',
+    avoidArts:     _lang==='en' ? 'Artists to Avoid'               : 'אמנים להימנע',
+    noRefs:        _lang==='en' ? 'No references'                  : 'אין רפרנסים',
+    // tab6
+    audience:      _lang==='en' ? 'Audience'                        : 'קהל',
+    whoAreThey:    _lang==='en' ? 'Who are they?'                   : 'מי הם?',
+    musicStyleRec: _lang==='en' ? 'Recommended Music Style'         : 'סגנון מוסיקלי מומלץ',
+    refArtists:    _lang==='en' ? 'Reference Artists'               : 'אמנים לרפרנס',
+    audDiff:       _lang==='en' ? 'Difference from Current Audience': 'מה השוני מהקהל הנוכחי',
+    noExpansion:   _lang==='en' ? 'No audience expansion data'      : 'אין נתוני הרחבת קהלים',
+    // export bar
+    clientView:    _lang==='en' ? '👔 Client View'  : '👔 מצב לקוח',
+    newAnalysis:   _lang==='en' ? 'New Analysis →'  : 'ניתוח חדש →',
+  };
+
+  // ── TAB 0: נתונים ─────────────────────────────────────────────────────
   function factRow(label, value) {
     if (!value || value === 'null') return '';
     return `<tr style="border-bottom:1px solid var(--border);">
@@ -1616,57 +1721,57 @@ function renderResults(d) {
       <div class="brand-highlight" style="font-size:32px;">${d.brandName}</div>
     </div>
 
-    ${acc('cf-identity','🏢','זהות החברה', `
+    ${acc('cf-identity','🏢',L.identity, `
       <div style="padding-top:12px;">
         <table style="width:100%;border-collapse:collapse;">
-          ${factRow('הוקמה', cf.founded)}
-          ${factRow('מטה', cf.headquarters)}
-          ${factRow('חברת אם', cf.parentCompany)}
-          ${factRow('חברות בת', (cf.subsidiaries||[]).filter(s=>s&&s!=='null').join(' · ') || null)}
-          ${factRow('עובדים', cf.employeeCount)}
-          ${factRow('נוכחות גיאוגרפית', cf.geographicPresence)}
+          ${factRow(L.founded, cf.founded)}
+          ${factRow(L.hq, cf.headquarters)}
+          ${factRow(L.parent, cf.parentCompany)}
+          ${factRow(L.subs, (cf.subsidiaries||[]).filter(s=>s&&s!=='null').join(' · ') || null)}
+          ${factRow(L.employees, cf.employeeCount)}
+          ${factRow(L.geo, cf.geographicPresence)}
         </table>
       </div>
     `, false)}
 
-    ${acc('cf-finance','💰','פיננסים ושוק', `
+    ${acc('cf-finance','💰',L.finance, `
       <div style="padding-top:12px;">
         <table style="width:100%;border-collapse:collapse;">
-          ${factRow('הכנסות', cf.revenue)}
-          ${factRow('צמיחה YoY', cf.revenueGrowth)}
-          ${factRow('שווי שוק', cf.marketCap)}
-          ${factRow('סימול בורסה', cf.stockSymbol)}
-          ${factRow('נתח שוק', cf.marketShare)}
-          ${factRow('מיקום בשוק', cf.marketPosition)}
+          ${factRow(L.revenue, cf.revenue)}
+          ${factRow(L.growth, cf.revenueGrowth)}
+          ${factRow(L.mktCap, cf.marketCap)}
+          ${factRow(L.stock, cf.stockSymbol)}
+          ${factRow(L.mktShare, cf.marketShare)}
+          ${factRow(L.mktPos, cf.marketPosition)}
         </table>
       </div>
     `, false)}
 
-    ${cf.keyProducts && cf.keyProducts.length ? acc('cf-products','📦','מוצרים מובילים', `
+    ${cf.keyProducts && cf.keyProducts.length ? acc('cf-products','📦',L.products, `
       <div style="padding-top:12px;">${keyProductsHtml}</div>
     `, false) : ''}
 
-    ${cf.recentLaunches && cf.recentLaunches.length ? acc('cf-launches','🚀','השקות אחרונות', `
+    ${cf.recentLaunches && cf.recentLaunches.length ? acc('cf-launches','🚀',L.launches, `
       <div style="padding-top:12px;">${launchesHtml}</div>
     `, false) : ''}
 
-    ${cf.mainCompetitors && cf.mainCompetitors.length ? acc('cf-comp','⚔️','מתחרים ונתחי שוק', `
+    ${cf.mainCompetitors && cf.mainCompetitors.length ? acc('cf-comp','⚔️',L.compTitle, `
       <div style="padding-top:12px;">${competitorsHtml}</div>
     `, false) : ''}
 
-    ${cf.notableAchievements && cf.notableAchievements.length ? acc('cf-achieve','🏆','הישגים בולטים', `
+    ${cf.notableAchievements && cf.notableAchievements.length ? acc('cf-achieve','🏆',L.achieve, `
       <div style="padding-top:12px;">
         ${(cf.notableAchievements||[]).map(a=>`<div style="padding:7px 0;border-bottom:1px solid var(--border);font-size:14px;color:var(--text);">✦ ${a}</div>`).join('')}
       </div>
     `, false) : ''}
 
-    ${cf.recentNews && cf.recentNews.length ? acc('cf-news','📰','חדשות אחרונות', `
+    ${cf.recentNews && cf.recentNews.length ? acc('cf-news','📰',L.news, `
       <div style="padding-top:12px;">
         ${(cf.recentNews||[]).map(n=>`<div style="padding:7px 0;border-bottom:1px solid var(--border);font-size:14px;color:var(--text2);">▸ ${n}</div>`).join('')}
       </div>
     `, false) : ''}
 
-    ${cf.challenges ? acc('cf-challenges','⚠️','אתגרים עסקיים', `
+    ${cf.challenges ? acc('cf-challenges','⚠️',L.challenges, `
       <div style="padding:12px 0;font-size:14px;color:var(--text2);line-height:1.8;">${cf.challenges}</div>
     `, false) : ''}
   `;
@@ -1676,87 +1781,87 @@ function renderResults(d) {
     <div style="margin-bottom:12px;">
       <div class="brand-highlight" style="font-size:32px;">${d.brandName}</div>
     </div>
-    ${acc('brand-summary','📋','תקציר המותג',`
+    ${acc('brand-summary','📋',L.brandSummaryTitle,`
       <div class="card-content" style="padding-top:12px;">${d.brandSummary || ''}${R(d.brandSummaryReasoning)}</div>
     `, false)}
-    ${acc('brand-archetype','🎭','ארכיטיפ המותג',`
+    ${acc('brand-archetype','🎭',L.archetypeTitle,`
       <div class="card-content" style="padding-top:12px;">
         <div class="section-block">
-          <div class="section-label">ארכיטיפ ראשי</div>
+          <div class="section-label">${L.arcPrimary}</div>
           <strong style="font-size:18px;color:var(--accent2);">${arc.primary || ''}</strong>
           ${R(arc.archetypeReasoning)}
         </div>
         <div class="section-block">
-          <div class="section-label">ארכיטיפ משני</div>
+          <div class="section-label">${L.arcSecondary}</div>
           <strong>${arc.secondary || ''}</strong>
         </div>
         <div class="section-block">
-          <div class="section-label">השלכות סאונד מהארכיטיפ</div>
+          <div class="section-label">${L.arcSonic}</div>
           ${arc.sonicImplication || ''}
         </div>
       </div>
     `, false)}
   `;
 
-  // ── TAB 2: קהל יעד ───────────────────────────────────────────
+  // ── TAB 2: קהל יעד ───────────────────────────────────────────────
   const tab2 = `
-    ${acc('aud-demo','👥','דמוגרפיה',`
+    ${acc('aud-demo','👥',L.demographics,`
       <div class="card-content" style="padding-top:12px;">
-        <div class="section-block"><div class="section-label">גיל עיקרי</div><strong>${a.primaryAge||''}</strong>${R(a.primaryAgeReasoning)}</div>
-        <div class="section-block"><div class="section-label">גיל משני</div><strong>${a.secondaryAge||''}</strong>${R(a.secondaryAgeReasoning)}</div>
-        <div class="section-block"><div class="section-label">מגדר</div><strong>${a.gender||''}</strong>${R(a.genderReasoning)}</div>
-        <div class="section-block"><div class="section-label">מעמד סוציואקונומי</div><strong>${a.socioeconomic||''}</strong>${R(a.socioeconomicReasoning)}</div>
-        <div class="section-block"><div class="section-label">השכלה</div>${a.education||''}</div>
+        <div class="section-block"><div class="section-label">${L.primaryAge}</div><strong>${a.primaryAge||''}</strong>${R(a.primaryAgeReasoning)}</div>
+        <div class="section-block"><div class="section-label">${L.secondaryAge}</div><strong>${a.secondaryAge||''}</strong>${R(a.secondaryAgeReasoning)}</div>
+        <div class="section-block"><div class="section-label">${L.gender}</div><strong>${a.gender||''}</strong>${R(a.genderReasoning)}</div>
+        <div class="section-block"><div class="section-label">${L.socio}</div><strong>${a.socioeconomic||''}</strong>${R(a.socioeconomicReasoning)}</div>
+        <div class="section-block"><div class="section-label">${L.education}</div>${a.education||''}</div>
       </div>
     `, false)}
-    ${acc('aud-life','🌍','אורח חיים וצריכת מדיה',`
+    ${acc('aud-life','🌍',L.lifestyle,`
       <div class="card-content" style="padding-top:12px;">
-        <div class="section-block"><div class="section-label">אורח חיים</div>${a.lifestyle||''}${R(a.lifestyleReasoning)}</div>
-        <div class="section-block"><div class="section-label">צריכת מדיה</div>${a.mediaConsumption||''}${R(a.mediaConsumptionReasoning)}</div>
+        <div class="section-block"><div class="section-label">${L.lifestyleLbl}</div>${a.lifestyle||''}${R(a.lifestyleReasoning)}</div>
+        <div class="section-block"><div class="section-label">${L.media}</div>${a.mediaConsumption||''}${R(a.mediaConsumptionReasoning)}</div>
       </div>
     `, false)}
-    ${acc('aud-vals','💡','ערכים, תחומי עניין, כאבים',`
+    ${acc('aud-vals','💡',L.valuesTitle,`
       <div class="card-content" style="padding-top:12px;">
         <div class="section-block">
-          <div class="section-label">ערכים</div>
+          <div class="section-label">${L.values}</div>
           <div class="tags">${(a.values||[]).map(v=>'<span class="tag">'+v+'</span>').join('')}</div>
           ${R(a.valuesReasoning)}
         </div>
         <div class="section-block">
-          <div class="section-label">תחומי עניין</div>
+          <div class="section-label">${L.interests}</div>
           <div class="tags">${(a.interests||[]).map(v=>'<span class="tag">'+v+'</span>').join('')}</div>
           ${R(a.interestsReasoning)}
         </div>
         <div class="section-block">
-          <div class="section-label">נקודות כאב</div>
+          <div class="section-label">${L.painPoints}</div>
           <div class="tags">${(a.painPoints||[]).map(v=>'<span class="tag" style="border-color:rgba(239,68,68,.3);color:#f87171">'+v+'</span>').join('')}</div>
           ${R(a.painPointsReasoning)}
         </div>
       </div>
     `, false)}
-    ${acc('aud-psych','🧠','פסיכוגרפיה',`
+    ${acc('aud-psych','🧠',L.psychTitle,`
       <div class="card-content" style="padding-top:12px;">
-        <div class="section-block"><div class="section-label">אישיות</div>${p.personality||''}${R(p.personalityReasoning)}</div>
-        <div class="section-block"><div class="section-label">מניעים רגשיים</div>${p.emotionalDrivers||''}${R(p.emotionalDriversReasoning)}</div>
-        <div class="section-block"><div class="section-label">קשר רגשי למותג</div>${p.brandRelationship||''}${R(p.brandRelationshipReasoning)}</div>
+        <div class="section-block"><div class="section-label">${L.personality}</div>${p.personality||''}${R(p.personalityReasoning)}</div>
+        <div class="section-block"><div class="section-label">${L.emoDrivers}</div>${p.emotionalDrivers||''}${R(p.emotionalDriversReasoning)}</div>
+        <div class="section-block"><div class="section-label">${L.brandRel}</div>${p.brandRelationship||''}${R(p.brandRelationshipReasoning)}</div>
       </div>
     `, false)}
   `;
 
-  // ── TAB 3: מפת סאונד ─────────────────────────────────────────
+  // ── TAB 3: מפת סאונד ───────────────────────────────────────────────────
   const tab3 = `
-    ${acc('sonic-comp','⚔️','מיצוב תחרותי',`
+    ${acc('sonic-comp','⚔️',L.compPos,`
       <div class="card-content" style="padding-top:12px;">
         <div class="section-block">
-          <div class="section-label">מתחרים עיקריים</div>
+          <div class="section-label">${L.mainComp}</div>
           <div class="tags">${(scm.mainCompetitors||[]).map(v=>'<span class="tag">'+v+'</span>').join('')}</div>
         </div>
-        <div class="section-block"><div class="section-label">הסאונד הרווח בקטגוריה</div>${scm.competitorsSonicDescription||''}</div>
-        <div class="section-block"><div class="section-label">חלל פנוי — White Space</div><strong>${scm.whiteSpace||''}</strong>${R(scm.whiteSpaceReasoning)}</div>
-        <div class="section-block"><div class="section-label">אסטרטגיית בידול</div>${scm.differentiationStrategy||''}</div>
+        <div class="section-block"><div class="section-label">${L.catSound}</div>${scm.competitorsSonicDescription||''}</div>
+        <div class="section-block"><div class="section-label">${L.whiteSpace}</div><strong>${scm.whiteSpace||''}</strong>${R(scm.whiteSpaceReasoning)}</div>
+        <div class="section-block"><div class="section-label">${L.diffStrat}</div>${scm.differentiationStrategy||''}</div>
       </div>
     `, false)}
-    ${acc('sonic-touch','📍','מפת נקודות מגע',`
+    ${acc('sonic-touch','📍',L.touchMap,`
       <div class="card-content" style="padding-top:12px;">
         ${tp.map(t => `
           <div class="section-block">
@@ -1769,21 +1874,21 @@ function renderResults(d) {
     `, false)}
   `;
 
-  // ── TAB 4: מסע רגשי ──────────────────────────────────────────
+  // ── TAB 4: מסע רגשי ──────────────────────────────────────────────
   const stageIcons = ['👁','🤔','💳','❤️'];
   const tab4 = ej.map((stage, i) => acc(
     `ej-${i}`,
     stageIcons[i] || '🎯',
-    stage.stage || `שלב ${i+1}`,
+    stage.stage || `${L.stage} ${i+1}`,
     `<div class="card-content" style="padding-top:12px;">
-      <div class="section-block"><div class="section-label">מטרה רגשית</div>${stage.emotionGoal||''}</div>
-      <div class="section-block"><div class="section-label">כיוון מוסיקלי</div><strong>${stage.musicDirection||''}</strong></div>
+      <div class="section-block"><div class="section-label">${L.emoGoal}</div>${stage.emotionGoal||''}</div>
+      <div class="section-block"><div class="section-label">${L.musicDir}</div><strong>${stage.musicDirection||''}</strong></div>
       ${R(stage.reasoning)}
     </div>`,
     false
   )).join('');
 
-  // ── TAB 5: בריף מוסיקלי ──────────────────────────────────────
+  // ── TAB 5: בריף מוסיקלי ──────────────────────────────────────────────
   const instrumentsHtml = Array.isArray(m.instruments)
     ? (typeof m.instruments[0] === 'object'
         ? (m.instruments||[]).map(i=>`<div style="padding:8px 0;border-bottom:1px solid var(--border);"><strong style="color:var(--text);">${i.name||''}</strong><div style="font-size:13px;color:var(--text2);margin-top:2px;">${i.detail||''}</div></div>`).join('')
@@ -1844,64 +1949,64 @@ function renderResults(d) {
   const tab5 = `
     ${m.sonicOneLiner ? `<div style="background:linear-gradient(135deg,rgba(200,164,78,.12),rgba(226,192,110,.06));border:1px solid var(--accent);border-radius:12px;padding:18px 20px;margin-bottom:16px;font-size:17px;font-weight:600;color:var(--accent2);line-height:1.6;">״${m.sonicOneLiner}״</div>` : ''}
 
-    ${acc('mb-dna','🎼','ז׳אנר · טמפו · טקסטורה',`
+    ${acc('mb-dna','🎼',L.genreTitle,`
       <div class="card-content" style="padding-top:12px;">
-        <div class="section-block"><div class="section-label">ז׳אנר עיקרי</div><strong style="font-size:17px;color:var(--accent2);">${m.primaryGenre||''}</strong>${R(m.primaryGenreReasoning)}</div>
-        <div class="section-block"><div class="section-label">תת-ז׳אנרים</div><div class="tags">${(m.subGenres||[]).map(v=>'<span class="tag">'+v+'</span>').join('')}</div></div>
-        <div class="section-block"><div class="section-label">השפעת תקופה</div>${m.eraInfluence||''}</div>
+        <div class="section-block"><div class="section-label">${L.primaryGenre}</div><strong style="font-size:17px;color:var(--accent2);">${m.primaryGenre||''}</strong>${R(m.primaryGenreReasoning)}</div>
+        <div class="section-block"><div class="section-label">${L.subGenres}</div><div class="tags">${(m.subGenres||[]).map(v=>'<span class="tag">'+v+'</span>').join('')}</div></div>
+        <div class="section-block"><div class="section-label">${L.eraInfluence}</div>${m.eraInfluence||''}</div>
         <div class="section-block"><div class="section-label">BPM</div><strong>${m.bpm||''}</strong> &nbsp;|&nbsp; <span style="color:var(--text2);">${m.groove||''}</span>${R(m.bpmReasoning)}</div>
-        <div class="section-block"><div class="section-label">טונליות</div>${m.keyTonality||''}</div>
-        <div class="section-block"><div class="section-label">מצב רוח</div><strong>${m.mood||''}</strong>${R(m.moodReasoning)}</div>
+        <div class="section-block"><div class="section-label">${L.tonality}</div>${m.keyTonality||''}</div>
+        <div class="section-block"><div class="section-label">${L.mood}</div><strong>${m.mood||''}</strong>${R(m.moodReasoning)}</div>
         <div class="section-block">
-          <div class="section-label">אנרגיה</div>
-          <div class="meter"><div class="meter-label"><span>נמוכה</span><span>${m.energy||0}%</span><span>גבוהה</span></div><div class="meter-bar"><div class="meter-fill" style="width:${m.energy||0}%"></div></div></div>
+          <div class="section-label">${L.energy}</div>
+          <div class="meter"><div class="meter-label"><span>${L.energyLow}</span><span>${m.energy||0}%</span><span>${L.energyHigh}</span></div><div class="meter-bar"><div class="meter-fill" style="width:${m.energy||0}%"></div></div></div>
           ${R(m.energyReasoning)}
         </div>
-        <div class="section-block"><div class="section-label">פרופיל תדרים</div>${m.frequencyProfile||''}</div>
-        <div class="section-block"><div class="section-label">טקסטורה סונית</div><div style="font-size:14px;color:var(--text);line-height:1.8;">${m.sonicTexture||''}</div></div>
+        <div class="section-block"><div class="section-label">${L.freqProfile}</div>${m.frequencyProfile||''}</div>
+        <div class="section-block"><div class="section-label">${L.sonicTexture}</div><div style="font-size:14px;color:var(--text);line-height:1.8;">${m.sonicTexture||''}</div></div>
       </div>
     `, false)}
 
-    ${acc('mb-prod','🎚️','הפקה · שירה · כלי נגינה',`
+    ${acc('mb-prod','🋺️',L.prodTitle,`
       <div class="card-content" style="padding-top:12px;">
-        <div class="section-block"><div class="section-label">סגנון הפקה</div><strong>${m.productionStyle||''}</strong>${R(m.productionStyleReasoning)}</div>
-        ${m.productionTechniques && m.productionTechniques.length ? `<div class="section-block"><div class="section-label">טכניקות הפקה</div><div class="tags">${(m.productionTechniques||[]).map(v=>'<span class="tag">'+v+'</span>').join('')}</div></div>` : ''}
-        <div class="section-block"><div class="section-label">סגנון שירה</div><strong>${m.vocalStyle||''}</strong>${R(m.vocalStyleReasoning)}</div>
-        <div class="section-block"><div class="section-label">כלי נגינה</div>${instrumentsHtml}${R(m.instrumentsReasoning)}</div>
+        <div class="section-block"><div class="section-label">${L.prodStyle}</div><strong>${m.productionStyle||''}</strong>${R(m.productionStyleReasoning)}</div>
+        ${m.productionTechniques && m.productionTechniques.length ? `<div class="section-block"><div class="section-label">${L.prodTech}</div><div class="tags">${(m.productionTechniques||[]).map(v=>'<span class="tag">'+v+'</span>').join('')}</div></div>` : ''}
+        <div class="section-block"><div class="section-label">${L.vocalStyle}</div><strong>${m.vocalStyle||''}</strong>${R(m.vocalStyleReasoning)}</div>
+        <div class="section-block"><div class="section-label">${L.instruments}</div>${instrumentsHtml}${R(m.instrumentsReasoning)}</div>
       </div>
     `, false)}
 
-    ${acc('mb-ref-tracks','🎧','רפרנסים — שירים ספציפיים',`
-      <div style="padding-top:12px;">${refTracksHtml || '<div style="color:var(--text2);font-size:14px;">אין רפרנסים</div>'}</div>
+    ${acc('mb-ref-tracks','🎧',L.tracksTitle,`
+      <div style="padding-top:12px;">${refTracksHtml || `<div style="color:var(--text2);font-size:14px;">${L.noRefs}</div>`}</div>
     `, false)}
 
-    ${acc('mb-ref-artists','🎤','רפרנסים — אמנים',`
+    ${acc('mb-ref-artists','🎤',L.artistsTitle,`
       <div style="padding-top:12px;">${refArtistsHtml}${R(m.referenceArtistsReasoning)}</div>
     `, false)}
 
-    ${refAlbumsHtml ? acc('mb-ref-albums','💿','רפרנסים — אלבומים',`
+    ${refAlbumsHtml ? acc('mb-ref-albums','📀',L.albumsTitle,`
       <div style="padding-top:12px;">${refAlbumsHtml}</div>
     `, false) : ''}
 
-    ${refProducersHtml ? acc('mb-ref-prod','🎛️','רפרנסים — מפיקים',`
+    ${refProducersHtml ? acc('mb-ref-prod','🏻️',L.prodsTitle,`
       <div style="padding-top:12px;">${refProducersHtml}</div>
     `, false) : ''}
 
-    ${acc('mb-lyrics','✍️','נושאים לטקסטים',`
+    ${acc('mb-lyrics','✍️',L.lyricsTitle,`
       <div class="card-content" style="padding-top:12px;">
         <div class="tags">${(m.lyricalThemes||[]).map(v=>'<span class="tag">'+v+'</span>').join('')}</div>
         ${R(m.lyricalThemesReasoning)}
       </div>
     `, false)}
 
-    ${acc('mb-avoid','🚫','מה להימנע ממנו',`
+    ${acc('mb-avoid','🚫',L.avoidTitle,`
       <div class="card-content" style="padding-top:12px;">
-        <div class="section-block"><div class="section-label">אלמנטים להימנע</div><div class="tags">${(m.avoidElements||[]).map(v=>'<span class="tag" style="border-color:rgba(239,68,68,.3);color:#f87171">'+v+'</span>').join('')}</div>${R(m.avoidElementsReasoning)}</div>
-        ${avoidArtistsHtml ? `<div class="section-block"><div class="section-label">אמנים להימנע</div>${avoidArtistsHtml}</div>` : ''}
+        <div class="section-block"><div class="section-label">${L.avoidElems}</div><div class="tags">${(m.avoidElements||[]).map(v=>'<span class="tag" style="border-color:rgba(239,68,68,.3);color:#f87171">'+v+'</span>').join('')}</div>${R(m.avoidElementsReasoning)}</div>
+        ${avoidArtistsHtml ? `<div class="section-block"><div class="section-label">${L.avoidArts}</div>${avoidArtistsHtml}</div>` : ''}
       </div>
     `, false)}
 
-    ${acc('mb-summary','📄','סיכום הבריף',`
+    ${acc('mb-summary','📄',L.briefSum,`
       <div style="background:var(--surface2);border-radius:10px;padding:18px;margin-top:12px;font-size:15px;line-height:1.9;color:var(--text);">${m.briefSummary||''}</div>
     `, false)}
   `;
@@ -1910,24 +2015,24 @@ function renderResults(d) {
   const tab6 = ex.length > 0 ? ex.map((seg, i) => acc(
     `exp-${i}`,
     '🚀',
-    `קהל ${i+1}: ${seg.segmentName||''}`,
+    `${L.audience} ${i+1}: ${seg.segmentName||''}`,
     `<div class="card-content" style="padding-top:12px;">
-      <div class="section-block"><div class="section-label">מי הם?</div>${seg.description||''}${R(seg.expansionReasoning)}</div>
-      <div class="section-block"><div class="section-label">סגנון מוסיקלי מומלץ</div><strong>${seg.musicStyle||''}</strong>${R(seg.musicReasoning)}</div>
-      <div class="section-block"><div class="section-label">אמנים לרפרנס</div><div class="tags">${(seg.referenceArtists||[]).map(v=>'<span class="tag">'+v+'</span>').join('')}</div></div>
-      <div class="section-block"><div class="section-label">מה השוני מהקהל הנוכחי</div>${seg.keyDifference||''}</div>
+      <div class="section-block"><div class="section-label">${L.whoAreThey}</div>${seg.description||''}${R(seg.expansionReasoning)}</div>
+      <div class="section-block"><div class="section-label">${L.musicStyleRec}</div><strong>${seg.musicStyle||''}</strong>${R(seg.musicReasoning)}</div>
+      <div class="section-block"><div class="section-label">${L.refArtists}</div><div class="tags">${(seg.referenceArtists||[]).map(v=>'<span class="tag">'+v+'</span>').join('')}</div></div>
+      <div class="section-block"><div class="section-label">${L.audDiff}</div>${seg.keyDifference||''}</div>
     </div>`,
     i === 0
-  )).join('') : '<p style="color:var(--text2);padding:20px 0;">אין נתוני הרחבת קהלים</p>';
+  )).join('') : `<p style="color:var(--text2);padding:20px 0;">${L.noExpansion}</p>`;
 
   const tabs = [
-    { id:'tab-facts',   label:'📊 נתונים',         content: tab0 },
-    { id:'tab-brand',   label:'🎭 מותג',            content: tab1 },
-    { id:'tab-aud',     label:'👥 קהל יעד',         content: tab2 },
-    { id:'tab-sonic',   label:'🗺️ מפת סאונד',      content: tab3 },
-    { id:'tab-journey', label:'🎯 מסע רגשי',        content: tab4 },
-    { id:'tab-brief',   label:'🎵 בריף מוסיקלי',   content: tab5 },
-    { id:'tab-growth',  label:'🚀 צמיחה',           content: tab6 },
+    { id:'tab-facts',   label: L.tabData,    content: tab0 },
+    { id:'tab-brand',   label: L.tabBrand,   content: tab1 },
+    { id:'tab-aud',     label: L.tabAud,     content: tab2 },
+    { id:'tab-sonic',   label: L.tabSonic,   content: tab3 },
+    { id:'tab-journey', label: L.tabJourney, content: tab4 },
+    { id:'tab-brief',   label: L.tabBrief,   content: tab5 },
+    { id:'tab-growth',  label: L.tabGrowth,  content: tab6 },
   ];
 
   results.innerHTML = `
@@ -1938,11 +2043,11 @@ function renderResults(d) {
       ${tabs.map((t,i) => `<div class="tab-panel${i===0?' active':''}" id="${t.id}">${t.content}</div>`).join('')}
     </div>
     <div class="export-bar">
-      <button class="export-btn" id="clientViewBtn" onclick="toggleClientView()">👔 מצב לקוח</button>
+      <button class="export-btn" id="clientViewBtn" onclick="toggleClientView()">${L.clientView}</button>
       <button class="export-btn" onclick="exportJSON()">⬇ JSON</button>
-      <button class="export-btn" onclick="copyBrief()">📋 בריף</button>
+      <button class="export-btn" onclick="copyBrief()">📋 Brief</button>
       <button class="export-pdf-btn" onclick="exportPDF()">📄 PDF</button>
-      <button class="new-search-btn" onclick="newSearch()">ניתוח חדש →</button>
+      <button class="new-search-btn" onclick="newSearch()">${L.newAnalysis}</button>
     </div>
   `;
 
@@ -1962,7 +2067,7 @@ function toggleAccordion(id) {
   if (el) el.classList.toggle('open');
 }
 
-// ── Comparison renderer ──────────────────────────────────────
+// ── Comparison renderer ──────────────────────────────────────────────
 function renderComparison(d1, d2) {
   const results = document.getElementById('results');
 
