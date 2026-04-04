@@ -909,6 +909,7 @@
       <button onclick="toggleCompare()" id="compareToggle" style="background:none;border:1px dashed var(--border);border-radius:8px;padding:8px 16px;font-size:13px;font-family:'Heebo',sans-serif;color:var(--text2);cursor:pointer;transition:all 0.2s;flex:1;text-align:right;">
         ⚖️ השווה מותגים
       </button>
+      <button onclick="toggleLang()" id="langToggle" style="background:none;border:1px solid var(--border);border-radius:8px;padding:8px 16px;font-size:13px;font-family:'Heebo',sans-serif;color:var(--text2);cursor:pointer;transition:all 0.2s;">🌐 עברית</button>
     </div>
 
     <!-- Compare input -->
@@ -1082,7 +1083,29 @@ function toggleCompare() {
   _togglePanel('comparePanel','compareToggle','⚖️ השווה מותגים','⚖️ בטל השוואה');
   const btn = document.getElementById('analyzeBtn');
   const open = document.getElementById('comparePanel').style.display !== 'none';
-  btn.textContent = open ? 'השווה ←' : 'נתח מותג ←';
+  btn.textContent = open ? (_lang==='en'?'Compare →':'השווה ←') : (_lang==='en'?'Analyze Brand →':'נתח מותג ←');
+}
+function toggleLang() {
+  _lang = _lang === 'he' ? 'en' : 'he';
+  const lb = document.getElementById('langToggle');
+  const ab = document.getElementById('analyzeBtn');
+  const bi = document.getElementById('brandInput');
+  const b2 = document.getElementById('brandInput2');
+  if (_lang === 'en') {
+    lb.textContent = '🌐 English'; lb.style.borderColor='var(--accent)'; lb.style.color='var(--accent2)';
+    ab.textContent = 'Analyze Brand →'; bi.placeholder = 'Enter brand name...';
+    if(b2) b2.placeholder='Second brand for comparison...';
+    document.getElementById('compareToggle').textContent='⚖️ Compare Brands';
+    document.getElementById('researchToggle').textContent='+ Research Data';
+    document.getElementById('campaignToggle').textContent='+ Campaign Mode';
+  } else {
+    lb.textContent = '🌐 עברית'; lb.style.borderColor='var(--border)'; lb.style.color='var(--text2)';
+    ab.textContent = 'נתח מותג ←'; bi.placeholder = 'הקלד שם מותג...';
+    if(b2) b2.placeholder='מותג שני להשוואה...';
+    document.getElementById('compareToggle').textContent='⚖️ השווה מותגים';
+    document.getElementById('researchToggle').textContent='+ נתוני מחקר';
+    document.getElementById('campaignToggle').textContent='+ מצב קמפיין';
+  }
 }
 
 // ── History ─────────────────────────────────────────────────
@@ -1157,6 +1180,7 @@ function showError(msg) {
 
 // Progress bar — smooth 50s fill, nothing else
 let _progressInterval = null;
+let _lang = 'he';
 
 function startProgressAnimation() {
   const fill = document.getElementById('progressFill');
@@ -1204,7 +1228,10 @@ ${audience ? `קהל יעד ספציפי: ${audience}` : ''}
 
 async function runAnalysis(brand, researchData, campaignBlock, webFactsBlock) {
   const apiKey = getApiKey();
-  const systemMsg = `אתה אסטרטג מותגים, מפיק מוסיקלי ומעצב סאונד ברמה עולמית.${researchData ? ' נתוני המחקר שסופקו גוברים על הידע הכללי שלך.' : ''}${webFactsBlock ? ' נתוני האינטרנט שנאספו מייצגים מידע עדכני — השתמש בהם.' : ''} כל מסקנה — נימוק מפורט. בבריף: שמות ספציפיים בלבד. JSON תקין בלבד, הכל בעברית.`;
+  const isEn = _lang === 'en';
+  const systemMsg = isEn
+    ? `You are a world-class brand strategist, music producer, and sound designer.${researchData ? ' Provided research data overrides your general knowledge.' : ''}${webFactsBlock ? ' Internet data collected represents current information — use it.' : ''} Every conclusion must have detailed reasoning. Specific names only in the brief. Return valid JSON only, everything in English.`
+    : `אתה אסטרטג מותגים, מפיק מוסיקלי ומעצב סאונד ברמה עולמית.${researchData ? ' נתוני המחקר שסופקו גוברים על הידע הכללי שלך.' : ''}${webFactsBlock ? ' נתוני האינטרנט שנאספו מייצגים מידע עדכני — השתמש בהם.' : ''} כל מסקנה — נימוק מפורט. בבריף: שמות ספציפיים בלבד. JSON תקין בלבד, הכל בעברית.`;
 
   const researchBlock = researchData ? `
 ═══════════════════════════════════════
@@ -1214,7 +1241,34 @@ ${researchData}
 ═══════════════════════════════════════
 ` : '';
 
-  const prompt = `${researchBlock}${webFactsBlock}${campaignBlock}אתה שלושה אנשים בו זמנית:
+  const prompt = `${researchBlock}${webFactsBlock}${campaignBlock}${isEn ? `You are three people simultaneously:
+1. Senior Brand Strategist — deep understanding of category, audience, psychology, competitive positioning
+2. World-class Music Producer — knows every genre, can name specific tracks, producers, albums, BPM, texture
+3. Sound Designer — understands how music creates emotion, brand identity, psychological connection to audience
+
+Your task: deeply analyze the brand "${brand}".
+
+Step 1 — Brand Research:
+- Product category, history, positioning, advertising messages
+- Competitors and how they are positioned
+- Market share, revenue, key products — every known fact
+
+Step 2 — Audience Profile:
+- Who buys? Age, gender, class, lifestyle, psychographics
+- What drives them, what's the emotional connection to the brand
+
+Step 3 — Musical DNA (most critical):
+a. Brand archetype + translation to sound
+b. What does the audience listen to? Genres, energy, era
+c. The central emotion the music must create
+d. Specific tracks: real name + artist + year + what specifically in them
+e. Specific artists + why
+f. Specific producers + what their sound gives
+g. Specific albums + why they represent the sonic world
+
+Iron rule: every field — detailed reasoning. Not "pop-style artist" but "Taylor Swift". Not "energetic song" but "Blinding Lights — The Weeknd, 2019".
+
+Return JSON only, everything in English:` : `אתה שלושה אנשים בו זמנית:
 1. אסטרטג מותגים בכיר — מבין עמוק את הקטגוריה, הקהל, הפסיכולוגיה, המיצוב התחרותי
 2. מפיק מוסיקה ברמה עולמית — מכיר כל ז׳אנר, יודע לאמן שמות שירים ספציפיים, מפיקים, אלבומים, BPM, טקסטורה
 3. מעצב סאונד — מבין כיצד מוסיקה יוצרת רגש, זהות מותגית, חיבור פסיכולוגי לקהל
@@ -1241,7 +1295,7 @@ ${researchData}
 
 כלל ברזל: כל שדה — נימוק מפורט. לא "אמן בסגנון פופ" אלא "Taylor Swift". לא "שיר אנרגטי" אלא "Blinding Lights — The Weeknd, 2019".
 
-החזר JSON בלבד, הכל בעברית:
+החזר JSON בלבד, הכל בעברית:`}
 {
   "brandName": "${brand}",
   "companyFacts": {
@@ -1371,7 +1425,15 @@ ${researchData}
   ]
 }
 
-כללים:
+${isEn ? `Rules:
+- JSON only, no markdown
+- Everything in English
+- companyFacts: facts only, use ~ for uncertain data
+- Every reasoning — minimum 2-3 detailed sentences
+- musicBrief: at least 5 specific referenceTracks, 4 referenceArtists with why, 2 referenceAlbums, 2 referenceProducers
+- audienceExpansion: exactly 3 audiences with different music styles
+- touchpointMap: 5 touchpoints
+- emotionalJourney: 4 stages` : `כללים:
 - JSON בלבד, ללא markdown
 - הכל בעברית
 - companyFacts: עובדות בלבד, ~לנתון לא ודאי
@@ -1379,7 +1441,7 @@ ${researchData}
 - musicBrief: לפחות 5 referenceTracks ספציפיים, 4 referenceArtists עם why, 2 referenceAlbums, 2 referenceProducers
 - audienceExpansion: 3 קהלים שונים
 - touchpointMap: 5 נקודות מגע
-- emotionalJourney: 4 שלבים`;
+- emotionalJourney: 4 שלבים`}`;
 
   const response = await fetch('https://api.openai.com/v1/chat/completions', {
     method: 'POST',
