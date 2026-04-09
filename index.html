@@ -2594,8 +2594,8 @@ function getSelectedChips(containerId) {
 
 // ── Small Brand Analysis ─────────────────────────────────────
 async function runSmallBrandAnalysis() {
-  const apiKey = localStorage.getItem('openai_api_key') || '';
-  if (!apiKey) { toggleSettings(); return; }
+  const apiKey = getApiKey();
+  if (!apiKey) { showError('לא מוגדר מפתח API — לחץ על ⚙ כדי להגדיר'); toggleSettings(); return; }
 
   const query = document.getElementById('sbInput').value.trim();
   if (!query) { document.getElementById('sbInput').focus(); return; }
