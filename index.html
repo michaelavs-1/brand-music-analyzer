@@ -837,6 +837,116 @@
 
   .export-pdf-btn:hover { transform: translateY(-1px); box-shadow: 0 4px 20px var(--accent-glow); }
 
+  /* ── Mode Toggle ──────────────────────────────────────────── */
+  .mode-toggle {
+    display: flex;
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    padding: 4px;
+    margin: 0 auto 28px;
+    width: fit-content;
+    gap: 4px;
+  }
+  .mode-btn {
+    background: none;
+    border: none;
+    border-radius: 8px;
+    padding: 10px 28px;
+    font-size: 14px;
+    font-weight: 700;
+    font-family: 'Heebo', sans-serif;
+    color: var(--text2);
+    cursor: pointer;
+    transition: all 0.2s;
+  }
+  .mode-btn.active {
+    background: var(--accent);
+    color: #000;
+  }
+  /* ── Small Brand Form ──────────────────────────────────── */
+  .sb-form { display: none; }
+  .sb-form.visible { display: block; }
+  .sb-section {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 16px;
+    padding: 24px;
+    margin-bottom: 16px;
+    position: relative;
+    overflow: hidden;
+  }
+  .sb-section::before {
+    content: '';
+    position: absolute;
+    top: 0; left: 0; right: 0;
+    height: 2px;
+    background: linear-gradient(90deg, transparent, var(--accent), transparent);
+  }
+  .sb-section-title {
+    font-size: 13px;
+    font-weight: 700;
+    color: var(--text2);
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    margin-bottom: 16px;
+  }
+  .sb-field {
+    background: var(--surface2);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    padding: 12px 16px;
+    font-size: 15px;
+    font-family: 'Heebo', sans-serif;
+    color: var(--text);
+    outline: none;
+    width: 100%;
+    box-sizing: border-box;
+    transition: border-color 0.2s;
+    margin-bottom: 10px;
+  }
+  .sb-field:focus { border-color: var(--accent); }
+  .sb-field::placeholder { color: #555; }
+  .sb-chips {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+    margin-bottom: 10px;
+  }
+  .sb-chip {
+    background: var(--surface2);
+    border: 1px solid var(--border);
+    border-radius: 20px;
+    padding: 6px 14px;
+    font-size: 13px;
+    font-family: 'Heebo', sans-serif;
+    cursor: pointer;
+    transition: all 0.2s;
+    user-select: none;
+    color: var(--text2);
+  }
+  .sb-chip.selected {
+    background: rgba(200,164,78,0.15);
+    border-color: var(--accent);
+    color: var(--accent2);
+  }
+  .sb-analyze-btn {
+    width: 100%;
+    background: linear-gradient(135deg, var(--accent), var(--accent2));
+    color: #000;
+    border: none;
+    border-radius: 12px;
+    padding: 16px;
+    font-size: 16px;
+    font-weight: 700;
+    font-family: 'Heebo', sans-serif;
+    cursor: pointer;
+    transition: all 0.2s;
+    margin-top: 4px;
+  }
+  .sb-analyze-btn:hover { opacity: 0.9; transform: translateY(-1px); }
+  .sb-analyze-btn:disabled { opacity: 0.6; cursor: not-allowed; transform: none; }
+
 </style>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
 </head>
@@ -888,10 +998,19 @@
     <h1>Musical Brandbook</h1>
   </div>
 
+  <!-- Mode Toggle -->
+  <div class="mode-toggle">
+    <button class="mode-btn active" id="modeBigBtn" onclick="switchMode('big')">🏢 ברנד גדול</button>
+    <button class="mode-btn" id="modeSmallBtn" onclick="switchMode('small')">☕ ברנד קטן</button>
+  </div>
+
+  <!-- Big Brand Section (existing — unchanged) -->
+  <div id="bigBrandSection">
+
   <!-- Input -->
   <div class="input-section">
     <div class="input-group">
-      <label>שם המותג</label>
+      <label id="brandLabel">שם המותג</label>
       <div class="input-row">
         <input type="text" class="brand-input" id="brandInput" placeholder="הקלד שם מותג..." />
         <button class="analyze-btn" id="analyzeBtn" onclick="analyze()">נתח מותג ←</button>
@@ -908,7 +1027,9 @@
       <button onclick="toggleCompare()" id="compareToggle" style="background:none;border:1px dashed var(--border);border-radius:8px;padding:8px 16px;font-size:13px;font-family:'Heebo',sans-serif;color:var(--text2);cursor:pointer;transition:all 0.2s;flex:1;text-align:right;">
         ⚖️ השווה מותגים
       </button>
-      <button onclick="toggleLang()" id="langToggle" style="background:none;border:1px solid var(--border);border-radius:8px;padding:8px 16px;font-size:13px;font-family:'Heebo',sans-serif;color:var(--text2);cursor:pointer;transition:all 0.2s;">🌐 עברית</button>
+      <button onclick="toggleLang()" id="langToggle" style="background:none;border:1px solid var(--border);border-radius:8px;padding:8px 16px;font-size:13px;font-family:'Heebo',sans-serif;color:var(--text2);cursor:pointer;transition:all 0.2s;">
+        🌐 עברית
+      </button>
     </div>
 
     <!-- Compare input -->
@@ -968,7 +1089,109 @@
     </div>
   </div>
 
-  <!-- Results -->
+  </div><!-- /bigBrandSection -->
+
+  <!-- Small Brand Form -->
+  <div class="sb-form" id="sbForm">
+
+    <!-- Section 1: Basics -->
+    <div class="sb-section">
+      <div class="sb-section-title">🏷️ פרטי העסק</div>
+      <div class="sb-grid">
+        <div class="sb-field">
+          <label class="sb-label">שם העסק *</label>
+          <input type="text" class="sb-input" id="sbName" placeholder="קפה לוויתן, בוטיק שלי..." />
+        </div>
+        <div class="sb-field">
+          <label class="sb-label">סוג העסק *</label>
+          <select class="sb-select" id="sbType">
+            <option value="">בחר...</option>
+            <option>בית קפה</option>
+            <option>מסעדה</option>
+            <option>בר</option>
+            <option>בוטיק / חנות בגדים</option>
+            <option>חנות עיצוב / ריהוט</option>
+            <option>ספרייה / גלריה</option>
+            <option>ספא / טיפולים</option>
+            <option>סטודיו כושר / יוגה</option>
+            <option>מספרה / קוסמטיקה</option>
+            <option>אחר</option>
+          </select>
+        </div>
+      </div>
+      <div class="sb-field">
+        <label class="sb-label">שכונה / עיר</label>
+        <input type="text" class="sb-input" id="sbLocation" placeholder="פלורנטין תל אביב, בן יהודה ירושלים..." />
+      </div>
+      <div class="sb-field">
+        <label class="sb-label">ספר לנו על המקום — מה הוא, ומה מייחד אותו?</label>
+        <textarea class="sb-textarea" id="sbDesc" placeholder="לדוגמה: קפה קטן ואינטימי בפלורנטין. עיצוב תעשייתי ורך. רוב הלקוחות עובדים על לפטופ בבוקר ומגיעים לשבת בשקט..."></textarea>
+      </div>
+    </div>
+
+    <!-- Section 2: Audience & Hours -->
+    <div class="sb-section">
+      <div class="sb-section-title">👥 קהל ושעות</div>
+      <div class="sb-field">
+        <label class="sb-label">מי הלקוחות שלך? (גיל, סגנון חיים)</label>
+        <input type="text" class="sb-input" id="sbAudience" placeholder="בני 25–40, אמנים ופרילנסרים, מודעים לסגנון..." />
+      </div>
+      <div class="sb-field">
+        <label class="sb-label">שעות שיא — מתי המקום הכי עמוס?</label>
+        <div class="sb-chips" id="sbHoursChips">
+          <span class="sb-chip" onclick="toggleChip(this)">🌅 בוקר מוקדם 7–10</span>
+          <span class="sb-chip" onclick="toggleChip(this)">☀️ בוקר 10–13</span>
+          <span class="sb-chip" onclick="toggleChip(this)">🌤 צהריים 13–16</span>
+          <span class="sb-chip" onclick="toggleChip(this)">🌇 אחה"צ 16–19</span>
+          <span class="sb-chip" onclick="toggleChip(this)">🌆 ערב 19–23</span>
+          <span class="sb-chip" onclick="toggleChip(this)">🌙 לילה 23+</span>
+          <span class="sb-chip" onclick="toggleChip(this)">📅 שישי–שבת</span>
+        </div>
+      </div>
+      <div class="sb-field">
+        <label class="sb-label">מה עושים אצלך? (כמה אפשרויות)</label>
+        <div class="sb-chips" id="sbActivityChips">
+          <span class="sb-chip" onclick="toggleChip(this)">💻 עבודה / לפטופ</span>
+          <span class="sb-chip" onclick="toggleChip(this)">🍽 ארוחה</span>
+          <span class="sb-chip" onclick="toggleChip(this)">☕ קפה ושיחה</span>
+          <span class="sb-chip" onclick="toggleChip(this)">🛍 קניות</span>
+          <span class="sb-chip" onclick="toggleChip(this)">🏋️ אימון</span>
+          <span class="sb-chip" onclick="toggleChip(this)">🧘 טיפול / ספא</span>
+          <span class="sb-chip" onclick="toggleChip(this)">🎉 אירועים</span>
+          <span class="sb-chip" onclick="toggleChip(this)">📚 קריאה / שקט</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- Section 3: Vibe -->
+    <div class="sb-section">
+      <div class="sb-section-title">🎯 אווירה וזהות</div>
+      <div class="sb-field">
+        <label class="sb-label">שלוש מילים שמתארות את האווירה שרוצים ליצור</label>
+        <div class="sb-vibe-row">
+          <input type="text" class="sb-input" id="sbVibe1" placeholder="מילה 1" style="text-align:center;" />
+          <input type="text" class="sb-input" id="sbVibe2" placeholder="מילה 2" style="text-align:center;" />
+          <input type="text" class="sb-input" id="sbVibe3" placeholder="מילה 3" style="text-align:center;" />
+        </div>
+      </div>
+      <div class="sb-field">
+        <label class="sb-label">מה אתם לא? (מה שסותר את הזהות שלכם)</label>
+        <textarea class="sb-textarea" id="sbNotThis" placeholder="לדוגמה: לא רועשים, לא מסחריים, לא EDM של מועדון..." style="min-height:60px;"></textarea>
+      </div>
+      <div class="sb-field">
+        <label class="sb-label">הרגע שאתם הכי גאים בו — מה הוא? (אופציונלי)</label>
+        <textarea class="sb-textarea" id="sbProudMoment" placeholder='לדוגמה: כשלקוח חדש נכנס ואומר "וואו איזה מקום"...' style="min-height:60px;"></textarea>
+      </div>
+      <div class="sb-field">
+        <label class="sb-label">אינסטגרם / אתר (אופציונלי)</label>
+        <input type="text" class="sb-input" id="sbSocial" placeholder="@cafesheli / cafesheli.co.il" />
+      </div>
+    </div>
+
+    <button class="sb-analyze-btn" id="sbAnalyzeBtn" onclick="runSmallBrandAnalysis()">✦ בנה פלייליסט ←</button>
+  </div><!-- /sbForm -->
+
+  <!-- Results (shared by both modes) -->
   <div class="results" id="results"></div>
 </div>
 
@@ -2427,6 +2650,372 @@ function newSearch() {
 document.getElementById('brandInput').addEventListener('keydown', e => {
   if (e.key === 'Enter') analyze();
 });
+
+// ── Mode Switch ──────────────────────────────────────────────
+function switchMode(mode) {
+  _mode = mode;
+  const bigSection   = document.getElementById('bigBrandSection');
+  const sbForm       = document.getElementById('sbForm');
+  const modeBigBtn   = document.getElementById('modeBigBtn');
+  const modeSmallBtn = document.getElementById('modeSmallBtn');
+  const results      = document.getElementById('results');
+  results.classList.remove('active');
+  results.innerHTML = '';
+  if (mode === 'big') {
+    bigSection.style.display = '';
+    sbForm.classList.remove('active');
+    modeBigBtn.classList.add('active');
+    modeSmallBtn.classList.remove('active');
+  } else {
+    bigSection.style.display = 'none';
+    sbForm.classList.add('active');
+    modeBigBtn.classList.remove('active');
+    modeSmallBtn.classList.add('active');
+  }
+}
+
+// ── Small Brand Helpers ──────────────────────────────────────
+function toggleChip(el) { el.classList.toggle('selected'); }
+
+function getSelectedChips(containerId) {
+  return [...document.querySelectorAll('#' + containerId + ' .sb-chip.selected')]
+    .map(c => c.textContent.trim());
+}
+
+// ── Small Brand Analysis ─────────────────────────────────────
+async function runSmallBrandAnalysis() {
+  const apiKey = localStorage.getItem('openai_api_key') || '';
+  if (!apiKey) { toggleSettings(); return; }
+
+  const name    = document.getElementById('sbName').value.trim();
+  const type    = document.getElementById('sbType').value;
+  const loc     = document.getElementById('sbLocation').value.trim();
+  const desc    = document.getElementById('sbDesc').value.trim();
+  const aud     = document.getElementById('sbAudience').value.trim();
+  const vibe1   = document.getElementById('sbVibe1').value.trim();
+  const vibe2   = document.getElementById('sbVibe2').value.trim();
+  const vibe3   = document.getElementById('sbVibe3').value.trim();
+  const notThis = document.getElementById('sbNotThis').value.trim();
+  const proud   = document.getElementById('sbProudMoment').value.trim();
+  const social  = document.getElementById('sbSocial').value.trim();
+  const hours   = getSelectedChips('sbHoursChips');
+  const acts.getElementById('sbAnalyzeBtn');
+  btn.disabled = true;
+  btn.textContent = '⏳ מנתח...';
+
+  const results = document.getElementById('results');
+  results.classList.remove('active');
+  results.innerHTML = '';
+
+  // Progress indicator
+  const prog = document.createElement('div');
+  prog.style.cssText = 'text-align:center;padding:60px 20px;';
+  prog.innerHTML = `
+    <div style="font-size:40px;margin-bottom:16px;">🎵</div>
+    <div style="font-size:18px;font-weight:700;color:var(--accent2);margin-bottom:8px;">בונה את הפלייליסט של ${name}...</div>
+    <div style="font-size:14px;color:var(--text2);margin-bottom:24px;">מנתח זהות, קהל ואווירה</div>
+    <div style="background:var(--surface2);border-radius:20px;height:4px;overflow:hidden;max-width:300px;margin:0 auto;">
+      <div id="sbFill" style="background:linear-gradient(90deg,var(--accent),var(--accent2));height:100%;width:0%;transition:width 0.5s ease;border-radius:20px;"></div>
+    </div>`;
+  results.appendChild(prog);
+  results.classList.add('active');
+
+  let pct = 0;
+  const piv = setInterval(() => {
+    pct = Math.min(pct + Math.random() * 3, 92);
+    const f = document.getElementById('sbFill');
+    if (f) f.style.width = pct + '%';
+  }, 600);
+
+  const vibeWords = [vibe1,vibe2,vibe3].filter(Boolean).join(', ');
+
+  const systemMsg = `אתה מומחה לאקוסטיקה של מקומות ואסטרטגיית מוסיקה לעסקים קטנים.
+המשימה שלך: לנתח עסק קטן ולהפיק עבורו בריף פלייליסט מוסיקלי מדויק ועמוק.
+המוסיקה היא חלק מהזהות של המקום — לא רקע.
+כל מסקנה חייבת הסבר קצר. שמות ספציפיים בלבד — ללא ז'אנרים גנריים בלבד.
+החזר JSON תקין בלבד, הכל בעברית.`;
+
+  const userMsg = `נתח את העסק הבא והחזר JSON בלבד:
+
+שם: ${name}
+סוג: ${type}
+${loc ? 'מיקום: ' + loc : ''}
+${desc ? 'תיאור: ' + desc : ''}
+${aud ? 'קהל: ' + aud : ''}
+${hours.length ? 'שעות שיא: ' + hours.join(', ') : ''}
+${acts.length ? 'פעילות: ' + acts.join(', ') : ''}
+${vibeWords ? 'אווירה רצויה: ' + vibeWords : ''}
+${notThis ? 'מה הם לא: ' + notThis : ''}
+${proud ? 'רגע גאווה: ' + proud : ''}
+${social ? 'רשתות / אתר: ' + social : ''}
+
+החזר JSON עם המבנה הזה בדיוק:
+{
+  "businessName": "",
+  "businessType": "",
+  "brandSummary": "תקציר חד-משפטי של הזהות המוסיקלית",
+  "audienceProfile": {
+    "who": "מי הם",
+    "age": "טווח גיל",
+    "lifestyle": "אורח חיים",
+    "mood": "מה מרגישים כשנכנסים"
+  },
+  "sonicDNA": {
+    "primaryGenre": "ז'אנר עיקרי ספציפי",
+    "subGenres": ["תת-ז'אנרים"],
+    "bpmRange": "XX–XX",
+    "energy": 45,
+    "texture": "תיאור הטקסטורה הסונית",
+    "tonality": "major/minor/modal",
+    "vocal": "עם שירה/בלי שירה/רקע",
+    "language": "עברית/אנגלית/מעורב/אינסטרומנטלי",
+    "era": "שנות ה-X עד היום",
+    "mood": "תיאור האווירה הסונית",
+    "reasoning": "הסבר מדוע הבחירות האלה נכונות לעסק הזה"
+  },
+  "timeLayers": [
+    {
+      "name": "שם השכבה",
+      "hours": "HH:MM–HH:MM",
+      "bpmRange": "XX–XX",
+      "energy": 30,
+      "style": "תיאור קצר",
+      "exampleArtist": "דוגמת אמן"
+    }
+  ],
+  "playlistBrief": {
+    "name": "שם הפלייליסט (ייחודי, מתאים למקום)",
+    "tagline": "משפט אחד שמסביר מה הפלייליסט עושה למקום",
+    "totalTracks": 70,
+    "instrumentalPercent": 40,
+    "hebrewPercent": 30,
+    "bpmRange": "XX–XX",
+    "averageEnergy": 45,
+    "styleKeywords": ["מילה", "מילה", "מילה", "מילה"]
+  },
+  "referenceArtists": [
+    {"name": "שם אמן", "why": "הסבר מפורט מדוע מתאים לעסק הזה"}
+  ],
+  "referenceTracks": [
+    {"track": "שם שיר", "artist": "שם אמן", "why": "מה באלמנטים שלו מתאים", "spotifySearch": "track artist"}
+  ],
+  "referencePlaylistNames": ["שם פלייליסט קיים 1 בספוטיפיי", "שם פלייליסט קיים 2"],
+  "avoidArtists": ["אמן שלא מתאים"],
+  "avoidGenres": ["ז'אנר שלא מתאים"],
+  "avoidReasoning": "הסבר מה לא ולמה זה סותר את הזהות",
+  "briefSummary": "פסקת סיכום מלאה — מה הפלייליסט הזה עושה לחוויה במקום"
+}`;
+
+  try {
+    const resp = await fetch('https://api.openai.com/v1/chat/completions', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${apiKey}` },
+      body: JSON.stringify({
+        model: 'gpt-4o',
+        response_format: { type: 'json_object' },
+        max_tokens: 4000,
+        messages: [
+          { role: 'system', content: systemMsg },
+          { role: 'user', content: userMsg }
+        ]
+      })
+    });
+    clearInterval(piv);
+    if (!resp.ok) throw new Error('API ' + resp.status);
+    const data = await resp.json();
+    const d = JSON.parse(data.choices[0].message.content);
+    const f = document.getElementById('sbFill');
+    if (f) f.style.width = '100%';
+    setTimeout(() => renderSmallBrandResults(d), 400);
+  } catch(err) {
+    clearInterval(piv);
+    results.innerHTML = `<div style="text-align:center;padding:40px;color:#f87171;">שגיאה: ${err.message}</div>`;
+  } finally {
+    btn.disabled = false;
+    btn.textContent = '✦ בנה פלייליסט ←';
+  }
+}
+
+// ── Small Brand Results ──────────────────────────────────────
+function renderSmallBrandResults(d) {
+  const results = document.getElementById('results');
+  const sd = d.sonicDNA || {};
+  const pb = d.playlistBrief || {};
+  const ap = d.audienceProfile || {};
+  const tl = d.timeLayers || [];
+  const ra = d.referenceArtists || [];
+  const rt = d.referenceTracks || [];
+  const rp = d.referencePlaylistNames || [];
+  const aa = d.avoidArtists || [];
+  const ag = d.avoidGenres || [];
+
+  function sbacc(id, icon, title, content, open) {
+    return `<div class="accordion${open?' open':''}" id="sba-${id}">
+      <div class="accordion-header" onclick="toggleAccordion('sba-${id}')">
+        <div class="accordion-title"><span>${icon}</span><span>${title}</span></div>
+        <span class="accordion-arrow">▼</span>
+      </div>
+      <div class="accordion-body">${content}</div>
+    </div>`;
+  }
+
+  const dnaHtml = sbacc('dna','🎼','DNA סוני',`
+    <div class="card-content" style="padding-top:12px;">
+      <div class="section-block"><div class="section-label">ז'אנר עיקרי</div><strong style="font-size:18px;color:var(--accent2);">${sd.primaryGenre||''}</strong></div>
+      ${sd.subGenres&&sd.subGenres.length?`<div class="section-block"><div class="section-label">תת-ז'אנרים</div><div class="tags">${sd.subGenres.map(v=>'<span class="tag">'+v+'</span>').join('')}</div></div>`:''}
+      <div class="section-block"><div class="section-label">BPM</div><strong>${sd.bpmRange||''}</strong></div>
+      <div class="section-block">
+        <div class="section-label">אנרגיה</div>
+        <div class="meter"><div class="meter-label"><span>נמוכה</span><span>${sd.energy||0}%</span><span>גבוהה</span></div><div class="meter-bar"><div class="meter-fill" style="width:${sd.energy||0}%"></div></div></div>
+      </div>
+      <div class="section-block"><div class="section-label">טקסטורה</div>${sd.texture||''}</div>
+      <div class="section-block"><div class="section-label">טונליות</div>${sd.tonality||''}</div>
+      <div class="section-block"><div class="section-label">שירה</div>${sd.vocal||''}</div>
+      <div class="section-block"><div class="section-label">שפה</div>${sd.language||''}</div>
+      <div class="section-block"><div class="section-label">עידן</div>${sd.era||''}</div>
+      <div class="section-block"><div class="section-label">אווירה</div>${sd.mood||''}</div>
+      ${sd.reasoning?`<div class="section-block"><div class="section-label">הנימוק</div><div style="font-size:13px;color:var(--text2);line-height:1.7;">${sd.reasoning}</div></div>`:''}
+    </div>
+  `,false);
+
+  const briefHtml = sbacc('brief','📋','בריף הפלייליסט',`
+    <div class="card-content" style="padding-top:12px;">
+      <div style="background:linear-gradient(135deg,rgba(200,164,78,.12),rgba(226,192,110,.06));border:1px solid var(--accent);border-radius:12px;padding:18px;margin-bottom:16px;">
+        <div style="font-size:22px;font-weight:800;color:var(--accent2);margin-bottom:4px;">${pb.name||''}</div>
+        <div style="font-size:14px;color:var(--text2);line-height:1.6;">${pb.tagline||''}</div>
+      </div>
+      <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:10px;margin-bottom:16px;">
+        <div style="background:var(--surface2);border-radius:10px;padding:14px;text-align:center;">
+          <div style="font-size:11px;color:var(--text2);text-transform:uppercase;letter-spacing:1px;margin-bottom:4px;">שירים</div>
+          <div style="font-size:26px;font-weight:800;color:var(--accent2);">${pb.totalTracks||70}</div>
+        </div>
+        <div style="background:var(--surface2);border-radius:10px;padding:14px;text-align:center;">
+          <div style="font-size:11px;color:var(--text2);text-transform:uppercase;letter-spacing:1px;margin-bottom:4px;">אינסטרומנטלי</div>
+          <div style="font-size:26px;font-weight:800;color:var(--accent2);">${pb.instrumentalPercent||0}%</div>
+        </div>
+        <div style="background:var(--surface2);border-radius:10px;padding:14px;text-align:center;">
+          <div style="font-size:11px;color:var(--text2);text-transform:uppercase;letter-spacing:1px;margin-bottom:4px;">עברית</div>
+          <div style="font-size:26px;font-weight:800;color:var(--accent2);">${pb.hebrewPercent||0}%</div>
+        </div>
+      </div>
+      <div class="section-block"><div class="section-label">BPM Range</div><strong>${pb.bpmRange||''}</strong></div>
+      <div class="section-block">
+        <div class="section-label">אנרגיה ממוצעת</div>
+        <div class="meter"><div class="meter-label"><span>נמוכה</span><span>${pb.averageEnergy||0}%</span><span>גבוהה</span></div><div class="meter-bar"><div class="meter-fill" style="width:${pb.averageEnergy||0}%"></div></div></div>
+      </div>
+      ${pb.styleKeywords&&pb.styleKeywords.length?`<div class="section-block"><div class="section-label">מילות סגנון</div><div class="tags">${pb.styleKeywords.map(v=>'<span class="tag">'+v+'</span>').join('')}</div></div>`:''}
+    </div>
+  `,false);
+
+  const layersHtml = tl.length ? sbacc('layers','🕐','שכבות זמן',`
+    <div class="card-content" style="padding-top:12px;">
+      ${tl.map((layer,i)=>`
+        <div style="background:var(--surface2);border-radius:10px;padding:14px;margin-bottom:10px;${i===0?'border-right:3px solid var(--accent);':''}">
+          <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px;">
+            <strong style="color:var(--accent2);">${layer.name||''}</strong>
+            <span style="font-size:12px;color:var(--text2);">${layer.hours||''}</span>
+          </div>
+          <div style="display:flex;gap:16px;font-size:13px;color:var(--text2);flex-wrap:wrap;margin-bottom:6px;">
+            <span>BPM: <strong style="color:var(--text);">${layer.bpmRange||''}</strong></span>
+            <span>אנרגיה: <strong style="color:var(--text);">${layer.energy||0}%</strong></span>
+            ${layer.exampleArtist?`<span>דוגמה: <strong style="color:var(--accent2);">${layer.exampleArtist}</strong></span>`:''}
+          </div>
+          ${layer.style?`<div style="font-size:13px;color:var(--text);line-height:1.6;">${layer.style}</div>`:''}
+        </div>
+      `).join('')}
+    </div>
+  `,false) : '';
+
+  const artistsHtml = ra.length ? sbacc('artists','🎤','אמנים לרפרנס',`
+    <div style="padding-top:12px;">
+      ${ra.map(a=>`
+        <div style="padding:10px 0;border-bottom:1px solid var(--border);">
+          <strong style="color:var(--accent2);font-size:15px;">${a.name||''}</strong>
+          <div style="font-size:13px;color:var(--text2);margin-top:4px;line-height:1.6;">${a.why||''}</div>
+        </div>
+      `).join('')}
+    </div>
+  `,false) : '';
+
+  const tracksHtml = rt.length ? sbacc('tracks','🎧','שירים לרפרנס',`
+    <div style="padding-top:12px;">
+      ${rt.map(t=>{
+        const sp='https://open.spotify.com/search/'+encodeURIComponent(t.spotifySearch||(t.track+' '+t.artist));
+        return `<div style="background:var(--surface2);border-radius:8px;padding:12px 14px;margin-bottom:8px;">
+          <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:6px;">
+            <div>
+              <div style="font-size:14px;font-weight:700;color:var(--text);">${t.track||''}</div>
+              <div style="font-size:13px;color:var(--accent2);">${t.artist||''}</div>
+            </div>
+            <a href="${sp}" target="_blank" style="background:#1DB954;color:#000;border-radius:20px;padding:4px 10px;font-size:11px;font-weight:700;text-decoration:none;white-space:nowrap;flex-shrink:0;">▶ Spotify</a>
+          </div>
+          ${t.why?`<div style="font-size:13px;color:var(--text2);line-height:1.6;">${t.why}</div>`:''}
+        </div>`;
+      }).join('')}
+      ${rp.length?`
+        <div style="margin-top:16px;padding-top:16px;border-top:1px solid var(--border);">
+          <div class="section-label" style="margin-bottom:10px;">פלייליסטים קיימים לרפרנס</div>
+          ${rp.map(pl=>`<div style="padding:5px 0;"><a href="https://open.spotify.com/search/${encodeURIComponent(pl)}" target="_blank" style="color:var(--accent2);text-decoration:none;font-size:14px;">▶ ${pl}</a></div>`).join('')}
+        </div>`:''}
+    </div>
+  `,false) : '';
+
+  const avoidHtml = (aa.length||ag.length) ? sbacc('avoid','🚫','מה להימנע',`
+    <div class="card-content" style="padding-top:12px;">
+      ${aa.length?`<div class="section-block"><div class="section-label">אמנים שלא מתאימים</div><div class="tags">${aa.map(v=>'<span class="tag" style="border-color:rgba(239,68,68,.3);color:#f87171;">'+v+'</span>').join('')}</div></div>`:''}
+      ${ag.length?`<div class="section-block"><div class="section-label">ז'אנרים שסותרים</div><div class="tags">${ag.map(v=>'<span class="tag" style="border-color:rgba(239,68,68,.3);color:#f87171;">'+v+'</span>').join('')}</div></div>`:''}
+      ${d.avoidReasoning?`<div class="section-block"><div class="section-label">הסבר</div><div style="font-size:13px;color:var(--text2);line-height:1.7;">${d.avoidReasoning}</div></div>`:''}
+    </div>
+  `,false) : '';
+
+  const audienceHtml = sbacc('aud','👥','פרופיל קהל',`
+    <div class="card-content" style="padding-top:12px;">
+      <div class="section-block"><div class="section-label">מי הם</div>${ap.who||''}</div>
+      <div class="section-block"><div class="section-label">גיל</div><strong>${ap.age||''}</strong></div>
+      <div class="section-block"><div class="section-label">אורח חיים</div>${ap.lifestyle||''}</div>
+      <div class="section-block"><div class="section-label">מה מרגישים כשנכנסים</div><em style="color:var(--accent2);">${ap.mood||''}</em></div>
+    </div>
+  `,false);
+
+  results.innerHTML = `
+    <div style="margin-bottom:20px;">
+      <div class="brand-highlight" style="font-size:28px;">${d.businessName||''}</div>
+      <div style="font-size:14px;color:var(--text2);margin-top:4px;">${d.businessType||''}</div>
+      ${d.brandSummary?`<div style="font-size:15px;color:var(--accent2);margin-top:10px;line-height:1.6;font-style:italic;">"${d.brandSummary}"</div>`:''}
+    </div>
+    ${audienceHtml}
+    ${dnaHtml}
+    ${briefHtml}
+    ${layersHtml}
+    ${artistsHtml}
+    ${tracksHtml}
+    ${avoidHtml}
+    ${d.briefSummary?`
+      <div style="background:var(--surface);border:1px solid var(--accent);border-radius:12px;padding:20px;margin-top:16px;">
+        <div class="section-label" style="margin-bottom:10px;">📄 סיכום</div>
+        <div style="font-size:15px;line-height:1.9;color:var(--text);">${d.briefSummary}</div>
+      </div>`:''}
+    <div class="export-bar">
+      <button class="new-search-btn" onclick="sbNewSearch()">ניתוח חדש ←</button>
+    </div>
+  `;
+  results.classList.add('active');
+  window._lastSbResult = d;
+}
+
+function sbNewSearch() {
+  const results = document.getElementById('results');
+  results.classList.remove('active');
+  results.innerHTML = '';
+  ['sbName','sbLocation','sbDesc','sbAudience','sbVibe1','sbVibe2','sbVibe3','sbNotThis','sbProudMoment','sbSocial'].forEach(id => {
+    const el = document.getElementById(id);
+    if (el) el.value = '';
+  });
+  document.getElementById('sbType').value = '';
+  document.querySelectorAll('.sb-chip.selected').forEach(c => c.classList.remove('selected'));
+  document.getElementById('sbName').focus();
+}
+
 </script>
 
 </body>
