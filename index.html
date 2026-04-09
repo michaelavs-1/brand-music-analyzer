@@ -1094,16 +1094,9 @@
   <!-- Small Brand Form -->
   <div class="sb-form" id="sbForm">
     <div class="input-section" style="flex-direction:column;gap:12px;align-items:stretch">
-      <input type="text" class="brand-input" id="sbName"
-        placeholder="שם העסק..."
-        onkeydown="if(event.key==='Enter')runSmallBrandAnalysis()" />
-      <input type="text" class="brand-input" id="sbLink"
-        placeholder="קישור לאינסטגרם / אתר (אופציונלי)"
-        onkeydown="if(event.key==='Enter')runSmallBrandAnalysis()" />
-      <textarea class="brand-input" id="sbDesc" rows="3"
-        style="resize:vertical;min-height:80px;font-family:inherit;font-size:inherit"
-        placeholder="תיאור חופשי של העסק, הקהל, הסגנון..."
-        onkeydown="if(event.key==='Enter'&&!event.shiftKey){event.preventDefault();runSmallBrandAnalysis()}"></textarea>
+      <input type="text" class="brand-input" id="sbName" placeholder="שם העסק..." onkeydown="if(event.key==='Enter')runSmallBrandAnalysis()" />
+      <input type="text" class="brand-input" id="sbLink" placeholder="קישור לאינסטגרם / אתר (אופציונלי)" onkeydown="if(event.key==='Enter')runSmallBrandAnalysis()" />
+      <textarea class="brand-input" id="sbDesc" rows="3" style="resize:vertical;min-height:80px;font-family:inherit;font-size:inherit" placeholder="תיאור חופשי של העסק, הקהל, הסגנון..." onkeydown="if(event.key==='Enter'&&!event.shiftKey){event.preventDefault();runSmallBrandAnalysis()}"></textarea>
       <button class="analyze-btn" id="sbAnalyzeBtn" onclick="runSmallBrandAnalysis()">✦ בנה פלייליסט ←</button>
     </div>
   </div><!-- /sbForm -->
@@ -2583,35 +2576,34 @@ function switchMode(mode) {
     sbForm.classList.remove('active');
     modeBigBtn.classList.add('active');
     modeSmallBtn.classList.remove('active');
-function runSmallBrandAnalysis() {
-  var nm  = (document.getElementById('sbName')  || {value:''}).value.trim();
-  var lnk = (document.getElementById('sbLink')  || {value:''}).value.trim();
-  var dsc = (document.getElementById('sbDesc')  || {value:''}).value.trim();
-  var parts = [];
-  if (nm)  parts.push(nm);
-  if (lnk) parts.push('קישור: ' + lnk);
-  if (dsc) parts.push('תיאור: '   + dsc);
-  if (!parts.length) {
-    var f = document.getElementById('sbName') || document.getElementById('sbInput');
-    if (f) f.focus();
-    return;
+  } else {
+    bigSection.style.display = 'none';
+    sbForm.classList.add('active');
+    modeBigBtn.classList.remove('active');
+    modeSmallBtn.classList.add('active');
   }
-  document.getElementById('brandInput').value = parts.join('\n');
+}
+
+// ── Small Brand Helpers ──────────────────────────────────────
+function toggleChip(el) { el.classList.toggle('selected'); }
+
+function getSelectedChips(containerId) {
+  return [...document.querySelectorAll('#' + containerId + ' .sb-chip.selected')]
+    .map(c => c.textContent.trim());
+}
+
+// ── Small Brand Analysis ─────────────────────────────────────
+async function runSmallBrandAnalysis() {
+  var nm=(document.getElementById('sbName')||{value:''}).value.trim();
+  var lnk=(document.getElementById('sbLink')||{value:''}).value.trim();
+  var dsc=(document.getElementById('sbDesc')||{value:''}).value.trim();
+  var parts=[];
+  if(nm)parts.push(nm);
+  if(lnk)parts.push('קישור: '+lnk);
+  if(dsc)parts.push('תיאור: '+dsc);
+  if(!parts.length){var f=document.getElementById('sbName')||document.getElementById('sbInput');if(f)f.focus();return;}
+  document.getElementById('brandInput').value=parts.join('\n');
   analyze();
-}piv);
-    if (!resp.ok) throw new Error('API ' + resp.status);
-    const data = await resp.json();
-    const d = JSON.parse(data.choices[0].message.content);
-    const f = document.getElementById('sbFill');
-    if (f) f.style.width = '100%';
-    setTimeout(() => renderSmallBrandResults(d), 400);
-  } catch(err) {
-    clearInterval(piv);
-    results.innerHTML = `<div style="text-align:center;padding:40px;color:#f87171;">שגיאה: ${err.message}</div>`;
-  } finally {
-    btn.disabled = false;
-    btn.textContent = '✦ בנה פלייליסט ←';
-  }
 }
 
 // ── Small Brand Results ──────────────────────────────────────
@@ -2781,13 +2773,7 @@ function renderSmallBrandResults(d) {
   window._lastSbResult = d;
 }
 
-function sbNewSearch() {
-  var results = document.getElementById('results');
-  if (results) { results.classList.remove('active'); results.innerHTML = ''; }
-  ['sbName','sbLink','sbDesc'].forEach(function(id){var el=document.getElementById(id);if(el)el.value='';});
-  var inp = document.getElementById('sbName');
-  if (inp) inp.focus();
-}
+function sbNewSearch(){var r=document.getElementById('results');if(r){r.classList.remove('active');r.innerHTML='';}['sbName','sbLink','sbDesc'].forEach(function(id){var el=document.getElementById(id);if(el)el.value='';});var inp=document.getElementById('sbName');if(inp)inp.focus();}
 
 </script>
 
