@@ -2699,7 +2699,11 @@ async function runSmallBrandAnalysis() {
   const proud   = document.getElementById('sbProudMoment').value.trim();
   const social  = document.getElementById('sbSocial').value.trim();
   const hours   = getSelectedChips('sbHoursChips');
-  const acts.getElementById('sbAnalyzeBtn');
+  const acts    = getSelectedChips('sbActivityChips');
+
+  if (!name || !type) { alert('נא למלא שם העסק וסוג העסק'); return; }
+
+  const btn = document.getElementById('sbAnalyzeBtn');
   btn.disabled = true;
   btn.textContent = '⏳ מנתח...';
 
