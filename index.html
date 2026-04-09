@@ -2634,12 +2634,69 @@ async function runSmallBrandAnalysis() {
 אם קיבלת שם עסק — נתח לפי מה שאתה יודע על סוג העסק, האווירה הטיפוסית, הקהל הסביר, והמיקום אם ידוע.
 אם קיבלת קישור לאינסטגרם או אתר — הסק מהשם והקישור את כל מה שניתן.
 המוסיקה היא חלק מהזהות של המקום — לא רקע.
-כל מסקנה חייבת הסבר קצר. שמות ספציפיים בלבד — ללא ז׳אנרים גנריים בלבד.
+כל מסקנה חייבת הסבר קצר. שמות ספציפיים בלבד — ללא ז'אנרים גנריים בלבד.
 החזר JSON תקין בלבד, הכל בעברית.`;
 
   const userMsg = `העסק: ${query}
 
-נתח את העסק הזה לפי מה שאתה יודע עליו ועל עסקים דומים, והחזר JSON בלבד.`;
+נתח את העסק הזה לפי מה שאתה יודע עליו ועל עסקים דומים, והחזר JSON בלבד.
+
+החזר JSON עם המבנה הזה בדיוק:
+{
+  "businessName": "",
+  "businessType": "",
+  "brandSummary": "תקציר חד-משפטי של הזהות המוסיקלית",
+  "audienceProfile": {
+    "who": "מי הם",
+    "age": "טווח גיל",
+    "lifestyle": "אורח חיים",
+    "mood": "מה מרגישים כשנכנסים"
+  },
+  "sonicDNA": {
+    "primaryGenre": "ז'אנר עיקרי ספציפי",
+    "subGenres": ["תת-ז'אנרים"],
+    "bpmRange": "XX–XX",
+    "energy": 45,
+    "texture": "תיאור הטקסטורה הסונית",
+    "tonality": "major/minor/modal",
+    "vocal": "עם שירה/בלי שירה/רקע",
+    "language": "עברית/אנגלית/מעורב/אינסטרומנטלי",
+    "era": "שנות ה-X עד היום",
+    "mood": "תיאור האווירה הסונית",
+    "reasoning": "הסבר מדוע הבחירות האלה נכונות לעסק הזה"
+  },
+  "timeLayers": [
+    {
+      "name": "שם השכבה",
+      "hours": "HH:MM–HH:MM",
+      "bpmRange": "XX–XX",
+      "energy": 30,
+      "style": "תיאור קצר",
+      "exampleArtist": "דוגמת אמן"
+    }
+  ],
+  "playlistBrief": {
+    "name": "שם הפלייליסט (ייחודי, מתאים למקום)",
+    "tagline": "משפט אחד שמסביר מה הפלייליסט עושה למקום",
+    "totalTracks": 70,
+    "instrumentalPercent": 40,
+    "hebrewPercent": 30,
+    "bpmRange": "XX–XX",
+    "averageEnergy": 45,
+    "styleKeywords": ["מילה1", "מילה2", "מילה3", "מילה4"]
+  },
+  "referenceArtists": [
+    {"name": "שם אמן", "why": "הסבר מפורט מדוע מתאים לעסק הזה"}
+  ],
+  "referenceTracks": [
+    {"track": "שם שיר", "artist": "שם אמן", "why": "מה באלמנטים שלו מתאים", "spotifySearch": "track artist"}
+  ],
+  "referencePlaylistNames": ["שם פלייליסט קיים 1 בספוטיפיי", "שם פלייליסט קיים 2"],
+  "avoidArtists": ["אמן שלא מתאים"],
+  "avoidGenres": ["ז'אנר שלא מתאים"],
+  "avoidReasoning": "הסבר מה לא ולמה זה סותר את הזהות",
+  "briefSummary": "פסקת סיכום מלאה — מה הפלייליסט הזה עושה לחוויה במקום"
+}`;
 
   try {
     const resp = await fetch('https://api.openai.com/v1/chat/completions', {
