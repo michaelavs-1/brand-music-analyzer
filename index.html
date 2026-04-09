@@ -1093,102 +1093,12 @@
 
   <!-- Small Brand Form -->
   <div class="sb-form" id="sbForm">
-
-    <!-- Section 1: Basics -->
-    <div class="sb-section">
-      <div class="sb-section-title">🏷️ פרטי העסק</div>
-      <div class="sb-grid">
-        <div class="sb-field">
-          <label class="sb-label">שם העסק *</label>
-          <input type="text" class="sb-input" id="sbName" placeholder="קפה לוויתן, בוטיק שלי..." />
-        </div>
-        <div class="sb-field">
-          <label class="sb-label">סוג העסק *</label>
-          <select class="sb-select" id="sbType">
-            <option value="">בחר...</option>
-            <option>בית קפה</option>
-            <option>מסעדה</option>
-            <option>בר</option>
-            <option>בוטיק / חנות בגדים</option>
-            <option>חנות עיצוב / ריהוט</option>
-            <option>ספרייה / גלריה</option>
-            <option>ספא / טיפולים</option>
-            <option>סטודיו כושר / יוגה</option>
-            <option>מספרה / קוסמטיקה</option>
-            <option>אחר</option>
-          </select>
-        </div>
-      </div>
-      <div class="sb-field">
-        <label class="sb-label">שכונה / עיר</label>
-        <input type="text" class="sb-input" id="sbLocation" placeholder="פלורנטין תל אביב, בן יהודה ירושלים..." />
-      </div>
-      <div class="sb-field">
-        <label class="sb-label">ספר לנו על המקום — מה הוא, ומה מייחד אותו?</label>
-        <textarea class="sb-textarea" id="sbDesc" placeholder="לדוגמה: קפה קטן ואינטימי בפלורנטין. עיצוב תעשייתי ורך. רוב הלקוחות עובדים על לפטופ בבוקר ומגיעים לשבת בשקט..."></textarea>
-      </div>
+    <div class="input-section">
+      <input type="text" class="brand-input" id="sbInput"
+        placeholder="שם העסק או קישור לאינסטגרם / אתר..."
+        onkeydown="if(event.key==='Enter')runSmallBrandAnalysis()" />
+      <button class="analyze-btn" id="sbAnalyzeBtn" onclick="runSmallBrandAnalysis()">✶ בנה פלייליסט ←</button>
     </div>
-
-    <!-- Section 2: Audience & Hours -->
-    <div class="sb-section">
-      <div class="sb-section-title">👥 קהל ושעות</div>
-      <div class="sb-field">
-        <label class="sb-label">מי הלקוחות שלך? (גיל, סגנון חיים)</label>
-        <input type="text" class="sb-input" id="sbAudience" placeholder="בני 25–40, אמנים ופרילנסרים, מודעים לסגנון..." />
-      </div>
-      <div class="sb-field">
-        <label class="sb-label">שעות שיא — מתי המקום הכי עמוס?</label>
-        <div class="sb-chips" id="sbHoursChips">
-          <span class="sb-chip" onclick="toggleChip(this)">🌅 בוקר מוקדם 7–10</span>
-          <span class="sb-chip" onclick="toggleChip(this)">☀️ בוקר 10–13</span>
-          <span class="sb-chip" onclick="toggleChip(this)">🌤 צהריים 13–16</span>
-          <span class="sb-chip" onclick="toggleChip(this)">🌇 אחה"צ 16–19</span>
-          <span class="sb-chip" onclick="toggleChip(this)">🌆 ערב 19–23</span>
-          <span class="sb-chip" onclick="toggleChip(this)">🌙 לילה 23+</span>
-          <span class="sb-chip" onclick="toggleChip(this)">📅 שישי–שבת</span>
-        </div>
-      </div>
-      <div class="sb-field">
-        <label class="sb-label">מה עושים אצלך? (כמה אפשרויות)</label>
-        <div class="sb-chips" id="sbActivityChips">
-          <span class="sb-chip" onclick="toggleChip(this)">💻 עבודה / לפטופ</span>
-          <span class="sb-chip" onclick="toggleChip(this)">🍽 ארוחה</span>
-          <span class="sb-chip" onclick="toggleChip(this)">☕ קפה ושיחה</span>
-          <span class="sb-chip" onclick="toggleChip(this)">🛍 קניות</span>
-          <span class="sb-chip" onclick="toggleChip(this)">🏋️ אימון</span>
-          <span class="sb-chip" onclick="toggleChip(this)">🧘 טיפול / ספא</span>
-          <span class="sb-chip" onclick="toggleChip(this)">🎉 אירועים</span>
-          <span class="sb-chip" onclick="toggleChip(this)">📚 קריאה / שקט</span>
-        </div>
-      </div>
-    </div>
-
-    <!-- Section 3: Vibe -->
-    <div class="sb-section">
-      <div class="sb-section-title">🎯 אווירה וזהות</div>
-      <div class="sb-field">
-        <label class="sb-label">שלוש מילים שמתארות את האווירה שרוצים ליצור</label>
-        <div class="sb-vibe-row">
-          <input type="text" class="sb-input" id="sbVibe1" placeholder="מילה 1" style="text-align:center;" />
-          <input type="text" class="sb-input" id="sbVibe2" placeholder="מילה 2" style="text-align:center;" />
-          <input type="text" class="sb-input" id="sbVibe3" placeholder="מילה 3" style="text-align:center;" />
-        </div>
-      </div>
-      <div class="sb-field">
-        <label class="sb-label">מה אתם לא? (מה שסותר את הזהות שלכם)</label>
-        <textarea class="sb-textarea" id="sbNotThis" placeholder="לדוגמה: לא רועשים, לא מסחריים, לא EDM של מועדון..." style="min-height:60px;"></textarea>
-      </div>
-      <div class="sb-field">
-        <label class="sb-label">הרגע שאתם הכי גאים בו — מה הוא? (אופציונלי)</label>
-        <textarea class="sb-textarea" id="sbProudMoment" placeholder='לדוגמה: כשלקוח חדש נכנס ואומר "וואו איזה מקום"...' style="min-height:60px;"></textarea>
-      </div>
-      <div class="sb-field">
-        <label class="sb-label">אינסטגרם / אתר (אופציונלי)</label>
-        <input type="text" class="sb-input" id="sbSocial" placeholder="@cafesheli / cafesheli.co.il" />
-      </div>
-    </div>
-
-    <button class="sb-analyze-btn" id="sbAnalyzeBtn" onclick="runSmallBrandAnalysis()">✦ בנה פלייליסט ←</button>
   </div><!-- /sbForm -->
 
   <!-- Results (shared by both modes) -->
@@ -2687,21 +2597,9 @@ async function runSmallBrandAnalysis() {
   const apiKey = localStorage.getItem('openai_api_key') || '';
   if (!apiKey) { toggleSettings(); return; }
 
-  const name    = document.getElementById('sbName').value.trim();
-  const type    = document.getElementById('sbType').value;
-  const loc     = document.getElementById('sbLocation').value.trim();
-  const desc    = document.getElementById('sbDesc').value.trim();
-  const aud     = document.getElementById('sbAudience').value.trim();
-  const vibe1   = document.getElementById('sbVibe1').value.trim();
-  const vibe2   = document.getElementById('sbVibe2').value.trim();
-  const vibe3   = document.getElementById('sbVibe3').value.trim();
-  const notThis = document.getElementById('sbNotThis').value.trim();
-  const proud   = document.getElementById('sbProudMoment').value.trim();
-  const social  = document.getElementById('sbSocial').value.trim();
-  const hours   = getSelectedChips('sbHoursChips');
-  const acts    = getSelectedChips('sbActivityChips');
-
-  if (!name || !type) { alert('נא למלא שם העסק וסוג העסק'); return; }
+  const query = document.getElementById('sbInput').value.trim();
+  if (!query) { document.getElementById('sbInput').focus(); return; }
+  const name = query;
 
   const btn = document.getElementById('sbAnalyzeBtn');
   btn.disabled = true;
@@ -2731,84 +2629,17 @@ async function runSmallBrandAnalysis() {
     if (f) f.style.width = pct + '%';
   }, 600);
 
-  const vibeWords = [vibe1,vibe2,vibe3].filter(Boolean).join(', ');
-
   const systemMsg = `אתה מומחה לאקוסטיקה של מקומות ואסטרטגיית מוסיקה לעסקים קטנים.
-המשימה שלך: לנתח עסק קטן ולהפיק עבורו בריף פלייליסט מוסיקלי מדויק ועמוק.
+המשימה שלך: לקבל שם עסק או קישור, לחקור אותו מהידע שלך, ולהפיק בריף פלייליסט מוסיקלי מדויק ועמוק.
+אם קיבלת שם עסק — נתח לפי מה שאתה יודע על סוג העסק, האווירה הטיפוסית, הקהל הסביר, והמיקום אם ידוע.
+אם קיבלת קישור לאינסטגרם או אתר — הסק מהשם והקישור את כל מה שניתן.
 המוסיקה היא חלק מהזהות של המקום — לא רקע.
-כל מסקנה חייבת הסבר קצר. שמות ספציפיים בלבד — ללא ז'אנרים גנריים בלבד.
+כל מסקנה חייבת הסבר קצר. שמות ספציפיים בלבד — ללא ז׳אנרים גנריים בלבד.
 החזר JSON תקין בלבד, הכל בעברית.`;
 
-  const userMsg = `נתח את העסק הבא והחזר JSON בלבד:
+  const userMsg = `העסק: ${query}
 
-שם: ${name}
-סוג: ${type}
-${loc ? 'מיקום: ' + loc : ''}
-${desc ? 'תיאור: ' + desc : ''}
-${aud ? 'קהל: ' + aud : ''}
-${hours.length ? 'שעות שיא: ' + hours.join(', ') : ''}
-${acts.length ? 'פעילות: ' + acts.join(', ') : ''}
-${vibeWords ? 'אווירה רצויה: ' + vibeWords : ''}
-${notThis ? 'מה הם לא: ' + notThis : ''}
-${proud ? 'רגע גאווה: ' + proud : ''}
-${social ? 'רשתות / אתר: ' + social : ''}
-
-החזר JSON עם המבנה הזה בדיוק:
-{
-  "businessName": "",
-  "businessType": "",
-  "brandSummary": "תקציר חד-משפטי של הזהות המוסיקלית",
-  "audienceProfile": {
-    "who": "מי הם",
-    "age": "טווח גיל",
-    "lifestyle": "אורח חיים",
-    "mood": "מה מרגישים כשנכנסים"
-  },
-  "sonicDNA": {
-    "primaryGenre": "ז'אנר עיקרי ספציפי",
-    "subGenres": ["תת-ז'אנרים"],
-    "bpmRange": "XX–XX",
-    "energy": 45,
-    "texture": "תיאור הטקסטורה הסונית",
-    "tonality": "major/minor/modal",
-    "vocal": "עם שירה/בלי שירה/רקע",
-    "language": "עברית/אנגלית/מעורב/אינסטרומנטלי",
-    "era": "שנות ה-X עד היום",
-    "mood": "תיאור האווירה הסונית",
-    "reasoning": "הסבר מדוע הבחירות האלה נכונות לעסק הזה"
-  },
-  "timeLayers": [
-    {
-      "name": "שם השכבה",
-      "hours": "HH:MM–HH:MM",
-      "bpmRange": "XX–XX",
-      "energy": 30,
-      "style": "תיאור קצר",
-      "exampleArtist": "דוגמת אמן"
-    }
-  ],
-  "playlistBrief": {
-    "name": "שם הפלייליסט (ייחודי, מתאים למקום)",
-    "tagline": "משפט אחד שמסביר מה הפלייליסט עושה למקום",
-    "totalTracks": 70,
-    "instrumentalPercent": 40,
-    "hebrewPercent": 30,
-    "bpmRange": "XX–XX",
-    "averageEnergy": 45,
-    "styleKeywords": ["מילה", "מילה", "מילה", "מילה"]
-  },
-  "referenceArtists": [
-    {"name": "שם אמן", "why": "הסבר מפורט מדוע מתאים לעסק הזה"}
-  ],
-  "referenceTracks": [
-    {"track": "שם שיר", "artist": "שם אמן", "why": "מה באלמנטים שלו מתאים", "spotifySearch": "track artist"}
-  ],
-  "referencePlaylistNames": ["שם פלייליסט קיים 1 בספוטיפיי", "שם פלייליסט קיים 2"],
-  "avoidArtists": ["אמן שלא מתאים"],
-  "avoidGenres": ["ז'אנר שלא מתאים"],
-  "avoidReasoning": "הסבר מה לא ולמה זה סותר את הזהות",
-  "briefSummary": "פסקת סיכום מלאה — מה הפלייליסט הזה עושה לחוויה במקום"
-}`;
+נתח את העסק הזה לפי מה שאתה יודע עליו ועל עסקים דומים, והחזר JSON בלבד.`;
 
   try {
     const resp = await fetch('https://api.openai.com/v1/chat/completions', {
@@ -3011,13 +2842,8 @@ function sbNewSearch() {
   const results = document.getElementById('results');
   results.classList.remove('active');
   results.innerHTML = '';
-  ['sbName','sbLocation','sbDesc','sbAudience','sbVibe1','sbVibe2','sbVibe3','sbNotThis','sbProudMoment','sbSocial'].forEach(id => {
-    const el = document.getElementById(id);
-    if (el) el.value = '';
-  });
-  document.getElementById('sbType').value = '';
-  document.querySelectorAll('.sb-chip.selected').forEach(c => c.classList.remove('selected'));
-  document.getElementById('sbName').focus();
+  const inp = document.getElementById('sbInput');
+  if (inp) { inp.value = ''; inp.focus(); }
 }
 
 </script>
