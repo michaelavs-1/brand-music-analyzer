@@ -149,7 +149,7 @@
   }
 
   .brand-input::placeholder {
-    color: #555;
+    color: #74747c;
   }
 
   .api-input {
@@ -249,6 +249,91 @@
     background: linear-gradient(90deg, var(--accent), var(--accent2));
     width: 0%;
     transition: width 0.2s linear;
+    position: relative;
+  }
+
+  /* subtle shimmer over the fill while loading */
+  .progress-fill::after {
+    content: '';
+    position: absolute;
+    inset: 0;
+    border-radius: 999px;
+    background: linear-gradient(90deg, transparent, rgba(255,255,255,0.35), transparent);
+    background-size: 200% 100%;
+    animation: shimmer 1.6s linear infinite;
+  }
+
+  @keyframes shimmer {
+    0%   { background-position: 200% 0; }
+    100% { background-position: -200% 0; }
+  }
+
+  .loading-meta {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-top: 14px;
+    font-size: 14px;
+    color: var(--text2);
+  }
+
+  .loading-step {
+    display: flex;
+    align-items: center;
+    gap: 9px;
+    font-weight: 500;
+    color: var(--text);
+    animation: stepFade 0.4s ease-out;
+  }
+
+  .loading-step::before {
+    content: '';
+    width: 15px;
+    height: 15px;
+    border: 2px solid var(--border);
+    border-top-color: var(--accent);
+    border-radius: 50%;
+    animation: spin 0.7s linear infinite;
+    flex-shrink: 0;
+  }
+
+  .loading-pct {
+    font-weight: 700;
+    color: var(--accent2);
+    font-variant-numeric: tabular-nums;
+  }
+
+  @keyframes spin { to { transform: rotate(360deg); } }
+
+  @keyframes stepFade {
+    from { opacity: 0; transform: translateY(4px); }
+    to   { opacity: 1; transform: translateY(0); }
+  }
+
+  /* Toast */
+  .toast {
+    position: fixed;
+    bottom: 28px;
+    left: 50%;
+    transform: translateX(-50%) translateY(20px);
+    background: var(--surface);
+    border: 1px solid var(--accent);
+    border-radius: 12px;
+    padding: 12px 22px;
+    font-size: 14px;
+    font-weight: 600;
+    font-family: 'Heebo', sans-serif;
+    color: var(--text);
+    box-shadow: 0 10px 40px rgba(0,0,0,0.5), 0 0 20px var(--accent-glow);
+    z-index: 500;
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity 0.25s, transform 0.25s;
+  }
+
+  .toast.show {
+    opacity: 1;
+    transform: translateX(-50%) translateY(0);
   }
 
   /* Results */
@@ -603,10 +688,34 @@
 
   /* Responsive */
   @media (max-width: 640px) {
+    .header { margin-top: 44px; }
     .header h1 { font-size: 28px; }
     .input-row { flex-direction: column; }
     .container { padding: 24px 16px; }
     .result-card { padding: 20px; }
+    .input-section { padding: 24px 20px; }
+    .toolbar-actions button { flex: 1 1 100% !important; }
+    .mode-toggle { width: 100%; }
+    .mode-btn { flex: 1; padding: 10px 12px; }
+    .export-bar { flex-wrap: wrap; }
+  }
+
+  /* Keyboard focus visibility (accessibility) */
+  button:focus-visible,
+  input:focus-visible,
+  textarea:focus-visible,
+  [onclick]:focus-visible {
+    outline: 2px solid var(--accent2);
+    outline-offset: 2px;
+  }
+
+  /* Respect users who prefer reduced motion */
+  @media (prefers-reduced-motion: reduce) {
+    *, *::before, *::after {
+      animation-duration: 0.001ms !important;
+      animation-iteration-count: 1 !important;
+      transition-duration: 0.001ms !important;
+    }
   }
 
   /* Brand name highlight */
@@ -906,7 +1015,7 @@
     margin-bottom: 10px;
   }
   .sb-field:focus { border-color: var(--accent); }
-  .sb-field::placeholder { color: #555; }
+  .sb-field::placeholder { color: #74747c; }
   .sb-chips {
     display: flex;
     flex-wrap: wrap;
@@ -956,7 +1065,7 @@
 <div style="position:fixed;top:20px;right:20px;background:var(--surface);border:1px solid var(--border);border-radius:8px;padding:4px 10px;font-size:11px;font-weight:700;color:var(--accent2);letter-spacing:1px;z-index:100;">V6</div>
 
 <!-- History Button -->
-<button onclick="showHistory()" style="position:fixed;top:20px;right:72px;background:var(--surface);border:1px solid var(--border);border-radius:8px;padding:4px 10px;font-size:13px;color:var(--text2);cursor:pointer;z-index:100;font-family:'Heebo',sans-serif;transition:all 0.2s;" onmouseover="this.style.borderColor='var(--accent)'" onmouseout="this.style.borderColor='var(--border)'">📚</button>
+<button onclick="showHistory()" aria-label="היסטוריית ניתוחים" title="היסטוריית ניתוחים" style="position:fixed;top:20px;right:72px;background:var(--surface);border:1px solid var(--border);border-radius:8px;padding:4px 10px;font-size:13px;color:var(--text2);cursor:pointer;z-index:100;font-family:'Heebo',sans-serif;transition:all 0.2s;" onmouseover="this.style.borderColor='var(--accent)'" onmouseout="this.style.borderColor='var(--border)'">📚</button>
 
 <!-- History Panel -->
 <div class="history-panel" id="historyPanel" onclick="if(event.target===this)closeHistory()">
@@ -969,7 +1078,7 @@
 </div>
 
 <!-- Settings Toggle -->
-<button class="settings-toggle" onclick="toggleSettings()">⚙</button>
+<button class="settings-toggle" onclick="toggleSettings()" aria-label="הגדרות ומפתח API" title="הגדרות">⚙</button>
 
 <!-- Settings Panel -->
 <div class="settings-panel" id="settingsPanel">
@@ -1017,10 +1126,7 @@
       </div>
     </div>
 
-    <div style="margin-top:12px;display:flex;gap:8px;flex-wrap:wrap;">
-      <button onclick="toggleResearch()" id="researchToggle" style="background:none;border:1px dashed var(--border);border-radius:8px;padding:8px 16px;font-size:13px;font-family:'Heebo',sans-serif;color:var(--text2);cursor:pointer;transition:all 0.2s;flex:1;text-align:right;">
-        + נתוני מחקר
-      </button>
+    <div class="toolbar-actions" style="margin-top:12px;display:flex;gap:8px;flex-wrap:wrap;">
       <button onclick="toggleCampaign()" id="campaignToggle" style="background:none;border:1px dashed var(--border);border-radius:8px;padding:8px 16px;font-size:13px;font-family:'Heebo',sans-serif;color:var(--text2);cursor:pointer;transition:all 0.2s;flex:1;text-align:right;">
         + מצב קמפיין
       </button>
@@ -1054,12 +1160,7 @@
       </div>
       <div style="margin-bottom:10px;">
         <label style="font-size:11px;color:var(--text2);display:block;margin-bottom:6px;">פלטפורמות</label>
-        <div style="display:flex;flex-wrap:wrap;gap:6px;" id="platformCheckboxes">
-          ${['TikTok','Instagram Reels','YouTube','טלוויזיה','רדיו','Spotify Ads','חנות/POS','אירוע לייב'].map(p=>`
-          <label style="display:flex;align-items:center;gap:4px;cursor:pointer;background:var(--surface);border:1px solid var(--border);border-radius:6px;padding:4px 10px;font-size:12px;font-family:'Heebo',sans-serif;color:var(--text2);">
-            <input type="checkbox" value="${p}" style="accent-color:var(--accent);"> ${p}
-          </label>`).join('')}
-        </div>
+        <div style="display:flex;flex-wrap:wrap;gap:6px;" id="platformCheckboxes"></div>
       </div>
       <div>
         <label style="font-size:11px;color:var(--text2);display:block;margin-bottom:4px;">קהל יעד ספציפי לקמפיין</label>
@@ -1082,13 +1183,6 @@
     <div class="error-msg" id="errorMsg"></div>
   </div>
 
-  <!-- Loading -->
-  <div class="loading" id="loading">
-    <div class="progress-wrap">
-      <div class="progress-fill" id="progressFill"></div>
-    </div>
-  </div>
-
   </div><!-- /bigBrandSection -->
 
   <!-- Small Brand Form -->
@@ -1101,9 +1195,23 @@
     </div>
   </div><!-- /sbForm -->
 
+  <!-- Loading (shared by both modes) -->
+  <div class="loading" id="loading">
+    <div class="progress-wrap">
+      <div class="progress-fill" id="progressFill"></div>
+    </div>
+    <div class="loading-meta">
+      <span class="loading-step" id="loadingStep">מתחבר…</span>
+      <span class="loading-pct" id="loadingPct">0%</span>
+    </div>
+  </div>
+
   <!-- Results (shared by both modes) -->
   <div class="results" id="results"></div>
 </div>
+
+<!-- Toast notifications -->
+<div class="toast" id="toast" role="status" aria-live="polite"></div>
 
 <script>
 // --- API Key Management ---
@@ -1181,8 +1289,20 @@ function toggleSettings() {
 }
 
 // Init on load
+// Render campaign platform checkboxes
+function renderPlatformCheckboxes() {
+  const wrap = document.getElementById('platformCheckboxes');
+  if (!wrap) return;
+  const platforms = ['TikTok','Instagram Reels','YouTube','טלוויזיה','רדיו','Spotify Ads','חנות/POS','אירוע לייב'];
+  wrap.innerHTML = platforms.map(p => `
+    <label style="display:flex;align-items:center;gap:4px;cursor:pointer;background:var(--surface);border:1px solid var(--border);border-radius:6px;padding:4px 10px;font-size:12px;font-family:'Heebo',sans-serif;color:var(--text2);">
+      <input type="checkbox" value="${p}" style="accent-color:var(--accent);"> ${p}
+    </label>`).join('');
+}
+
 document.addEventListener('DOMContentLoaded', () => {
   updateApiStatus();
+  renderPlatformCheckboxes();
   // Only open settings if no key at all (won't trigger with hardcoded key)
   if (!getApiKey()) {
     setTimeout(() => toggleSettings(), 600);
@@ -1310,14 +1430,55 @@ function showError(msg) {
   setTimeout(() => el.classList.remove('active'), 5000);
 }
 
-// Progress bar — smooth 50s fill, nothing else
+// Toast notification
+let _toastTimer = null;
+function showToast(msg) {
+  const t = document.getElementById('toast');
+  if (!t) return;
+  t.textContent = msg;
+  t.classList.add('show');
+  clearTimeout(_toastTimer);
+  _toastTimer = setTimeout(() => t.classList.remove('show'), 2400);
+}
+
+// Progress bar — smooth 50s fill with contextual step messages
 let _progressInterval = null;
 let _lang = 'he';
 
+// Steps keyed to the % of the bar at which they appear
+const _loadingSteps = [
+  { at: 0,  he: 'מחפש נתונים עדכניים על המותג…', en: 'Searching for current brand data…' },
+  { at: 18, he: 'מנתח את קהל היעד…',            en: 'Analyzing the target audience…' },
+  { at: 38, he: 'ממפה את זהות המותג…',           en: 'Mapping brand identity…' },
+  { at: 58, he: 'בונה DNA מוזיקלי…',             en: 'Building the sonic DNA…' },
+  { at: 78, he: 'מרכיב בריף והמלצות…',           en: 'Assembling brief & references…' },
+  { at: 92, he: 'כמעט מוכן…',                    en: 'Almost ready…' },
+];
+
+function _setLoadingStep(pct) {
+  const stepEl = document.getElementById('loadingStep');
+  const pctEl  = document.getElementById('loadingPct');
+  if (pctEl) pctEl.textContent = Math.round(pct) + '%';
+  if (!stepEl) return;
+  let label = _loadingSteps[0];
+  for (const s of _loadingSteps) { if (pct >= s.at) label = s; }
+  const text = _lang === 'en' ? label.en : label.he;
+  if (stepEl.dataset.step !== text) {
+    stepEl.dataset.step = text;
+    stepEl.textContent = text;
+    // retrigger fade-in animation
+    stepEl.style.animation = 'none';
+    void stepEl.offsetWidth;
+    stepEl.style.animation = '';
+  }
+}
+
 function startProgressAnimation() {
   const fill = document.getElementById('progressFill');
+  fill.style.transition = 'width 0.2s linear';
   fill.style.width = '0%';
   let current = 0;
+  _setLoadingStep(0);
   // Target: reach ~98% in 50 seconds
   // Interval: every 200ms → 250 ticks in 50s → 98/250 = 0.392% per tick
   const increment = 98 / 250;
@@ -1325,6 +1486,7 @@ function startProgressAnimation() {
   _progressInterval = setInterval(() => {
     current = Math.min(current + increment, 98);
     fill.style.width = current + '%';
+    _setLoadingStep(current);
     if (current >= 98) clearInterval(_progressInterval);
   }, 200);
 }
@@ -1334,6 +1496,10 @@ function finishProgress() {
   const fill = document.getElementById('progressFill');
   fill.style.transition = 'width 0.3s ease-out';
   fill.style.width = '100%';
+  const stepEl = document.getElementById('loadingStep');
+  const pctEl  = document.getElementById('loadingPct');
+  if (pctEl) pctEl.textContent = '100%';
+  if (stepEl) { stepEl.dataset.step = 'done'; stepEl.textContent = _lang === 'en' ? 'Done ✓' : 'הושלם ✓'; }
 }
 
 function buildCampaignBlock() {
@@ -2544,8 +2710,8 @@ ${m.briefSummary}`;
 
   navigator.clipboard.writeText(text).then(() => {
     const btns = document.querySelectorAll('.export-btn');
-    btns[1].textContent = '✓ הועתק!';
-    setTimeout(() => btns[1].textContent = 'העתק בריף', 2000);
+    if (btns[1]) { btns[1].textContent = '✓ הועתק!'; setTimeout(() => btns[1].textContent = 'העתק בריף', 2000); }
+    showToast('✓ הבריף הועתק ללוח');
   });
 }
 
@@ -2571,6 +2737,8 @@ function switchMode(mode) {
   const results      = document.getElementById('results');
   results.classList.remove('active');
   results.innerHTML = '';
+  clearInterval(_progressInterval);
+  document.getElementById('loading').classList.remove('active');
   if (mode === 'big') {
     bigSection.style.display = '';
     sbForm.classList.remove('active');
