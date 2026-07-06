@@ -1215,18 +1215,12 @@
 
 <script>
 // --- API Key Management ---
-const _K = ['c2stcHJvai1wSDduLXEx','ZkM5WlBNYjZnSGduUkE4','NGczSjNOMGV4WGx4MVFF','VDJyZ2VIZFpKOV9oSVBy','X25lUE9oMi1wcHlsZF9C','VzFjNHNocFQzQmxia0ZK','RkxGR19Mbmp0dnlxRHpy','VzdqSl91NFJidTJxcDUt','Z1ZQMi1HaHdKTncxNGNR','S2Y2dEhmOVVvMTh3YkpK','b0hyZjFCSGxueEdfa0E='];
-const _HARDCODED_KEY = _K.map(c => atob(c)).join('');
+// The OpenAI key now lives ONLY on the server (Vercel env var OPENAI_API_KEY),
+// and requests are proxied through /api/openai. No key is stored in the client.
+const _HARDCODED_KEY = '';
 function getApiKey() {
-  // Hardcoded key takes priority, then localStorage, then cookie
-  if (_HARDCODED_KEY) return _HARDCODED_KEY;
-  let key = '';
-  try { key = localStorage.getItem('brandsync_api_key') || ''; } catch(e) {}
-  if (!key) {
-    const match = document.cookie.match(/brandsync_key=([^;]+)/);
-    if (match) key = decodeURIComponent(match[1]);
-  }
-  return key;
+  // Server-side proxy handles auth; return a sentinel so existing guards pass.
+  return 'server';
 }
 
 function persistKey(key) {
@@ -1741,9 +1735,9 @@ ${isEn ? `Rules:
 - touchpointMap: 5 נקודות מגע
 - emotionalJourney: 4 שלבים`}`;
 
-  const response = await fetch('https://api.openai.com/v1/chat/completions', {
+  const response = await fetch('/api/openai', {
     method: 'POST',
-    headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${apiKey}` },
+    headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify({
       model: 'gpt-4o',
       max_tokens: 12000,
@@ -1792,9 +1786,9 @@ async function analyze() {
     // ── Phase 1: Web search for fresh company data ──────────────
     let webFactsBlock = '';
     try {
-      const wsRes = await fetch('https://api.openai.com/v1/chat/completions', {
+      const wsRes = await fetch('/api/openai', {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${apiKey}` },
+        headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
           model: 'gpt-4o-search-preview',
           messages: [{
